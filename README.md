@@ -5,7 +5,15 @@ ESCoE project to explore shortcomings of SIC taxonomy and build a new industrial
 
 ## Setup
 
-To configure git and build the environment simply run `make install`.
+Ensure you have AWS configured, and [git-crypt](https://github.com/AGWA/git-crypt) installed.
+
+To configure git, build the environment, and setup metaflow simply run `make install`.
+
+### Cache metaflow getters
+
+Adding `temp_dir` in a `.env` file, e.g. `temp_dir=/Users/<username>/GIT/industrial-taxonomy/data/interim/` will cause the metaflow getters to be pickled and cached in `temp_dir`. This cache will be checked and used first when running a getter - this saves downloading large files each time you run a getter at the expense of using more disk-space.
+
+Note: metaflow does do some limited caching by itself (i.e. without setting `temp_dir`) but is not as consistent and will not persist between reboots.
 
 ## Code-style
 
