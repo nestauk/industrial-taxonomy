@@ -5,7 +5,9 @@ ESCoE project to explore shortcomings of SIC taxonomy and build a new industrial
 
 ## Setup
 
-To configure git and build the environment simply run `make install`.
+Ensure you have AWS configured, and [git-crypt](https://github.com/AGWA/git-crypt) installed.
+
+To configure git, build the environment, and setup metaflow simply run `make install`.
 
 ## Code-style
 

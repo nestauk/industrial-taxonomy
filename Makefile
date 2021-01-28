@@ -33,7 +33,11 @@ endef
 # COMMANDS                                                                      #
 #################################################################################
 
-install: git create_environment
+install: git create_environment aws_metaflow
+
+## Get AWS metaflow config
+aws_metaflow:
+	$(call execute_in_env, bash bin/install_metaflow_aws.sh)
 
 ## Setup git filter for notebooks
 git:
