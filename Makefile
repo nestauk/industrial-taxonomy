@@ -9,6 +9,7 @@ BUCKET = industrial-taxonomy
 PROFILE = default
 PROJECT_NAME = industrial_taxonomy
 PYTHON_INTERPRETER = python3
+SHELL := /bin/bash
 
 ifeq (,$(shell which conda))
 HAS_CONDA=False
