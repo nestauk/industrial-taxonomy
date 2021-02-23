@@ -16,6 +16,8 @@ dependencies:
   - clang_osx-64  # [not linux]
   - gcc_linux-64  # [not darwin]
   - metaflow
+  - xlrd
+  - umap-learn
   # Put any conda dependencies here
 
   - pip:
@@ -44,3 +46,4 @@ dependencies:
   - pytest
   - mypy
   - jupytext
+  - sentence-transformers
