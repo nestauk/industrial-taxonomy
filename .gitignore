@@ -93,6 +93,9 @@ target/
 /data/interim/
 /data/processed/
 
+# Models
+/models/
+
 # Mac OS-specific storage files
 .DS_Store
 
