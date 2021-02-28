@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.10.0
+#       jupytext_version: 1.9.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -442,164 +442,219 @@ def print_classification_examples(X, y, preds, pred_type='tp', num_examples=5,
 print_classification_examples(X_test, y_test, pred_labels, pred_type='fp', 
                               label_lookup=label_section_lookup, max_chars=200)
 
-
 # %% [markdown]
 # ## Dynamic Padding and Uniform Batching
 
 # %%
+from dataclasses import dataclass, field
+
+@dataclass
+class Row:
+    text: str
+    label: int
+
+
+# %%
+from transformers.data.data_collator import DataCollator
+
+# %%
+import random
+import time
+
+from typing import Dict, Optional, List
+
+import torch
+from torch.utils.data.dataset import Dataset, IterableDataset
+from torch.utils.tensorboard import SummaryWriter
+from transformers import (AutoTokenizer, EvalPrediction, Trainer, 
+                          HfArgumentParser, TrainingArguments, 
+                          AutoModelForSequenceClassification, 
+                          set_seed, AutoConfig)
+from transformers import PreTrainedTokenizer, DataCollator, PreTrainedModel, PreTrainedTokenizerBase
+
 @dataclass
 class Features:
     input_ids: List[int]
     attention_mask: List[int]
     label: int
+    
+# class SICDataset(torch.utils.data.Dataset):
+#     def __init__(self, encodings, labels):
+#         self.encodings = encodings
+#         self.labels = [int(l) for l in labels]
 
-@dataclass
-class Example:
-    text: str
-    label: int
-        
-@dataclass
-class ModelParameters:
-    max_seq_len: Optional[int] = field(
-        default=None,
-        metadata={'help': 'max seq len'}
-    )
-    dynamic_padding: bool = field(
-        default=False,
-        metadata={'help': 'limit pad size at batch level'}
-    )
-    smart_batching: bool = field(
-        default=False,
-        metadata={'help': 'build batch of similar sizes'}
-    )
-    dynamic_batch_size: bool = field(
-        default=False,
-        metadata={'help': 'build batch of similar sizes'}
-    )
+#     def __getitem__(self, idx):
+#         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+#         item['labels'] = torch.tensor(self.labels[idx])
+#         return item
 
-class DynamicSICDataset(Dataset):
-    def __init__(self, tokenizer: PreTrainedTokenizer, pad_to_max_length: bool, max_len: int,
-                 examples: List[Example]) -> None:
+#     def __len__(self):
+#         return len(self.labels)
+    
+class DynamicDataset(Dataset):
+    def __init__(self, tokenizer: PreTrainedTokenizer,
+                pad_to_max_length: bool, max_len: int,
+                rows: List[Row]) -> None:
         self.tokenizer = tokenizer
         self.max_len = max_len
-        self.examples: List[Example] = examples
+        self.rows: List[Rows] = rows
         self.current = 0
         self.pad_to_max_length = pad_to_max_length
-
-    def encode(self, ex: Example) -> Features:
-        encode_dict = self.tokenizer.encode_plus(text=ex.text_a,
-                                                 text_pair=ex.text_b,
-                                                 add_special_tokens=True,
-                                                 max_length=self.max_len,
-                                                 pad_to_max_length=self.pad_to_max_length,
-                                                 return_token_type_ids=False,
-                                                 return_attention_mask=True,
-                                                 return_overflowing_tokens=False,
-                                                 return_special_tokens_mask=False,
-                                                 )
-        return Features(input_ids=encode_dict["input_ids"],
-                        attention_mask=encode_dict["attention_mask"],
-                        label=ex.label)
-
-    def __getitem__(self, idx) -> Features:  # Trainer doesn't support IterableDataset (define sampler)
-        if self.current == len(self.examples):
+        
+    def encode(self, row: Row) -> Features:
+        encode_dict = self.tokenizer(
+            text=row.text,
+            add_special_tokens=True,
+            max_length=self.max_len,
+            pad_to_max_length=self.pad_to_max_length,
+            return_token_type_ids=True,
+            return_attention_mask=True,
+            return_overflowing_tokens=False,
+            return_special_tokens_mask=False
+        )
+        return Features(input_ids=encode_dict['input_ids'],
+                        attention_mask=encode_dict['attention_mask'],
+                        label=row.label
+                       )
+    
+#     def __getitem__(self, i) -> Features:
+#         return self.encode(row=self.rows[i])
+    def __getitem__(self, _) -> Features:
+        if self.current == len(self.rows):
             self.current = 0
-        ex = self.examples[self.current]
+        row = self.rows[self.current]
         self.current += 1
-        return self.encode(ex=ex)
+        return self.encode(row)
 
     def __len__(self):
-        return len(self.examples)
-
-
+        return len(self.rows)
+        
 def pad_seq(seq: List[int], max_batch_len: int, pad_value: int) -> List[int]:
     return seq + (max_batch_len - len(seq)) * [pad_value]
 
 @dataclass
 class SmartCollator():
-    pad_token_id: int
-
-    def collate_batch(self, batch: List[Features]) -> Dict[str, torch.Tensor]:
+    tokenizer: PreTrainedTokenizerBase
+    
+    def __call__(self, batch):
+        return self._collate_batch(batch, self.tokenizer)
+        
+    def _collate_batch(self, batch: List[Features], tokenizer) -> Dict[str, torch.Tensor]:
         batch_inputs = list()
-        batch_attention_masks = list()
+        batch_attn_masks = list()
         labels = list()
-        max_size = max([len(ex.input_ids) for ex in batch])
+        max_size = max([len(item.input_ids) for item in batch])
         for item in batch:
-            batch_inputs += [pad_seq(item.input_ids, max_size, self.pad_token_id)]
-            batch_attention_masks += [pad_seq(item.attention_mask, max_size, 0)]
+            batch_inputs += [pad_seq(
+                item.input_ids, max_size, tokenizer.pad_token_id)]
+            batch_attn_masks += [pad_seq(
+                item.attention_mask, max_size, 0)]
             labels.append(item.label)
-
-        return {"input_ids": torch.tensor(batch_inputs, dtype=torch.long),
-                "attention_mask": torch.tensor(batch_attention_masks, dtype=torch.long),
-                "labels": torch.tensor(labels, dtype=torch.long)
-                }
-
-def load_transformers_model(pretrained_model_name_or_path: str,
-                            use_cuda: bool,
-                            mixed_precision: bool) -> PreTrainedModel:
-    config = AutoConfig.from_pretrained(pretrained_model_name_or_path=pretrained_model_name_or_path,
-                                        num_labels=3)
-    model = AutoModelForSequenceClassification.from_pretrained(
-        pretrained_model_name_or_path=pretrained_model_name_or_path,
-        config=config)
-    if use_cuda and torch.cuda.is_available():
-        device = torch.device('cuda')
-        model.to(device)
-
-    if mixed_precision:
-        try:
-            from apex import amp
-            model = amp.initialize(model, opt_level='O1')
-        except ImportError:
-            raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
+            
+        return {
+            'input_ids': torch.tensor(batch_inputs, dtype=torch.long),
+            'attention_mask': torch.tensor(batch_attn_masks, dtype=torch.long),
+            'labels': torch.tensor(labels, dtype=torch.long)
+               }
+    
+def load_transformers_model(model: str, use_cuda: bool) -> PreTrainedModel:
     return model
 
 
-def load_train_data(path: str, sort: bool) -> List[Example]:
-    sentences = list()
-    with open(path) as f:
-        first = False
-        for line in f:
-            if not first:
-                first = True
-                continue
-            text_a, text_b, label = line.rstrip().split("\t")
-            lab = len(text_a) + len(text_b)
-            sentences.append((lab, Example(text_a=text_a, text_b=text_b, label=label_codes[label])))
-    if sort:
-        sentences.sort(key=lambda x: x[0])
+# %%
+def model_init(frozen=False):
+    model = AutoModelForSequenceClassification.from_pretrained(
+        MODEL,
+        num_labels=N_LABELS,
+        return_dict=True)
+    if frozen:
+        for param in model.base_model.parameters():
+            param.requires_grad = False
+    return model
 
-    return [e for (_, e) in sentences]
-
-
-def load_dev_data(path: str) -> List[Example]:
-    sentences = list()
-    with open(path) as f:
-        for raw_line in f:
-            line = raw_line.split("\t")
-            if line[0] != "fr":
-                continue
-            text_a = line[6]
-            text_b = line[7]
-            label = line[1]
-            lab = len(text_a) + len(text_b)
-            sentences.append((lab, Example(text_a=text_a, text_b=text_b, label=label_codes[label])))
-
-    sentences.sort(key=lambda x: x[0])
-
-    return [e for (_, e) in sentences]
+def compute_metrics(pred):
+    labels = pred.label_ids
+    preds = pred.predictions.argmax(-1)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        labels, 
+        preds, 
+        average='micro'
+    )
+    acc = accuracy_score(labels, preds)
+    return {
+        'accuracy': acc,
+        'f1': f1,
+        'precision': precision,
+        'recall': recall
+    }   
 
 
-def build_batches(sentences: List[Example], batch_size: int) -> List[Example]:
-    batch_ordered_sentences = list()
-    while len(sentences) > 0:
-        to_take = min(batch_size, len(sentences))
-        select = random.randint(0, len(sentences) - to_take)
-        batch_ordered_sentences += sentences[select:select + to_take]
-        del sentences[select:select + to_take]
-    return batch_ordered_sentences
+# %%
+MODEL = 'distilbert-base-uncased'
+MAX_LEN = 256
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL)
+model = model_init()
 
 
+# %%
+def create_rows(text, labels):
+    lens = [len(t) for t in text]
+    _, text, labels = (list(t) for t in zip(*sorted(zip(lens, text, labels))))
+    return [Row(t, l) for t, l in zip(text, labels)]
+
+
+# %%
+args = TrainingArguments(output_dir=f"{project_dir}/models/test_dyn_padding",
+                         seed=123,
+                         num_train_epochs=1,
+                         per_device_train_batch_size=16,  # max batch size without OOM exception, because of the large max token length
+                         per_device_eval_batch_size=16,
+#                          evaluate_during_training=True,
+                         logging_steps=5000,
+                         save_steps=0,
+                        )
+
+# %%
+train = create_rows(X_train, y_train)
+val = create_rows(X_val, y_val)
+
+# %%
+train_set = DynamicDataset(
+    tokenizer=tokenizer,
+    max_len=MAX_LEN,
+    rows=train,
+    pad_to_max_length=False
+)
+
+# %%
+val_set = DynamicDataset(
+    tokenizer=tokenizer,
+    max_len=MAX_LEN,
+    rows=val,
+    pad_to_max_length=False
+)
+
+# %%
+trainer = Trainer(
+    model=model,
+    args=args,
+    train_dataset=train_set,
+#     data_collator=SmartCollator(pad_token_id=tokenizer.pad_token_id),
+    data_collator=SmartCollator(tokenizer=tokenizer),
+    eval_dataset=val_set,
+    compute_metrics=compute_metrics,
+)
+
+# %%
+start_time = time.time()
+trainer.train()
+print(f"training took {(time.time() - start_time) / 60:.2f}mn")
+# result = trainer.evaluate()
+# print(result)
+
+# %% [markdown]
+# ## Hyperparameter Tuning
 
 # %%
 import logging
