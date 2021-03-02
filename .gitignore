@@ -1,3 +1,5 @@
+*.key
+
 # Metaflow
 .metaflow
 metaflow.s3.*
