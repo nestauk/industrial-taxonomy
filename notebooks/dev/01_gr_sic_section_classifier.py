@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.9.1
+#       jupytext_version: 1.10.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -24,6 +24,12 @@
 # %%
 import yaml
 import os
+
+from sklearn.metrics import (classification_report, f1_score, 
+                             confusion_matrix)
+from imblearn.metrics import classification_report_imbalanced
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
 
 from industrial_taxonomy.getters.glass import get_organisation_description
 from industrial_taxonomy.getters.companies_house import get_sector
@@ -119,7 +125,7 @@ import torch
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
-    FRAC = 1
+    FRAC = .5
 else:
     device = torch.device("cpu")
     FRAC = 0.001
@@ -128,17 +134,16 @@ else:
 orgs_sample = orgs.sample(frac=FRAC, random_state=RANDOM_SEED)
 
 # %%
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-
-# %%
 le = LabelEncoder()
 sic_section_label = le.fit_transform(orgs_sample['SIC_section'])
 
-label_section_lookup = {le.transform([k])[0]: v for k, v in section_name_lookup.items()}
+# label_section_lookup = {le.transform([k])[0]: v for k, v in section_name_lookup.items()}
 
 # %%
 N_LABELS = le.classes_.shape[0]
+
+# %%
+N_LABELS
 
 # %%
 TRAIN_SIZE = 0.8
@@ -205,22 +210,8 @@ train_dataset = SICDataset(train_encodings, y_train)
 val_dataset = SICDataset(val_encodings, y_val)
 test_dataset = SICDataset(test_encodings, y_test)
 
-# %%
-from torch.utils.data import DataLoader
-from torch.utils.data.dataset import IterableDataset
-from dataclasses import dataclass, field
-
-# %%
-data_loader_opts = {
-    'batch_size': 32
-}
-
-train_dataloader = DataLoader(train_dataset, **data_loader_opts)
-val_dataloader = DataLoader(val_dataset, **data_loader_opts)
-test_dataloader = DataLoader(test_dataset, **data_loader_opts)
-
 # %% [markdown]
-# ## 4 HuggingFace + Ray
+# ## 4 HuggingFace
 
 # %% [markdown]
 # ### 4.1 Model Creation
@@ -331,10 +322,6 @@ loss
 preds = trainer.predict(test_dataset)
 pred_sectors = le.inverse_transform(np.argmax(preds.predictions, axis=1))
 pred_labels = np.argmax(preds.predictions, axis=1)
-
-# %%
-from sklearn.metrics import classification_report, f1_score, confusion_matrix
-from imblearn.metrics import classification_report_imbalanced
 
 
 # %%
@@ -465,7 +452,7 @@ from typing import Dict, Optional, List
 
 import torch
 from torch.utils.data.dataset import Dataset, IterableDataset
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 from transformers import (AutoTokenizer, EvalPrediction, Trainer, 
                           HfArgumentParser, TrainingArguments, 
                           AutoModelForSequenceClassification, 
@@ -605,15 +592,30 @@ def create_rows(text, labels):
 
 
 # %%
-args = TrainingArguments(output_dir=f"{project_dir}/models/test_dyn_padding",
-                         seed=123,
-                         num_train_epochs=1,
-                         per_device_train_batch_size=16,  # max batch size without OOM exception, because of the large max token length
-                         per_device_eval_batch_size=16,
-#                          evaluate_during_training=True,
-                         logging_steps=5000,
-                         save_steps=0,
-                        )
+# args = TrainingArguments(output_dir=f"{project_dir}/models/test_dyn_padding",
+#                          seed=RANDOM_SEED,
+#                          num_train_epochs=1,
+#                          per_device_train_batch_size=8,  # max batch size without OOM exception, because of the large max token length
+#                          per_device_eval_batch_size=8,
+# #                          evaluate_during_training=True,
+#                          logging_steps=5000,
+#                          save_steps=0,
+#                         )
+
+training_args = TrainingArguments(
+    learning_rate=1e-5,
+    output_dir=f'{project_dir}/models/sic4_bert_0',          # output directory
+    num_train_epochs=1,              # total number of training epochs
+    per_device_train_batch_size=8,  # batch size per device during training
+    per_device_eval_batch_size=16,   # batch size for evaluation
+    warmup_steps=500,                # number of warmup steps for learning rate scheduler
+    weight_decay=0.01,               # strength of weight decay
+    logging_dir='./logs',            # directory for storing logs
+    logging_steps=50,
+    fp16=True,
+    save_total_limit=2
+#     do_train=True,
+)
 
 # %%
 train = create_rows(X_train, y_train)
@@ -638,7 +640,7 @@ val_set = DynamicDataset(
 # %%
 trainer = Trainer(
     model=model,
-    args=args,
+    args=training_args,
     train_dataset=train_set,
 #     data_collator=SmartCollator(pad_token_id=tokenizer.pad_token_id),
     data_collator=SmartCollator(tokenizer=tokenizer),
@@ -648,10 +650,108 @@ trainer = Trainer(
 
 # %%
 start_time = time.time()
-trainer.train()
+loss = trainer.train()
 print(f"training took {(time.time() - start_time) / 60:.2f}mn")
 # result = trainer.evaluate()
 # print(result)
+
+# %%
+trainer.save_model(f'{project_dir}/models/sic4_bert_0/model')
+
+# %%
+loss.metrics['train_runtime'] / 60
+
+# %%
+test = create_rows(X_test, y_test)
+
+# %%
+test_set = DynamicDataset(
+    tokenizer=tokenizer,
+    max_len=MAX_LEN,
+    rows=test,
+    pad_to_max_length=False
+)
+
+# %%
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score
+
+# %%
+preds = trainer.predict(test_set)
+
+# %%
+pred_labels = np.argmax(preds.predictions, axis=1)
+pred_codes = le.inverse_transform(pred_labels)
+
+
+# %%
+def print_description_preds(dataset, pred_codes, topn=10, first=17000):
+    descriptions = [row.text for row in dataset.rows[first:first+topn]]
+    labels = pred_codes[first:first+topn]
+    
+    for d, l in zip(descriptions, labels):
+        print('- Pred:', section_name_lookup[l])
+        print('- Text:', d[:200] + '...', '\n')
+
+
+# %%
+print_description_preds(test_set, pred_codes)
+
+# %%
+import sentence_transformers
+
+# %%
+model = AutoModelForSequenceClassification.from_pretrained('../../models/sic_section_0/model/', 
+                                                        local_files_only=True)
+
+# %%
+training_args = TrainingArguments(
+    learning_rate=1e-5,
+    output_dir=f'{project_dir}/models/sic4_bert_0',          # output directory
+    num_train_epochs=1,              # total number of training epochs
+    per_device_train_batch_size=8,  # batch size per device during training
+    per_device_eval_batch_size=16,   # batch size for evaluation
+    warmup_steps=500,                # number of warmup steps for learning rate scheduler
+    weight_decay=0.01,               # strength of weight decay
+    logging_dir='./logs',            # directory for storing logs
+    logging_steps=50,
+    fp16=True,
+    save_total_limit=2
+#     do_train=True,
+)
+
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_set,
+#     data_collator=SmartCollator(pad_token_id=tokenizer.pad_token_id),
+    data_collator=SmartCollator(tokenizer=tokenizer),
+    eval_dataset=val_set,
+    compute_metrics=compute_metrics,
+)
+
+# %%
+preds = trainer.predict(test_set)
+
+# %%
+pred_labels = np.argmax(preds.predictions, axis=1)
+pred_codes = le.inverse_transform(pred_labels)
+
+
+# %%
+def print_description_preds(dataset, pred_codes, topn=10, first=17000):
+    descriptions = [row.text for row in dataset.rows[first:first+topn]]
+    labels = pred_codes[first:first+topn]
+    
+    for d, l in zip(descriptions, labels):
+        print('- Pred:', section_name_lookup[l])
+        print('- Text:', d[:200] + '...', '\n')
+
+
+# %%
+print_description_preds(test_set, pred_codes)
+
+# %%
 
 # %% [markdown]
 # ## Hyperparameter Tuning

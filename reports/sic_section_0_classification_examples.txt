@@ -1,0 +1,385 @@
+=== Label: A: Agriculture, Forestry And Fishing ===
+
+True: M: Professional, Scientific And Technical Activities
+Pred: A: Agriculture, Forestry And Fishing
+Description: Flinthill is a kennel showing and breeding Pointers and Irish Setters, based in County Durham... 
+
+True: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Pred: A: Agriculture, Forestry And Fishing
+Description: By giving us your email address/details you are agreeing to receive communications/promotions from Little Beau Sheep. Your details will be held solely by Little Beau Sheep and will not be shared with ... 
+
+True: N: Administrative And Support Service Activities
+Pred: A: Agriculture, Forestry And Fishing
+Description: At Peninsula Forestry, we are committed to offering your trees the best care and maintenance they can get. You can rely on us to provide high-quality tree care services that will maintain them in good... 
+
+True: I: Accommodation And Food Service Activities
+Pred: A: Agriculture, Forestry And Fishing
+Description: Wayside Farm is farmed by Charlie Wray. Wayside Farm is Hertfordshire’s one of only two remaining Jersey Herd Dairy Farm. The farm is situated on the outskirts of Kings Langley. Wayside Farm is a Hert... 
+
+True: N: Administrative And Support Service Activities
+Pred: A: Agriculture, Forestry And Fishing
+Description: At Essex Tree Care Ltd, we’re fully trained and equipped to provide proper care for your trees. You are guaranteed complete peace of mind, with work carried out by experienced staff at competitive rat... 
+
+
+=== Label: B: Mining And Quarrying ===
+
+True: M: Professional, Scientific And Technical Activities
+Pred: B: Mining And Quarrying
+Description: BHP is a world-leading resources company. We extract and process minerals, oil and gas, with more than 60,000 employees and contractors, primarily in Australia and the Americas. Our products are sold ... 
+
+
+=== Label: C: Manufacturing ===
+
+True: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Pred: C: Manufacturing
+Description: bitznfix in POOLE provides a complete range of appliance installation and repair services for all your everyday and emergency needs... 
+
+True: I: Accommodation And Food Service Activities
+Pred: C: Manufacturing
+Description: Our range of pies includes both savoury and sweet, a glorious  taste-bud tantalising spectrum of tastes and textures, a delicate  balancing act of seasonings, spices - resulting in pies that we  are p... 
+
+True: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Pred: C: Manufacturing
+Description: East London Brewing Company is situated at the end of Lammas Road, just of the Lea Bridge Road in E10, next to the Waterworks Nature Reserve. We are about 10 minutes from Lea Bridge overland station a... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: C: Manufacturing
+Description: The Reinhardt four- arm machine just keeps on producing and producing with zero downtime. If your competition does not have a machine as good as Reinhardt he is no competition at all. all in less than... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: C: Manufacturing
+Description: Onward Engineering speciallises in all aspects of on site machining such as line boring/bore weld recovery, in position keyway machining and refurbishment, slew ring face machining and drilling and br... 
+
+
+=== Label: D: Electricity, Gas, Steam And Air Conditioning Supply ===
+
+
+=== Label: E: Water Supply; Sewerage, Waste Management And Remediation Activities ===
+
+True: N: Administrative And Support Service Activities
+Pred: E: Water Supply; Sewerage, Waste Management And Remediation Activities
+Description: The Williamson family have been in the metal recycling business since 1927 and have 5 yards throughout Scotland and on our 4th generation of taking the business forward. The Williamson family bought R... 
+
+True: S: Other Service Activities
+Pred: E: Water Supply; Sewerage, Waste Management And Remediation Activities
+Description: Rainbow Water Services Ltd is an established company celebrating over 20 Years in Business based in Kent. We endeavour to deliver a hands-on can-do attitude, combined with up to date knowledge and exp... 
+
+True: S: Other Service Activities
+Pred: E: Water Supply; Sewerage, Waste Management And Remediation Activities
+Description: WasteCare are proud sponsors of the Zero Waste Awards for the third year running. The Awards underpin our focus on minimising landfill and maximising the financial return to clients from recovered met... 
+
+True: D: Electricity, Gas, Steam And Air Conditioning Supply
+Pred: E: Water Supply; Sewerage, Waste Management And Remediation Activities
+Description: More so than ever, local authorities need to ensure they are choosing the most cost effective and sustainable solution for the recycling and treatment of organic wastes.  We are aware of the issues th... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: E: Water Supply; Sewerage, Waste Management And Remediation Activities
+Description: Hammond Lane Metal Co. was acquired by The Clearway Group in 1999 and the company continues to trade in that name that has been synonymous with metal recycling in Ireland for over 100 years. Hammond L... 
+
+
+=== Label: F: Construction ===
+
+True: N: Administrative And Support Service Activities
+Pred: F: Construction
+Description: At Paul Newman New Homes each and every new development we undertake is bespoke. We pride ourselves on our continual ability to produce individually striking, unique homes and new communities which tr... 
+
+True: U: Activities Of Extraterritorial Organisations And Bodies
+Pred: F: Construction
+Description: We are a family owned company with traditional family values and are one of the only chartered building companies in the South West. We are passionate about building modern, environmentally friendly h... 
+
+True: N: Administrative And Support Service Activities
+Pred: F: Construction
+Description: DLJ Services was started with the idea that we could provide the best exterior renovation services in the region. With our attention to detail and our high expectations of ourselves we have been able ... 
+
+True: S: Other Service Activities
+Pred: F: Construction
+Description: With over 20 years of experience in the double glazing industry Colney Windows & Doors are one of the leading installers of new replacement double glazing, UPVC windows and doors of South East England... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: F: Construction
+Description: Edwards Diving Services (EDS) are a vastly experienced, multi-disciplined civil & marine engineering services contractor, capable of delivering tailor made solutions for today’s dynamic engineering wo... 
+
+
+=== Label: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles ===
+
+True: F: Construction
+Pred: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Description: Coe Carpets offers a professional home select carpet supply and fitting service.  We are a small family run independent business, established for over 40 years, based in Newmarket, Suffolk.... 
+
+True: N: Administrative And Support Service Activities
+Pred: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Description: Established in 1996, and being based in Dingle just outside Liverpool City Centre, we specialise in delivering a fantastic level of choice for people who want to make their homes look wonderful withou... 
+
+True: N: Administrative And Support Service Activities
+Pred: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Description: Off the Pole is brought to you by Sarah Scott... 
+
+True: U: Activities Of Extraterritorial Organisations And Bodies
+Pred: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Description: Costume Boutique offers an exclusive collection of quality costumes for hire to Private Customers, Parties, Stylists, Costume Designers, Photographers, PR and Event Agencies and also to Production Com... 
+
+True: C: Manufacturing
+Pred: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Description: At The Coffee Officina, we have our own technique of roasting coffee beans, as we believe that every coffee bean should be treated differently. We have been an established coffee roasting company sinc... 
+
+
+=== Label: H: Transportation And Storage ===
+
+True: F: Construction
+Pred: H: Transportation And Storage
+Description: We have a large fleet of vehicles covering the North East and our bulk tippers, low loaders and plant transporters can accommodate even the most complex loads.... 
+
+True: C: Manufacturing
+Pred: H: Transportation And Storage
+Description: Marine Services Chirk is a family run business with vastly experienced employees who can cater for any of your canal boating needs. As a Boat Retailers And Brokers Association member you can confident... 
+
+True: F: Construction
+Pred: H: Transportation And Storage
+Description: Commencing Trading in 1949, S.& R. Smith & Son is a long established South Eastern regional specialist distribution company. Over the years we have strived to provide and maintain the best possible se... 
+
+True: L: Real Estate Activities
+Pred: H: Transportation And Storage
+Description: Based in Cowes Vestige Storage provides all your storage needs across the Isle of Wight including self storage, caravan & other vehicle storage, rental... 
+
+True: N: Administrative And Support Service Activities
+Pred: H: Transportation And Storage
+Description: 2012 saw a milestone reached as JAK Travel passed the 25 years of being a coach tour operator. From a standing start of not having been in the industry before, and with no contacts or contracts, it is... 
+
+
+=== Label: I: Accommodation And Food Service Activities ===
+
+True: N: Administrative And Support Service Activities
+Pred: I: Accommodation And Food Service Activities
+Description: We're also proud to be one of the few fine dining Fitzrovia restaurants to offer an extensive vegetarian menu. For lunch, we offer a set menu of two plates for £22 or three plates for £28, alongside o... 
+
+True: K: Financial And Insurance Activities
+Pred: I: Accommodation And Food Service Activities
+Description: This house lies 1 mile west of the village of Dale on the St. Anne’s Head peninsular. It is close to a number of delightful beaches and enjoys spectacular sea views, south to Milford haven and Linney ... 
+
+True: R: Arts, Entertainment And Recreation
+Pred: I: Accommodation And Food Service Activities
+Description: At Yeaveley Estate we have been offering Corporate entertainment since the early 1960’s; with a proven track record in corporate entertainment of over 50 years we are very confident that we have the e... 
+
+True: A: Agriculture, Forestry And Fishing
+Pred: I: Accommodation And Food Service Activities
+Description: The fascinating North Shields Fish Quay dates back to the 13th Century. Amongst its many historical components is Clifford’s Fort, a Scheduled Ancient Monument located in the heart of the Quay, built ... 
+
+True: L: Real Estate Activities
+Pred: I: Accommodation And Food Service Activities
+Description: If you are thinking of visiting the Isle of Wight then look no further than the Richmond Apartments for your stay. The Richmond Apartments offer the most spectacular views of Ventnor Bay. It is situat... 
+
+
+=== Label: J: Information And Communication ===
+
+True: M: Professional, Scientific And Technical Activities
+Pred: J: Information And Communication
+Description: Superlative Solutions has over 25 years experience of building complex IT and Telecommunications systems and services covering a wide range of technologies, products, and tools. Our expertise ranges f... 
+
+True: S: Other Service Activities
+Pred: J: Information And Communication
+Description: Our team have been pioneers in recruitment technology even before we set out to launch SourceChain, delivering hiring solutions to leading businesses for over a decade. We've had the opportunity to wo... 
+
+True: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Pred: J: Information And Communication
+Description: We do not warrant or represent that the right to be identified as the author of any of the literary and artistic works in the pages in this Website has been waived. You may print or download any of th... 
+
+True: R: Arts, Entertainment And Recreation
+Pred: J: Information And Communication
+Description: What we do Mirage, at its heart, is a creative agency with production expertise. We deliver print campaigns, but we believe that film and video are more powerful than ever. The explosion of mobile dev... 
+
+True: R: Arts, Entertainment And Recreation
+Pred: J: Information And Communication
+Description: The Heretic Pixes are an original character series designed by Pale Heretic. They are available on a range of branded products and we have figures in development. The Heretic Pixies also have a galler... 
+
+
+=== Label: K: Financial And Insurance Activities ===
+
+True: N: Administrative And Support Service Activities
+Pred: K: Financial And Insurance Activities
+Description: We understand that you are a shareholder in London Asia Capital plc, formerly known as Netvest plc, as your name and address has been provided to us by your custodian. Your shares in London Asia Capit... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: K: Financial And Insurance Activities
+Description: ALG Financial is a London-based consultancy firm, providing assistance and support to small and medium-sized businesses across the UK. We prioritize our clients’ best interests and aim to build long-t... 
+
+True: N: Administrative And Support Service Activities
+Pred: K: Financial And Insurance Activities
+Description: At Robert Cavendish we understand that the Financial Services market is in constant change. Consequently, we realise that our success derives from us being utterly focused and flexible so that we can ... 
+
+True: J: Information And Communication
+Pred: K: Financial And Insurance Activities
+Description: RetireEasy is the UK’s only independent retirement planning tool. LifePlan gives you an overview of all of your assets – including investments, pensions, savings, business assets and properties – and ... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: K: Financial And Insurance Activities
+Description: Applying over 25 years of international insurance, broking, training, auditing and risk management experience, Pilkington Solutions provides its clients with a tailor-made and bespoke solution for the... 
+
+
+=== Label: L: Real Estate Activities ===
+
+True: F: Construction
+Pred: L: Real Estate Activities
+Description: Family Homes are Independent Sales, Lettings and Property Management Specialists. Our offices are based in Sittingbourne, covering all of Kent; including Sonora Fields, Great East Hall, Newington, Tun... 
+
+True: F: Construction
+Pred: L: Real Estate Activities
+Description: Links Commercial Property Consultants was established in January 2008 by David Matthews MRICS. Our aim is to offer sound advice to landlords, tenants and investors and to their professional advisers a... 
+
+True: N: Administrative And Support Service Activities
+Pred: L: Real Estate Activities
+Description: Constrat Limited find innovative solutions to solve property challenges in residential, industrial and commercial acquisitions across the UK.... 
+
+True: F: Construction
+Pred: L: Real Estate Activities
+Description: In addition to purchasing opportunities outright, Denman House Estates works alongside landowners to secure residential or mixed-use consents from local planning authorities as swiftly as possible and... 
+
+True: J: Information And Communication
+Pred: L: Real Estate Activities
+Description: FOR SALE: Kootenay Lake commercial real estate property business, waterfront resort, lodge, restaurant, executive house & home near Nelson BC in Balfour BC... 
+
+
+=== Label: M: Professional, Scientific And Technical Activities ===
+
+True: P: Education
+Pred: M: Professional, Scientific And Technical Activities
+Description: Established in 2010 Northern Management Development brings together a number of highly skilled trainers and coaches to offer a major quality resource for individual and organisational development. We ... 
+
+True: Q: Human Health And Social Work Activities
+Pred: M: Professional, Scientific And Technical Activities
+Description: Successful businesses are built and run by people who work well with other people. Managing relationships is a fundamental skill for success. Productive collaborative relationships are absolutely esse... 
+
+True: Q: Human Health And Social Work Activities
+Pred: M: Professional, Scientific And Technical Activities
+Description: Realife is part of a new ERASMUS funded project led by our friends from Rytmus in the Czech Republic with a partnership that includes self-advocates from Austria, Spain and Croatia. The first visit is... 
+
+True: Q: Human Health And Social Work Activities
+Pred: M: Professional, Scientific And Technical Activities
+Description: We are professionals with different knowledge and background in laboratory medicine. Our experience in multiple fields comprises training, scientific marketing, clinical routine, research, business de... 
+
+True: S: Other Service Activities
+Pred: M: Professional, Scientific And Technical Activities
+Description: CMR Consultancy & Training work with a broad range of companies & Industries where all of the growth has been established through recommendations and referrals. In order to be this successful across s... 
+
+
+=== Label: N: Administrative And Support Service Activities ===
+
+True: C: Manufacturing
+Pred: N: Administrative And Support Service Activities
+Description: Diamond Security Systems was formed in Poole, Dorset in 1993. The owners have over 35 years in the electronics/electrical industry. With tremendous growth in our customer base in  Diamond Security Sys... 
+
+True: F: Construction
+Pred: N: Administrative And Support Service Activities
+Description: TWS Contracts Ltd is a cleaning services company based in the South East of England. At TWS Contracts Ltd we are dedicated to providing a complete range of specialist cleaning services to business and... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: N: Administrative And Support Service Activities
+Description: OUR MISSION - Proviso Systems Ltd is a company that takes its mission very seriously to change the way the UK performs predictive maintenance. We recognise that by maintaining our commitment towards o... 
+
+True: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Pred: N: Administrative And Support Service Activities
+Description: Hooper Services is the brainchild of Ian Hooper, who has been at the helm since day one in 1990. Mr Hooper started his career repairing cleaning machinery for a company that sent him all over the coun... 
+
+True: I: Accommodation And Food Service Activities
+Pred: N: Administrative And Support Service Activities
+Description: Portscatho Holidays is a family run business which was established in 1982 with roots going back to the fifties, and has the largest selection of self catering holiday homes on the beautiful Roseland ... 
+
+
+=== Label: O: Public Administration And Defence; Compulsory Social Security ===
+
+
+=== Label: P: Education ===
+
+True: J: Information And Communication
+Pred: P: Education
+Description: Our winning format has now taught tens of thousands of families how to enjoy signing with their babies. After the initial launch of classes in Brighton the Sing and Sign Video was made and later in th... 
+
+True: R: Arts, Entertainment And Recreation
+Pred: P: Education
+Description: Our passionate, friendly, helpful and award winning staff strive to make a difference to your scuba education experience. For all us us at DiveMania Scuba, teaching people to dive is something we all ... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: P: Education
+Description: Athenoya runs highly interactive and practical presentation skills training courses for all levels. Our courses encourage the learning and development of new skills with a friendly and supportive appr... 
+
+True: N: Administrative And Support Service Activities
+Pred: P: Education
+Description: A Global Educational Centre University of Nicosia, with its affiliated college Intercollege and its training organisation Globaltraining.... 
+
+True: Q: Human Health And Social Work Activities
+Pred: P: Education
+Description: We are a company that specialise in providing support and advice to schools about all areas of their provision for Social, Emotional and Mental Health (SEMH) and Well-Being. Schools are now being requ... 
+
+
+=== Label: Q: Human Health And Social Work Activities ===
+
+True: S: Other Service Activities
+Pred: Q: Human Health And Social Work Activities
+Description: Willcob Care is a team of Health and Social Care Professionals with extensive industry experience. Through our proven experience, we provide specialist assessments and well-trained professionals to de... 
+
+True: P: Education
+Pred: Q: Human Health And Social Work Activities
+Description: We are a tight knit team of 7 part time staff, with a huge amount of experience in working with young children. We are a charity, managed by a committee of trustees.... 
+
+True: S: Other Service Activities
+Pred: Q: Human Health And Social Work Activities
+Description: We are a friendly pro-active group of blind and partially sighted people, meeting on a regular basis. It is about what we can do, not what we can't do.... 
+
+True: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Pred: Q: Human Health And Social Work Activities
+Description: Our premises are equipped with the finest ophthalmic technology, enabling us to carry out precision eye examinations. Nu-Sight offer innovative eye care solutions, such as the Ortho-K contact lens – e... 
+
+True: H: Transportation And Storage
+Pred: Q: Human Health And Social Work Activities
+Description: Ablewell Care, based in Macclesfield, provides homecare solutions in and around East Cheshire, to people where care or support is required. From 15 minute check visits to blocks of respite care, Ablew... 
+
+
+=== Label: R: Arts, Entertainment And Recreation ===
+
+True: M: Professional, Scientific And Technical Activities
+Pred: R: Arts, Entertainment And Recreation
+Description: We are a Hereford based pyrotechnics and special effects company providing unique contract special effects services for the entertainment industry, individuals and organisations. At Smoking Boots, our... 
+
+True: J: Information And Communication
+Pred: R: Arts, Entertainment And Recreation
+Description: We use a mix of modern and vintage instruments, so we can recreate a true warm acoustic sound. Unlike many other duos, we use a selection of acoustic instruments. When performing with two acoustic gui... 
+
+True: G: Wholesale And Retail Trade; Repair Of Motor Vehicles And Motorcycles
+Pred: R: Arts, Entertainment And Recreation
+Description: A realm that worships a myriad of gods. Traditions that echo of untold stories and great passion. And people constantly reinventing themselves. We deem ourselves capable of communicating these stories... 
+
+True: S: Other Service Activities
+Pred: R: Arts, Entertainment And Recreation
+Description: We have a wide range of groups that you can be part of, whether it’s costume you are interested in, audio/visual, catering or set design. It’s your chance to get involved in one of the UK’s best amate... 
+
+True: P: Education
+Pred: R: Arts, Entertainment And Recreation
+Description: Whether you want your child to be the next dance star or just want to give them a healthy lifestyle, we can help you with our exciting dance classes. If you're anywhere in Greenwich, Blackheath, Lewis... 
+
+
+=== Label: S: Other Service Activities ===
+
+True: Q: Human Health And Social Work Activities
+Pred: S: Other Service Activities
+Description: Gordano Valley Church is committed to working closely with other churches in the Portishead.  We may meet in different locations and express our faith in different ways but we have a common purpose, t... 
+
+True: J: Information And Communication
+Pred: S: Other Service Activities
+Description: The Scottish Association of Landlords (SAL) came to Tall Projects in 2016 after two other companies were unable to deliver the required membership technology. We started by understanding how SAL works... 
+
+True: Q: Human Health And Social Work Activities
+Pred: S: Other Service Activities
+Description: Use the About menu options to find out more about our vision, mission and values... Meet our Trustees and our regional staff team... Discover churches around the UK who partner with us... Link to part... 
+
+True: M: Professional, Scientific And Technical Activities
+Pred: S: Other Service Activities
+Description: Undercover Glamour is the first choice for brides for achieving their perfect wedding look. We love helping brides and bridesmaids select the right bra for their dress, and advising on the right hair ... 
+
+True: U: Activities Of Extraterritorial Organisations And Bodies
+Pred: S: Other Service Activities
+Description: Part time voluntary role. The Disabled Students’ Officer role is one of the three liberation positions at The Students’ Union at UWE. Liberation is the movement for the removal of discrimination and o... 
+
+
+=== Label: T: Activities Of Households As Employers; Undifferentiated Goods-and Services-producing Activities Of Households For Own Use ===
+
+
+=== Label: U: Activities Of Extraterritorial Organisations And Bodies ===

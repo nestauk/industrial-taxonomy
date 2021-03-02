@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.9.1
+#       jupytext_version: 1.10.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -56,10 +56,8 @@ sic_2007 = load_sic_taxonomy()
 
 # %%
 sic4_lookup = extract_sic_code_description(sic_2007, 'Class')
-sic4_structure_df = pd.read_csv('../../data/aux/sic4_2007_structure.csv')
-
-# %%
-sic4_structure_df[sic4_structure_df['description'].str.contains('spirits')]
+sic4_structure_df = pd.read_csv('../../data/aux/sic_2007_structure.csv')
+sic4_structure_df['sic4'] = sic4_structure_df['sic4'].astype(str).str.zfill(4)
 
 
 # %%
