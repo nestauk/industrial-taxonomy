@@ -3,7 +3,7 @@
 import logging
 import pandas as pd
 from yake import KeywordExtractor
-from industrial_taxonomy.extractor.utils import get_top_kws
+from industrial_taxonomy.extraction.utils import get_top_terms
 
 
 def get_yake_phrases(
@@ -29,6 +29,6 @@ def get_yake_phrases(
         yake_ks = yake_extractor.extract_keywords(c)
         keywords.append([x[0] for x in yake_ks[:top_t]])
 
-    top_kws = get_top_kws(keywords, min_thres)
+    top_kws = get_top_terms(keywords, min_thres)
 
     return top_kws

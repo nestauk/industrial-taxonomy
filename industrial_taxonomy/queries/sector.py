@@ -47,9 +47,7 @@ def get_glass_descriptions_SIC_sectors(
         .assign(division=lambda df: [x[:2] for x in df["SIC5_code"]])
         # Drop duplicated organisations
         .drop_duplicates(subset=["org_id"])
-        .drop(
-            axis=1, labels=["rank", "data_dump_date"]
-        )
+        .drop(axis=1, labels=["rank", "data_dump_date"])
         .reset_index(drop=True)
     )
     return sectors_descriptions

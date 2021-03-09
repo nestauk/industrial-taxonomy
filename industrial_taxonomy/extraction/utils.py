@@ -3,7 +3,7 @@ from itertools import chain
 import pandas as pd
 
 
-def return_top_terms(_list, min_thres):
+def get_top_terms(_list, min_thres) -> pd.Series:
     """Takes a list of keyword lists and returns their frequencies if
     above a threshold
     """

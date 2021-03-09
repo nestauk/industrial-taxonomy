@@ -5,3 +5,9 @@ flows:
     run_id: 414
 params:
   match_threshold: 60
+extraction:
+  keybert:
+    use_maxsum: True
+  sample:
+    sample_size: 10000
+    divisions: ['62','74']
