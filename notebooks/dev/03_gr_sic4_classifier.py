@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.9.1
+#       jupytext_version: 1.10.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -22,14 +22,13 @@
 # %run ../notebook_preamble.ipy
 
 # %%
-# !pip install imbalanced-learn
-
-# %%
 import yaml
 import os
 
 from sklearn.metrics import (classification_report, f1_score, 
-                             confusion_matrix)
+                             confusion_matrix, accuracy_score,
+                             precision_recall_fscore_support
+                             )
 from imblearn.metrics import classification_report_imbalanced
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -128,7 +127,7 @@ import torch
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
-    FRAC = .5
+    FRAC = 1
 else:
     device = torch.device("cpu")
     FRAC = 0.001
@@ -149,7 +148,7 @@ N_LABELS = le.classes_.shape[0]
 N_LABELS
 
 # %%
-TRAIN_SIZE = 0.8
+TRAIN_SIZE = 0.7
 VAL_SIZE=0.5
 
 # %%
@@ -180,6 +179,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Row:
+    index: int
     text: str
     label: int
 
@@ -321,17 +321,18 @@ def compute_metrics(pred):
 
 # %%
 MODEL = 'distilbert-base-uncased'
-MAX_LEN = 256
+MAX_LEN = 512
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL)
 model = model_init()
 
 
 # %%
-def create_rows(text, labels):
+def create_rows(ids, text, labels):
     lens = [len(t) for t in text]
-    _, text, labels = (list(t) for t in zip(*sorted(zip(lens, text, labels))))
-    return [Row(t, l) for t, l in zip(text, labels)]
+    _, ids, text, labels = (list(t) for t in 
+                       zip(*sorted(zip(lens, ids, text, labels))))
+    return [Row(i, t, l) for i, t, l in zip(ids, text, labels)]
 
 
 # %%
@@ -347,7 +348,7 @@ def create_rows(text, labels):
 
 training_args = TrainingArguments(
     learning_rate=1e-5,
-    output_dir=f'{project_dir}/models/sic4_bert_0',          # output directory
+    output_dir=f'{project_dir}/models/sic4_bert_1',          # output directory
     num_train_epochs=1,              # total number of training epochs
     per_device_train_batch_size=8,  # batch size per device during training
     per_device_eval_batch_size=16,   # batch size for evaluation
@@ -357,7 +358,6 @@ training_args = TrainingArguments(
     logging_steps=50,
     fp16=True,
     save_total_limit=2
-#     do_train=True,
 )
 
 # %%
@@ -385,11 +385,13 @@ trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=train_set,
-#     data_collator=SmartCollator(pad_token_id=tokenizer.pad_token_id),
     data_collator=SmartCollator(tokenizer=tokenizer),
     eval_dataset=val_set,
     compute_metrics=compute_metrics,
 )
+
+# %%
+from scipy.special import softmax
 
 # %%
 start_time = time.time()
@@ -399,7 +401,7 @@ print(f"training took {(time.time() - start_time) / 60:.2f}mn")
 # print(result)
 
 # %%
-trainer.save_model(f'{project_dir}/models/sic4_bert_0/model')
+trainer.save_model(f'{project_dir}/models/sic4_bert_1/model')
 
 # %%
 loss.metrics['train_runtime'] / 60
@@ -425,7 +427,7 @@ trainer = Trainer(
 )
 
 # %%
-test = create_rows(X_test, y_test)
+test = create_rows(X_test.index, X_test, y_test)
 
 # %%
 test_set = DynamicDataset(
@@ -439,6 +441,7 @@ test_set = DynamicDataset(
 preds = trainer.predict(test_set)
 
 # %%
+pred_probs = softmax(preds.predictions, axis=1)
 pred_labels = np.argmax(preds.predictions, axis=1)
 pred_codes = le.inverse_transform(pred_labels)
 
@@ -463,15 +466,22 @@ def create_pred_table(rows, preds, label_encoder):
     preds = label_encoder.inverse_transform(preds)
     labels = label_encoder.inverse_transform([r.label for r in rows])
     text = [r.text for r in rows]
+    ids = [r.index for r in rows]
     
-    return pd.DataFrame({'text': text, 'label': labels, 'pred': preds})
+    return pd.DataFrame({'id': ids, 'text': text, 'label': labels, 'pred': preds})
 
 
 # %%
 pred_table = create_pred_table(test, pred_labels, le)
 
 # %%
-pred_table.to_csv('../../data/interim/sic4_test_predictions.csv', index=False)
+merge_cols = ['org_id', 'company_number', 'date', 'data_dump_date']
+pred_table = pred_table.merge(orgs_sample[merge_cols],
+                              left_on='id', right_index=True, how='inner')
+
+# %%
+pred_table.to_csv('../../data/processed/sic4_test_predictions.csv', 
+                  index=False)
 
 # %%
 from sentence_transformers import SentenceTransformer
@@ -482,7 +492,15 @@ st = SentenceTransformer(bert_model)
 test_encodings = st.encode(pred_table['text'])
 
 # %%
-np.save('../../data/interim/sic4_test_embeddings.np', test_encodings)
+np.save('../../data/processed/sic4_test_embeddings.np', test_encodings)
+np.save('../../data/processed/sic4_test_pred_probs.np', test_encodings)
+
+# %%
+import joblib('../../models/processed/sic4_test_embeddings.np')
+
+# %%
+with open('../../models/sic4_bert_1/label_encoder.pkl', 'wb') as f:
+    joblib.dump(le, f)
 
 # %% [markdown]
 # ### 3.2 Tokenization
@@ -923,144 +941,5 @@ best_run = trainer.hyperparameter_search(
 
 # %%
 ray.shutdown()
-
-# %% [markdown]
-# ## Evaluation
-
-# %%
-embeddings = np.load('../../data/raw/sic4_test_embeddings.npy')
-
-# %%
-sic4_structure_df = pd.read_csv('../../data/aux/sic4_2007_structure.csv')
-
-# %%
-sic4_structure_df['sic4'] = sic4_structure_df['sic4'].astype(str).str.zfill(4)
-sic4_structure_df.head()
-
-# %%
-test_df = pd.read_csv('../../data/raw/sic4_test_predictions.csv')
-
-for col in ['label', 'pred']:
-    test_df[col] = test_df[col].astype(str).str.zfill(4)
-
-# %%
-from sklearn.metrics import classification_report
-
-# %%
-print(classification_report(test_df['label'], test_df['pred']))
-
-# %%
-sic4_product_group_lookup = {code: group for code, group 
-                             in zip(sic4_structure_df['sic4'], sic4_structure_df['product_group'])}
-
-# %%
-test_df['label_group'] = test_df['label'].map(sic4_product_group_lookup)
-test_df['pred_group'] = test_df['pred'].map(sic4_product_group_lookup)
-
-# %%
-test_df.head()
-
-# %%
-test_df = test_df.dropna()
-
-# %%
-print(classification_report(test_df['label_group'], test_df['pred_group']))
-
-# %%
-from sklearn.decomposition import TruncatedSVD
-from umap import UMAP
-
-# %%
-svd = TruncatedSVD(n_components=30)
-umap = UMAP(n_components=2)
-
-# %%
-svd_vecs = svd.fit_transform(embeddings)
-umap_vecs = umap.fit_transform(svd_vecs)
-
-# %%
-umap_vecs = mms.fit_transform(umap_vecs)
-
-# %%
-plt.scatter(umap_vecs[:, 0], umap_vecs[:, 1], alpha=0.05)
-
-# %%
-import altair as alt
-
-# %%
-test_df['Predicted'] = test_df['pred'].map(sic4_name_lookup)
-test_df['Label'] = test_df['label'].map(sic4_name_lookup)
-
-# %%
-test_df['Snippet'] = test_df['text'].str[:280] + '...'
-
-# %%
-test_df['UMAP 0'] = umap_vecs[:, 0]
-test_df['UMAP 1'] = umap_vecs[:, 1]
-
-# %%
-test_df_ = test_df.dropna().sample(frac=0.1)
-
-# %%
-alt.Chart(test_df_).mark_circle(size=40).encode(
-    x='UMAP 0',
-    y='UMAP 1',
-    tooltip=['Label', 'Predicted', 'Snippet']
-)
-
-# %%
-plt.hist(test_df['Label'].value_counts(), bins=600, cumulative=True, density='normed', histtype='step');
-
-# %%
-top_labels = pd.merge(
-    test_df['Label'].value_counts()[:20], 
-    test_df['Predicted'].value_counts()[:20], 
-    right_index=True, left_index=True)
-
-# %%
-fig, ax = plt.subplots()
-top_labels.plot.barh(ax=ax)
-ax.set_xlabel('Frequency')
-# plt.tight_layout()
-plt.savefig('../../figures/predicted_true_freq_sic4_codes_barh.png', dpi=300, bbox_inches='tight');
-
-# %%
-test_df['Label'].value_counts()[:10]
-
-# %%
-pred_ratios = test_df['Predicted'].value_counts() / test_df['Label'].value_counts()
-
-# %%
-fig, axs = plt.subplots(nrows=2, figsize=(5, 8))
-
-pred_ratios.sort_values(ascending=False)[:20][::-1].plot.barh(ax=axs[0])
-
-pred_ratios.sort_values(ascending=True)[:20].plot.barh(color='C3', ax=axs[1])
-
-axs[1].set_xlabel('N Predicted / N True')
-plt.tight_layout()
-plt.savefig('../../figures/predicted_true_ratio_sic4_codes_barh.png', dpi=300, bbox_inches='tight');
-
-
-# %%
-top_labels = pd.merge(
-    test_df['Label'].value_counts(), 
-    test_df['Predicted'].value_counts(), 
-    right_index=True, left_index=True)
-
-# %%
-top_labels['Ratio'] = top_labels['Predicted'] / top_labels['Label']
-top_labels['colour'] = ['C0' if y >= 1 else 'C3' for y in top_labels['Ratio']]
-
-# %%
-plt.scatter(top_labels['Label'], top_labels['Ratio'], c=top_labels['colour'])
-
-# %%
-test_df = test_df.rename(columns={'text': 'Description'})
-
-# %%
-test_df_sample = test_df.sample(10)[['Description', 'Label', 'Predicted']]
-test_df_sample['Description'] = test_df_sample['Description'].str[:200]
-test_df_sample.to_markdown('../../figures/test_sample.md', index=False)
 
 # %%
