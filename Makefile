@@ -57,8 +57,12 @@ lint:
 sync_data_to_s3:
 ifeq (default,$(PROFILE))
 	aws s3 sync data/raw s3://$(BUCKET)/data/raw
+	aws s3 sync data/processed s3://$(BUCKET)/data/processed
+	aws s3 sync models s3://$(BUCKET)/models
 else
 	aws s3 sync data/raw s3://$(BUCKET)/data/raw --profile $(PROFILE)
+	aws s3 sync data/processed s3://$(BUCKET)/data/processed --profile $(PROFILE)
+	aws s3 sync models s3://$(BUCKET)/models --profile $(PROFILE)
 endif
 
 ## Download Data from S3
