@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.10.0
+#       jupytext_version: 1.9.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -20,6 +20,9 @@
 
 # %%
 # %run ../notebook_preamble.ipy
+
+# %%
+# !pip install imbalanced-learn
 
 # %%
 import yaml
@@ -920,5 +923,144 @@ best_run = trainer.hyperparameter_search(
 
 # %%
 ray.shutdown()
+
+# %% [markdown]
+# ## Evaluation
+
+# %%
+embeddings = np.load('../../data/raw/sic4_test_embeddings.npy')
+
+# %%
+sic4_structure_df = pd.read_csv('../../data/aux/sic4_2007_structure.csv')
+
+# %%
+sic4_structure_df['sic4'] = sic4_structure_df['sic4'].astype(str).str.zfill(4)
+sic4_structure_df.head()
+
+# %%
+test_df = pd.read_csv('../../data/raw/sic4_test_predictions.csv')
+
+for col in ['label', 'pred']:
+    test_df[col] = test_df[col].astype(str).str.zfill(4)
+
+# %%
+from sklearn.metrics import classification_report
+
+# %%
+print(classification_report(test_df['label'], test_df['pred']))
+
+# %%
+sic4_product_group_lookup = {code: group for code, group 
+                             in zip(sic4_structure_df['sic4'], sic4_structure_df['product_group'])}
+
+# %%
+test_df['label_group'] = test_df['label'].map(sic4_product_group_lookup)
+test_df['pred_group'] = test_df['pred'].map(sic4_product_group_lookup)
+
+# %%
+test_df.head()
+
+# %%
+test_df = test_df.dropna()
+
+# %%
+print(classification_report(test_df['label_group'], test_df['pred_group']))
+
+# %%
+from sklearn.decomposition import TruncatedSVD
+from umap import UMAP
+
+# %%
+svd = TruncatedSVD(n_components=30)
+umap = UMAP(n_components=2)
+
+# %%
+svd_vecs = svd.fit_transform(embeddings)
+umap_vecs = umap.fit_transform(svd_vecs)
+
+# %%
+umap_vecs = mms.fit_transform(umap_vecs)
+
+# %%
+plt.scatter(umap_vecs[:, 0], umap_vecs[:, 1], alpha=0.05)
+
+# %%
+import altair as alt
+
+# %%
+test_df['Predicted'] = test_df['pred'].map(sic4_name_lookup)
+test_df['Label'] = test_df['label'].map(sic4_name_lookup)
+
+# %%
+test_df['Snippet'] = test_df['text'].str[:280] + '...'
+
+# %%
+test_df['UMAP 0'] = umap_vecs[:, 0]
+test_df['UMAP 1'] = umap_vecs[:, 1]
+
+# %%
+test_df_ = test_df.dropna().sample(frac=0.1)
+
+# %%
+alt.Chart(test_df_).mark_circle(size=40).encode(
+    x='UMAP 0',
+    y='UMAP 1',
+    tooltip=['Label', 'Predicted', 'Snippet']
+)
+
+# %%
+plt.hist(test_df['Label'].value_counts(), bins=600, cumulative=True, density='normed', histtype='step');
+
+# %%
+top_labels = pd.merge(
+    test_df['Label'].value_counts()[:20], 
+    test_df['Predicted'].value_counts()[:20], 
+    right_index=True, left_index=True)
+
+# %%
+fig, ax = plt.subplots()
+top_labels.plot.barh(ax=ax)
+ax.set_xlabel('Frequency')
+# plt.tight_layout()
+plt.savefig('../../figures/predicted_true_freq_sic4_codes_barh.png', dpi=300, bbox_inches='tight');
+
+# %%
+test_df['Label'].value_counts()[:10]
+
+# %%
+pred_ratios = test_df['Predicted'].value_counts() / test_df['Label'].value_counts()
+
+# %%
+fig, axs = plt.subplots(nrows=2, figsize=(5, 8))
+
+pred_ratios.sort_values(ascending=False)[:20][::-1].plot.barh(ax=axs[0])
+
+pred_ratios.sort_values(ascending=True)[:20].plot.barh(color='C3', ax=axs[1])
+
+axs[1].set_xlabel('N Predicted / N True')
+plt.tight_layout()
+plt.savefig('../../figures/predicted_true_ratio_sic4_codes_barh.png', dpi=300, bbox_inches='tight');
+
+
+# %%
+top_labels = pd.merge(
+    test_df['Label'].value_counts(), 
+    test_df['Predicted'].value_counts(), 
+    right_index=True, left_index=True)
+
+# %%
+top_labels['Ratio'] = top_labels['Predicted'] / top_labels['Label']
+top_labels['colour'] = ['C0' if y >= 1 else 'C3' for y in top_labels['Ratio']]
+
+# %%
+plt.scatter(top_labels['Label'], top_labels['Ratio'], c=top_labels['colour'])
+
+# %%
+test_df = test_df.rename(columns={'text': 'Description'})
+
+# %%
+test_df_sample = test_df.sample(10)[['Description', 'Label', 'Predicted']]
+test_df_sample['Description'] = test_df_sample['Description'].str[:200]
+test_df_sample.to_markdown('../../figures/test_sample.md', index=False)
 
 # %%
