@@ -9,5 +9,10 @@ extraction:
   keybert:
     use_maxsum: True
   sample:
-    sample_size: 10000
-    divisions: ['62','74']
+    sample_size: 200
+  industries:
+    - category: sic4
+      code: 6201
+    - category: sic4
+      code: 7490
+
