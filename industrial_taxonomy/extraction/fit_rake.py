@@ -2,7 +2,7 @@
 import logging
 import pandas as pd
 from rake_nltk import Rake, Metric
-from industrial_taxonomy.extractor.utils import get_top_kws
+from industrial_taxonomy.extraction.utils import get_top_kws
 
 
 def get_rake_phrases(
