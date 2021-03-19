@@ -9,6 +9,7 @@ from industrial_taxonomy.extraction.utils import get_top_terms
 # TODO (in future versions): include additional KB parametres
 # Parallelise the keyword extraction
 
+
 def get_keybert_phrases(
     company_descriptions,
     top_t=10,

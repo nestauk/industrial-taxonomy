@@ -40,13 +40,17 @@ def sample_companies(
     Returns a sampled list of descriptions
     """
 
-    comp_sampled = (
-        comps.loc[comps[category] == str(code)]
-        .sample(n=sample_size)["description"]
-        .reset_index(drop=True)
-        .tolist()
-    )
-    return comp_sampled
+    comps_sector = comps.loc[comps[category] == str(code)]
+
+    if len(comps_sector) > sample_size:
+        comp_out = (
+            comps_sector.sample(n=sample_size)["description"]
+            .tolist()
+        )
+
+    else:
+        comp_out = comps_sector['description'].tolist()
+    return comp_out
 
 
 def build_unspsc_terms():
