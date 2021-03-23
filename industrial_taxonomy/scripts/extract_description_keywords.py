@@ -35,18 +35,16 @@ def sample_companies(
         code (str): value for the industry code
         category (str): sector name
         div (str): division
-        sample_size (n): number of companies to sample. Defaults to 5,000
+        sample_size (n): number of companies to sample.
 
     Returns a sampled list of descriptions
     """
 
-    comp_sampled = (
-        comps.loc[comps[category] == str(code)]
-        .sample(n=sample_size)["description"]
-        .reset_index(drop=True)
-        .tolist()
-    )
-    return comp_sampled
+    comps_sector = comps.loc[comps[category] == str(code)]
+    if len(comps_sector) > sample_size:
+        comps_sector = comps_sector.sample(n=sample_size)
+
+    return comps_sector["description"].tolist()
 
 
 def build_unspsc_terms():

@@ -5,6 +5,26 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import networkx as nx
+import industrial_taxonomy
+
+project_dir = industrial_taxonomy.project_dir
+
+
+def plot_extraction_performance():
+    """Plots the performance of kw extraction algorithms"""
+    perf = pd.read_csv(
+        f"{project_dir}/data/processed/extraction_performance_6201_7490.csv"
+    ).query("sic4==7490")
+    ch = (
+        alt.Chart(perf)
+        .mark_bar()
+        .encode(
+            y=alt.Y("method", sort=alt.EncodingSortField("time", order="ascending")),
+            x=alt.X("time", title="seconds", scale=alt.Scale(type="log")),
+        )
+        .properties(width=350, height=100)
+    )
+    return ch
 
 
 def filter_keywords(

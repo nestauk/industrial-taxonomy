@@ -9,7 +9,7 @@ extraction:
   keybert:
     use_maxsum: True
   sample:
-    sample_size: 200
+    sample_size: 10000
   industries:
     - category: sic4
       code: 6201
