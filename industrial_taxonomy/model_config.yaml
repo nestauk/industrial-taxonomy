@@ -15,4 +15,6 @@ extraction:
       code: 6201
     - category: sic4
       code: 7490
+taxonomy_test:
+  test_file: description_kws_6201_7490
 

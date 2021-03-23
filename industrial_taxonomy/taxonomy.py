@@ -90,7 +90,7 @@ def not_stop_kws(co_occ: list, thres=0.1) -> list:
     return to_keep
 
 
-def make_network_from_coocc(co_occ: list, thres=0.1, spanning=True) -> nx.Network:
+def make_network_from_coocc(co_occ: list, thres=0.1, spanning=True) -> nx.Graph:
     """Create a network from a list of co-occurring terms
     Args
         co_occ: each element is a list of co-occurring entities
@@ -119,3 +119,28 @@ def make_network_from_coocc(co_occ: list, thres=0.1, spanning=True) -> nx.Networ
         return nx.maximum_spanning_tree(sg)
     else:
         return sg
+
+
+def get_adjacency(net: nx.Graph) -> np.array:
+    """Extracts adjacency matrix from a network
+    Args:
+        net: network
+    """
+
+    adj = np.array(nx.adjacency_matrix(net).todense())
+    return adj
+
+
+def label_comms(comm_output: list, net: nx.Graph) -> list:
+    """Labels communities
+    Args:
+        comm_output: each number indexes a community
+        net: network with node names
+    """
+
+    net_names = dict({n: name for n, name in enumerate(net.nodes())})
+    labelled = [[net_names[term] for term in comm] for comm in comm_output]
+    return labelled
+
+
+# Visualise?

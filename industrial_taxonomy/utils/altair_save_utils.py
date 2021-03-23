@@ -30,7 +30,6 @@ def save_altair(fig, name, driver, path=FIG_PATH):
         driver: webdriver
         path: path to save the figure
     """
-    print(path)
     save(
         fig,
         f"{path}/png/{name}.png",

@@ -15,6 +15,17 @@ Adding `temp_dir` in a `.env` file, e.g. `temp_dir=/Users/<username>/GIT/industr
 
 Note: metaflow does do some limited caching by itself (i.e. without setting `temp_dir`) but is not as consistent and will not persist between reboots.
 
+## Functionality
+
+### Experimental keyword-extraction and keyword community detection.
+
+Run `python industrial_taxonomy/scripts/extract_description_keywords.py` to extract keywords from a sample of test sectors.
+
+Run `python industrial_taxonomy/scripts/make_test_taxonomy.py` to build a network of keyword co-occurrences and extract keyword communities indicative of sectors.
+
+Control the sectors used in these experiments in `industrial_taxonomy/model_config.yaml`.
+
+
 ## Code-style
 
 Please run `make lint` to format your code to a common style, and to lint code with flake8.
