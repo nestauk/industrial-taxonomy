@@ -68,9 +68,13 @@ endif
 ## Download Data from S3
 sync_data_from_s3:
 ifeq (default,$(PROFILE))
-	aws s3 sync s3://$(BUCKET)/data/raw data/raw
+	aws s3 sync  s3://$(BUCKET)/data/raw data/raw
+	aws s3 sync  s3://$(BUCKET)/data/processed data/processed
+	aws s3 sync  s3://$(BUCKET)/models models
 else
-	aws s3 sync s3://$(BUCKET)/data/raw data/raw --profile $(PROFILE)
+	aws s3 sync  s3://$(BUCKET)/data/raw --profile $(PROFILE) data/raw
+	aws s3 sync  s3://$(BUCKET)/data/processed --profile $(PROFILE) data/processed
+	aws s3 sync  s3://$(BUCKET)/models --profile $(PROFILE) models
 endif
 
 ## Set up python interpreter environment
