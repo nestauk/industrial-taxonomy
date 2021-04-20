@@ -9,6 +9,9 @@ import torch
 from torch.utils.data.dataset import Dataset
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
+from industrial_taxonomy.getters.glass import get_organisation_description
+from industrial_taxonomy.getters.companies_house import get_sector
+from industrial_taxonomy.getters.glass_house import get_glass_house
 from industrial_taxonomy.utils.metaflow_client import cache_getter_fn
 
 

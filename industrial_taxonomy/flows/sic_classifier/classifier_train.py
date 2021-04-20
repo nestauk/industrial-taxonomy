@@ -27,11 +27,11 @@ class TrainTextClassifier(FlowSpec):
             help="Path to directory for saving model",
             type=str
             )
-    sic_level = Parameter(
-            "sic_level",
-            help="Level of SIC to use as training and prediction classes",
-            type=str
-            )
+#     sic_level = Parameter(
+#             "sic_level",
+#             help="Level of SIC to use as training and prediction classes",
+#             type=str
+#             )
     freeze_model = Parameter(
             "freeze_model",
             help="If True, layers before classification layer will be frozen",
@@ -53,14 +53,12 @@ class TrainTextClassifier(FlowSpec):
 
     @step
     def start(self):
-        model_config = self.config["model"]
         tokenizer_config = self.config["tokenizer"]
 
         with open(self.documents_path, 'r') as f:
             self.documents = json.load(f)
 
         self.tokenizer = AutoTokenizer.from_pretrained(**self.tokenizer_config)
-        self.model = partial(model_init, self.model_config, self.freeze_model)
 
         self.next(self.generate_label_lookup)
 
@@ -117,6 +115,10 @@ class TrainTextClassifier(FlowSpec):
 
     @step
     def fine_tune(self):
+        model_config = self.config["model"]
+        model_config["num_labels"] = len(self.label_lookup)
+
+        self.model = partial(model_init, self.model_config, self.freeze_model)
         training_args_config = self.config["training_args"]
         trainer_config = self.config["trainer"]
 
