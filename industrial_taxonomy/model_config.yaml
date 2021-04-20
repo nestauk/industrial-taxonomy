@@ -7,6 +7,7 @@ flows:
     match_threshold: 75
     sic_level: 4 # numbe of sic digits to classify to, 0 gives Section
     freeze_model: False
+    output_dir: "../models/" 
     config:
       encode: # for transformers.AutoTokenizer.__call__
         add_pecial_tokens: True

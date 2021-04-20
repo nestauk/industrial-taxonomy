@@ -3,21 +3,22 @@ dynamic padding.
 """
 
 import json
+from functools import partial
 from dataclasses import dataclass, field
 
 from metaflow import FlowSpec, step, Parameter, JSONType
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
+        TrainingArguments, Trainer)
 
 from industrial_taxonomy.flows.sic_classifier.classifier_utils import (
        BatchCollator, OrderedDataset, compute_metrics, model_init) 
-from industrial_taxonomy.sic import extract_sic_code_description, load_sic_taxonomy
 
 
 class TrainTextClassifier(FlowSpec):
     documents_path = Parameter(
-            "documents path",
+            "documents_path",
             help="Path to JSON training data",
             type=str,
             )
@@ -32,7 +33,7 @@ class TrainTextClassifier(FlowSpec):
             type=str
             )
     freeze_model = Parameter(
-            "freeze model",
+            "freeze_model",
             help="If True, layers before classification layer will be frozen",
             type=bool,
             default=False
@@ -44,6 +45,12 @@ class TrainTextClassifier(FlowSpec):
             type=JSONType,
             )
 
+    def _encode(self, dataset):
+        encode_config = self.config["encode"]
+        encodings = OrderedDataset(self.tokenizer, 
+                self.train_set, encode_config, self.label_lookup)
+        return encodings
+
     @step
     def start(self):
         model_config = self.config["model"]
@@ -53,24 +60,28 @@ class TrainTextClassifier(FlowSpec):
             self.documents = json.load(f)
 
         self.tokenizer = AutoTokenizer.from_pretrained(**self.tokenizer_config)
-        self.model = partial(model_init, self.freeze_model, self.model_config)
+        self.model = partial(model_init, self.model_config, self.freeze_model)
 
-        self.next(self.generate_classes)
-
+        self.next(self.generate_label_lookup)
 
     @step
-    def generate_class_lookup(self):
+    def generate_label_lookup(self):
+        """Maps sample labels to unique integer IDs and creates a lookup
+        """
+        self.label_lookup = dict()
+        i = 0
+        for doc in self.documents:
+            label = doc['label']
+            if label not in self.label_lookup:
+                self.label_lookup[label] = i
+                i += 1
+            doc['label'] = self.label_lookup[label]
 
-        sic_level = self.config["sic_level"]
-        sic_2007 = load_sic_taxonomy()
-        sic_lookup = extract_sic_code_description(sic_2007, sic_level)
-
-        self.class_lookup = {c: i for i, c in enumerate(sic_lookup.keys())}
-        self.next(self.train_validation_split)
-
+        self.next(self.train_val_test_split)
 
     @step
     def train_val_test_split(self):
+        """Splits the data into train, evaluation and test sets"""
         split_config = self.config["train_val_test_split"]
         train_size = split_config.pop('train_size')
         val_size = split_config.pop('val_size')
@@ -84,27 +95,25 @@ class TrainTextClassifier(FlowSpec):
         self.val_set, self.test_set = train_test_split(rest, train_size=val_size, 
                 test_size=test_size, **split_config)
 
-        self.next(self.prepare_train_dataset, self.prepare_val_dataset)
+        self.next(self.encode_train_set, self.encode_val_set)
 
     @step
     def encode_train_set(self):
-        encode_config = self.config["encode"]
-        self.encodings = OrderedDataset(self.tokenizer, 
-                self.train_set, encode_config, self.class_lookup)
+        """Encodes the training dataset"""
+        self.encodings = self._encode(self.train_set)
         self.next(self.encodings_join)
 
     @step
     def encode_val_set(self):
-        encode_config = self.config["encode"]
-        self.encodings = OrderedDataset(self.tokenizer, 
-                self.val_set, encode_config)
-        self.next(self.encodings_join, self.class_lookup)
+        """Encodes the evaluation dataset"""
+        self.encodings = self._encode(self.val_set)
+        self.next(self.encodings_join)
 
     @step
-    def encodings_join(self):
-        self.train_encodings = self.encode_train_set.encodings
-        self.val_encodings = self.encode_val_set.encodings
-        self.next(fine_tune)
+    def encodings_join(self, inputs):
+        self.train_encodings = self.inputs.encode_train_set.encodings
+        self.val_encodings = self.inputs.encode_val_set.encodings
+        self.next(self.fine_tune)
 
     @step
     def fine_tune(self):
@@ -123,6 +132,7 @@ class TrainTextClassifier(FlowSpec):
         trainer.train()
 
         trainer.save_model(self.output_dir)
+        self.next(self.end)
 
     @step
     def end(self):

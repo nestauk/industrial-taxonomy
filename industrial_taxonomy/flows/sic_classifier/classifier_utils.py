@@ -1,14 +1,15 @@
 """Tools for fine-tuning a transformer"""
 
 from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
-        Trainer, TrainingArguments)
+        Trainer, TrainingArguments, PreTrainedModel, PreTrainedTokenizerBase)
 from dataclasses import dataclass, field
 from typing import Dict, Optional, List
 
 import torch
 from torch.utils.data.dataset import Dataset
-
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
+
+from industrial_taxonomy.utils.metaflow_client import cache_getter_fn
 
 
 @dataclass
@@ -44,7 +45,7 @@ class OrderedDataset(Dataset):
     """A dataset that returns samples in the order that they were inserted.
     """
 
-    def __init__(self, tokenizer: PreTrainedTokenizer,
+    def __init__(self, tokenizer: PreTrainedModel,
             samples: List[Sample], config: dict, class_lookup: dict) -> None:
         """
         Args:
@@ -146,7 +147,7 @@ class BatchCollator():
             'labels': torch.tensor(labels, dtype=torch.long)
                }
 
-def model_init(frozen=False, model_kwargs):
+def model_init(model_kwargs, frozen=False):
     model = AutoModelForSequenceClassification.from_pretrained(**model_kwargs)
     if frozen:
         for param in model.base_model.parameters():
@@ -169,7 +170,7 @@ def compute_metrics(pred):
         'recall': recall
     }   
 
-def load_trained_model(path, tokenizer, training_args)
+def load_trained_model(path, tokenizer, training_args):
     model = AutoModelForSequenceClassification.from_pretrained(
         path, return_dict=True)
 
