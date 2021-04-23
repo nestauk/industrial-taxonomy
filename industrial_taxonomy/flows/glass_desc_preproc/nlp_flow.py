@@ -11,7 +11,6 @@ from nlp_utils import (
     post_token_filter,
     spacy_pipeline,
     bag_of_words as bag_of_words_,
-    ENTS,
 )
 
 
@@ -47,7 +46,7 @@ class EscoeNlpFlow(FlowSpec):
         "entity-mappings",
         help="",
         type=JSONType,
-        default=json.dumps(ENTS),
+        default=None,
     )
     input_file = IncludeFile(
         "input-file",
@@ -113,20 +112,20 @@ class EscoeNlpFlow(FlowSpec):
 
 if __name__ == "__main__":
     EscoeNlpFlow()
-else:
-    # %%
+# else:
+#     # %%
 
-    nlp = spacy_pipeline()
-    with open("input_data.json") as f:
-        documents = list(json.load(f).values())
+#     nlp = spacy_pipeline()
+#     with open("input_data.json") as f:
+#         documents = list(json.load(f).values())
 
-    # %%
+#     # %%
 
-    bag_of_words_(nlp(documents[0]))
-    # %%
+#     bag_of_words_(nlp(documents[0]))
+#     # %%
 
-    print("curry")
-    bag_of_words = t.curry(bag_of_words_, entity_mappings=ENTS)
-    bag_of_words(nlp(documents[0]))
+#     print("curry")
+#     bag_of_words = t.curry(bag_of_words_, entity_mappings)
+#     bag_of_words(nlp(documents[0]))
 
 # %%

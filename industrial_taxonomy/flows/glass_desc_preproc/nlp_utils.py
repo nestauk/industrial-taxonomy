@@ -19,29 +19,6 @@ SECOND_ORDER_STOP_WORDS: Set[str] = t.pipe(
 )
 
 
-ENTS = {
-    "CARDINAL": "CARDINAL",
-    "DATE": "DATE",
-    "GPE": "GPE",
-    "LOC": "LOC",
-    "MONEY": "MONEY",
-    "NORP": "NORP",  # ?
-    "ORDINAL": "ORDINAL",
-    "ORG": "ORG",
-    "PERCENT": "PERCENT",
-    "PERSON": "PERSON",
-    "QUANTITY": "QUANTITY",
-    "TIME": "TIME",
-    # Undesirable / empricially too inaccurate:
-    #   "EVENT",
-    #   "FAC",
-    #   "LANGUAGE",
-    #   "LAW",
-    #   "PRODUCT",  # Loses too much info, we're interested in industry
-    #   "WORK_OF_ART",
-}
-
-
 def make_ngrams(
     documents: List[List[str]], n: int = 2, phrase_kws: Optional[Dict[str, Any]] = None
 ) -> List[List[str]]:
@@ -119,13 +96,37 @@ def spacy_pipeline() -> Language:
     return nlp
 
 
-def bag_of_words(doc: Doc, entity_mappings: Dict[str, str] = ENTS) -> List[str]:
+def bag_of_words(
+    doc: Doc, entity_mappings: Optional[Dict[str, str]] = None
+) -> List[str]:
     """Convert spacy document to bag of words for topic modelling."""
+
+    entity_mappings_: Dict[str, str] = entity_mappings or {
+        "CARDINAL": "CARDINAL",
+        "DATE": "DATE",
+        "GPE": "GPE",
+        "LOC": "LOC",
+        "MONEY": "MONEY",
+        "NORP": "NORP",  # ?
+        "ORDINAL": "ORDINAL",
+        "ORG": "ORG",
+        "PERCENT": "PERCENT",
+        "PERSON": "PERSON",
+        "QUANTITY": "QUANTITY",
+        "TIME": "TIME",
+        # Undesirable / empricially too inaccurate:
+        #   "EVENT",
+        #   "FAC",
+        #   "LANGUAGE",
+        #   "LAW",
+        #   "PRODUCT",  # Loses too much info, we're interested in industry
+        #   "WORK_OF_ART",
+    }
 
     def extract_text(token: Token) -> str:
         """Extract text from a spacy token."""
-        if token.ent_type_ in entity_mappings:
-            return entity_mappings[token.ent_type_]
+        if token.ent_type_ in entity_mappings_:
+            return entity_mappings_[token.ent_type_]
         else:
             return token.lemma_
 

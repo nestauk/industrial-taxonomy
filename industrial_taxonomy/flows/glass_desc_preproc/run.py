@@ -43,14 +43,15 @@ if __name__ == "__main__":
     flow_config = config["flows"][FLOW_ID]
     params = flow_config["params"]
 
-    input_file = generate_input_data(match_threshold, params.get("n_docs", None))
+    input_file = generate_input_data(match_threshold, params.get("n-docs", None))
 
     cmd_params = {
-        "--n-gram": str(params["n_gram"]),
-        "--entity-mappings": json.dumps(params["entity_mappings"]),
-        "--input-file": str(input_file),
-        "--n-process": str(params["n_process"]),
+        f"--{k}": json.dumps(params[k])
+        for k in ["n-gram", "entity-mappings", "n-process"]
+        if k in params
     }
+    cmd_params["--input-file"] = str(input_file)
+
     flow_file = Path(__file__).resolve().parents[0] / f"{FLOW_ID}.py"
     run_id = execute_flow(
         flow_file,
