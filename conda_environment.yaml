@@ -17,17 +17,17 @@ dependencies:
   - gcc_linux-64  # [not darwin]
   - metaflow
   # Put any conda dependencies here
-  - s3fs
 
   - pip:
     # Put any pip dependencies here (and no conda ones anywhere below)
     - altair_saver
     - sh
+    - s3fs
 
   # Tooling requirements (don't edit)
     - tornado>=5.0  # Stops luigi breaking jupyter
-  - pandoc
-  - pandoc-crossref
+    - pandoc
+    - pandoc-crossref
   - tqdm
   - pyyaml
   - pytables

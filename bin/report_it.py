@@ -1,4 +1,5 @@
 #!/bin/env python
+"""Typer CLI to generate HTML / pdf reports."""
 import logging
 from pathlib import Path
 from typing import List, Optional
@@ -12,15 +13,15 @@ BUCKET = "industrial-taxonomy"
 app = typer.Typer()
 state = {"verbose": False}
 
+
 @app.callback()
 def callback(verbose: bool = False):
-    """
-    Convert pandoc markdown to a snazzy report.
+    """Convert pandoc markdown to a snazzy report.
 
     Convert to HTML with html command.
 
     Convert to PDF (via. LaTeX) with the pdf command.
-    """
+    """  # noqa: DAR101
     if verbose:
         state["verbose"] = True
     else:
@@ -34,16 +35,16 @@ def pdf(
     ),
     output: Optional[Path] = typer.Option(
         None,
-        help="Output path. Defaults to the first value of INPUTS... with a PDF file suffix",
+        help="Output path. Defaults to first value of INPUTS... with a PDF file suffix",
     ),
 ):
     """Convert markdown INPUTS...  to pdf OUTPUT."""
-
     _validate_inputs(inputs)
 
     if output is None:
         output = Path(inputs[0]).with_suffix(".tex")
 
+    # TODO: fix s.t. figure paths work if run outside `output/`
     metadata_file = Path(project_dir) / "output/latex_metadata.yaml"
     _pandoc(inputs, output, metadata_file, variable="urlcolor=blue", citeproc=True)
 
@@ -57,12 +58,11 @@ def html(
     ),
     output: Optional[Path] = typer.Option(
         None,
-        help="Output path. Defaults to the first value of INPUTS... with a HTML file suffix",
+        help="Output path. Defaults to the first value of INPUTS... with a HTML file suffix",  # noqa: B950
     ),
     publish: bool = typer.Option(False, help="Publish document to s3"),
 ):
     """Convert markdown INPUTS...  to html OUTPUT."""
-
     _validate_inputs(inputs)
 
     if output is None:
@@ -80,13 +80,14 @@ def html(
             recursive=True,
             acl="public-read",
         )
+        key = output.resolve().relative_to(Path(project_dir))
         sh.aws.s3.cp(
-            Path(project_dir) / f"output/{output}",
-            f"s3://{BUCKET}/{output}",
+            output,
+            f"s3://{BUCKET}/{key}",
             acl="public-read",
         )
         typer.secho(
-            f"Published report to https://{BUCKET}.s3.amazonaws.com/{output}",
+            f"Published report to https://{BUCKET}.s3.amazonaws.com/{key}",
             bg="green",
             fg="black",
         )
@@ -94,7 +95,6 @@ def html(
 
 def _pandoc(inputs, output, metadata_file, **kwargs):
     """Run pandoc to convert `inputs` to `output`."""
-
     return sh.pandoc(
         *map(str, inputs),
         metadata_file=metadata_file,
