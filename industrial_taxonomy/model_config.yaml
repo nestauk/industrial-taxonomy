@@ -7,17 +7,7 @@ flows:
     params:
       n_docs: 100000
       n_gram: 2
-      test_mode: false
+      test_mode: true
     run_id: 1012
-  topsbm_v1:
-    params:
-      n_docs: -1
-    run_id: 1020
-  topsbm_v2:
-    params:
-      n_docs: -1
-    run_id: 1025
-  sic:
-    run_id: 1059
 params:
   match_threshold: 60
