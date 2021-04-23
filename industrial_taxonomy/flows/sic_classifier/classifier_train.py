@@ -3,6 +3,7 @@ dynamic padding.
 """
 
 import json
+import logging
 from functools import partial
 from dataclasses import dataclass, field
 
@@ -13,8 +14,9 @@ from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
         TrainingArguments, Trainer)
 
 from industrial_taxonomy.flows.sic_classifier.classifier_utils import (
-       BatchCollator, OrderedDataset, compute_metrics, model_init) 
+       BatchCollator, OrderedDataset, compute_metrics, model_init, Sample) 
 
+logger = logging.getLogger(__name__)
 
 class TrainTextClassifier(FlowSpec):
     documents_path = Parameter(
@@ -22,16 +24,6 @@ class TrainTextClassifier(FlowSpec):
             help="Path to JSON training data",
             type=str,
             )
-    output_dir = Parameter(
-            "output_dir",
-            help="Path to directory for saving model",
-            type=str
-            )
-#     sic_level = Parameter(
-#             "sic_level",
-#             help="Level of SIC to use as training and prediction classes",
-#             type=str
-#             )
     freeze_model = Parameter(
             "freeze_model",
             help="If True, layers before classification layer will be frozen",
@@ -47,8 +39,9 @@ class TrainTextClassifier(FlowSpec):
 
     def _encode(self, dataset):
         encode_config = self.config["encode"]
+        dataset = [Sample(**s) for s in dataset]
         encodings = OrderedDataset(self.tokenizer, 
-                self.train_set, encode_config, self.label_lookup)
+                dataset, encode_config, self.label_lookup)
         return encodings
 
     @step
@@ -58,7 +51,7 @@ class TrainTextClassifier(FlowSpec):
         with open(self.documents_path, 'r') as f:
             self.documents = json.load(f)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(**self.tokenizer_config)
+        self.tokenizer = AutoTokenizer.from_pretrained(**tokenizer_config)
 
         self.next(self.generate_label_lookup)
 
@@ -73,7 +66,7 @@ class TrainTextClassifier(FlowSpec):
             if label not in self.label_lookup:
                 self.label_lookup[label] = i
                 i += 1
-            doc['label'] = self.label_lookup[label]
+#            doc['label'] = self.label_lookup[label]
 
         self.next(self.train_val_test_split)
 
@@ -86,7 +79,7 @@ class TrainTextClassifier(FlowSpec):
         test_size = split_config.pop('test_size')
 
         if sum([train_size, test_size, val_size]) > 1:
-            raise ValueError('Sum of train, validation and test sizes must be ≤ 1')
+            raise ValueError('Sum of train, validation and test sizes must be \xe2 1')
 
         self.train_set, rest = train_test_split(self.documents, train_size=train_size,
                 test_size=val_size + test_size, **split_config)
@@ -109,31 +102,33 @@ class TrainTextClassifier(FlowSpec):
 
     @step
     def encodings_join(self, inputs):
-        self.train_encodings = self.inputs.encode_train_set.encodings
-        self.val_encodings = self.inputs.encode_val_set.encodings
+        self.merge_artifacts(inputs, exclude=['encodings'])
+        self.train_encodings = inputs.encode_train_set.encodings
+        self.val_encodings = inputs.encode_val_set.encodings
         self.next(self.fine_tune)
 
     @step
     def fine_tune(self):
+
         model_config = self.config["model"]
         model_config["num_labels"] = len(self.label_lookup)
-
-        self.model = partial(model_init, self.model_config, self.freeze_model)
+        logger.info('Loading pre-trained model')
+        self.model = partial(model_init, model_config)
         training_args_config = self.config["training_args"]
-        trainer_config = self.config["trainer"]
 
         training_args = TrainingArguments(**training_args_config)
         trainer = Trainer(
-                model=self.model,
+                model=self.model(self.freeze_model),
                 args=training_args,
                 train_dataset=self.train_encodings,
                 eval_dataset=self.val_encodings,
                 compute_metrics=compute_metrics,
                 data_collator=BatchCollator(self.tokenizer)
                 )
+        logger.info(f'Training model with {len(self.train_encodings)} samples')
         trainer.train()
 
-        trainer.save_model(self.output_dir)
+        trainer.save_model(training_args_config['output_dir'])
         self.next(self.end)
 
     @step

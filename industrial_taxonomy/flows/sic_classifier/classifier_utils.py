@@ -66,7 +66,7 @@ class OrderedDataset(Dataset):
         """Encodes and sorts samples"""
         features = [self._encode(s) for s in samples]
         lens = [len(f.input_ids) for f in features]
-        _, features = (list(t) for t in zip(*sorted(zip(lens, features))))
+        features = [f for _, f in sorted(zip(lens, features), key=lambda t: t[0])]
         return features
         
     def _encode(self, sample: Sample) -> Features:
@@ -105,10 +105,10 @@ class OrderedDataset(Dataset):
             self.current = 0
         sample = self.features[self.current]
         self.current += 1
-        return self.encode(sample)
+        return sample
 
     def __len__(self):
-        return len(self.sample)
+        return len(self.features)
 
 
 def pad_seq(seq: List[int], max_len: int, pad_value: int) -> List[int]:
