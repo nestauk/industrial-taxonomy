@@ -136,8 +136,12 @@ else:
 orgs_sample = orgs.sample(frac=FRAC, random_state=RANDOM_SEED)
 
 # %%
+orgs_sample = orgs_sample[orgs_sample['SIC4_code'].isin(list(sic4_name_lookup.keys()))]
+
+# %%
 le = LabelEncoder()
-sic_section_label = le.fit_transform(orgs_sample['SIC4_code'])
+le.fit(list(sic4_name_lookup.keys()))
+sic_section_label = le.transform(orgs_sample['SIC4_code'])
 
 # label_section_lookup = {le.transform([k])[0]: v for k, v in section_name_lookup.items()}
 
@@ -170,6 +174,10 @@ X_val, X_test, y_val, y_test = train_test_split(
 )
 
 X_train.shape, X_val.shape, X_test.shape
+
+# %%
+train_df = pd.DataFrame({'description': X_train, 'label': le.inverse_transform(y_train)})
+train_df.to_csv(f'{data_path}/processed/train_data.csv', index=False)
 
 # %% [markdown]
 # ## Dynamic Padding and Uniform Batching
@@ -361,8 +369,8 @@ training_args = TrainingArguments(
 )
 
 # %%
-train = create_rows(X_train, y_train)
-val = create_rows(X_val, y_val)
+train = create_rows(X_train.index, X_train, y_train)
+val = create_rows(X_val.index, X_val, y_val)
 
 # %%
 train_set = DynamicDataset(
@@ -403,15 +411,12 @@ print(f"training took {(time.time() - start_time) / 60:.2f}mn")
 # %%
 trainer.save_model(f'{project_dir}/models/sic4_bert_1/model')
 
-# %%
-loss.metrics['train_runtime'] / 60
-
 # %% [markdown]
 # ### Load and Test
 
 # %%
 model = AutoModelForSequenceClassification.from_pretrained(
-        f'{project_dir}/models/sic4_bert_0/model',
+        f'{project_dir}/models/sic4_bert_1/model',
         num_labels=N_LABELS,
         return_dict=True)
 
@@ -419,10 +424,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=train_set,
-#     data_collator=SmartCollator(pad_token_id=tokenizer.pad_token_id),
     data_collator=SmartCollator(tokenizer=tokenizer),
-    eval_dataset=val_set,
     compute_metrics=compute_metrics,
 )
 
@@ -492,15 +494,40 @@ st = SentenceTransformer(bert_model)
 test_encodings = st.encode(pred_table['text'])
 
 # %%
-np.save('../../data/processed/sic4_test_embeddings.np', test_encodings)
-np.save('../../data/processed/sic4_test_pred_probs.np', test_encodings)
+np.save('../../data/processed/sic4_test_embeddings', test_encodings)
+np.save('../../data/processed/sic4_test_pred_probs', pred_probs)
 
 # %%
-import joblib('../../models/processed/sic4_test_embeddings.np')
+import joblib
 
 # %%
 with open('../../models/sic4_bert_1/label_encoder.pkl', 'wb') as f:
     joblib.dump(le, f)
+
+# %%
+sic4_encodings = st.encode(list(sic4_name_lookup.values()))
+
+# %%
+np.save('../../data/processed/sic4_encodings', sic4_encodings)
+
+
+# %%
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
+# %%
+train_encodings = []
+for chunk in chunks(list(train_df['description']), 10000): 
+    encs = st.encode(chunk)
+    train_encodings.extend(encs)
+    
+train_encodings = np.array(train_encodings)
+
+# %%
+np.save('../../data/processed/train_encodings', train_encodings)
 
 # %% [markdown]
 # ### 3.2 Tokenization
