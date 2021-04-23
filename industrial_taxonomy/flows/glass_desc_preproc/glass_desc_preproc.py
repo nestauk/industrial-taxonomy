@@ -1,98 +1,25 @@
 """Tokenises and ngrams Glass organisation descriptions."""
-import re
-import string
-from itertools import product
-from typing import Any, Dict, Generator, Iterable, List, Optional, Set
+from typing import Any, Generator, List
 
 import pandas as pd
 import spacy
 import toolz.curried as t
-from gensim.corpora import Dictionary
 from metaflow import FlowSpec, step, Parameter
-from nltk.stem import WordNetLemmatizer
 from spacy.tokens import Doc, Token
 from spacy.language import Language
 
 import industrial_taxonomy
 from industrial_taxonomy.getters.glass import get_organisation_description
 from industrial_taxonomy.getters.glass_house import get_glass_house
-from industrial_taxonomy.nlp import make_ngrams, tokenize, STOP_WORDS, REGEX_TOKEN_TYPES
+from nlp_utils import make_ngrams, filter_frequency, post_token_filter
 
-N_TEST_DOCS = 1_000
-SECOND_ORDER_STOP_WORDS: Set[str] = t.pipe(
-    STOP_WORDS,
-    lambda stops: product(stops, stops),
-    t.map(lambda x: f"{x[0]}_{x[1]}"),
-    set,
-    lambda stops: stops | STOP_WORDS,
-)
+N_TEST_DOCS = 1_00
 
 
 @t.curry
 def log_(msg: str, x: Any, how=print) -> Any:
     how(msg)
     return x
-
-
-def pre_token_filter(tokens: Iterable[str]) -> Iterable[str]:
-    """Pre n-gram token filter."""
-
-    filter_re = "|".join(
-        [REGEX_TOKEN_TYPES["URL"], REGEX_TOKEN_TYPES["@word"], REGEX_TOKEN_TYPES["XML"]]
-    )
-
-    def predicate(token: str) -> bool:
-        return (
-            # At least one ascii letter
-            any(x in token for x in string.ascii_lowercase)
-            # No URL's | twitter ID's
-            and not re.match(filter_re, token)
-        )
-
-    return filter(predicate, tokens)
-
-
-def post_token_filter(tokens: Iterable[str]) -> Iterable[str]:
-    """Post n-gram token filter."""
-
-    def predicate(token: str) -> bool:
-        return (
-            # No short words
-            (not len(token) <= 2)
-            # No stopwords
-            and (token not in SECOND_ORDER_STOP_WORDS)
-        )
-
-    return filter(predicate, tokens)
-
-
-def token_converter(tokens: Iterable[str]) -> Iterable[str]:
-    """Convert tokens."""
-
-    def convert(token: str) -> str:
-        return token.lower().replace("-", "_")
-
-    return map(convert, tokens)
-
-
-@t.curry
-def filter_frequency(
-    documents: List[str], kwargs: Optional[Dict[str, Any]] = None
-) -> Iterable[str]:
-    """Filter `documents` based on token frequency corpus."""
-    dct = Dictionary(documents)
-
-    default_kwargs = dict(no_below=10, no_above=0.9, keep_n=1_000_000)
-    if kwargs is None:
-        kwargs = default_kwargs
-    else:
-        kwargs = t.merge(default_kwargs, kwargs)
-
-    dct.filter_extremes(**kwargs)
-    return t.pipe(
-        documents,
-        t.map(lambda document: [token for token in document if token in dct.token2id]),
-    )
 
 
 class GlassDescPreprocFlow(FlowSpec):
@@ -155,57 +82,11 @@ class GlassDescPreprocFlow(FlowSpec):
         self.documents = documents.description.tolist()
         self.keys = documents.org_id.tolist()
 
-        self.next(self.pipeline1, self.pipeline2)
+        self.next(self.pipeline)
 
     @step
-    def pipeline1(self):
-        lemmatiser = WordNetLemmatizer()
-
-        tokens_re = re.compile(
-            "|".join(
-                [
-                    REGEX_TOKEN_TYPES["URL"],
-                    REGEX_TOKEN_TYPES["@word"],
-                    REGEX_TOKEN_TYPES["XML"],
-                    REGEX_TOKEN_TYPES["strip_apostrophe"],
-                    REGEX_TOKEN_TYPES["hyphenated"],
-                    REGEX_TOKEN_TYPES["word"],
-                ]
-            ),
-            re.VERBOSE | re.IGNORECASE,
-        )
-
-        tokenize_ = t.curry(tokenize, tokens_re=tokens_re)
-
-        tokens = t.pipe(
-            self.pop_documents(),
-            # Tokenise and filter
-            t.map(t.compose(list, pre_token_filter, token_converter, tokenize_)),
-            list,
-            log_("Tokenised"),
-            # Filter low frequency terms (want to keep high frequency terms)
-            filter_frequency(kwargs={"no_above": 1}),
-            list,
-            log_("Frequency filter 1"),
-            # N-gram
-            t.curry(make_ngrams, n=self.n_gram),
-            # Lemmatise
-            t.map(lambda document: [lemmatiser.lemmatize(word) for word in document]),
-            # Filter ngrams: combination of stopwords, e.g. `of_the`
-            t.map(t.compose(list, post_token_filter)),
-            list,
-            log_("N-grammed, lemmatised, and post filtered"),
-            # Filter ngrams:  low (and very high) frequency terms
-            filter_frequency,
-            list,
-            log_("Frequency filter 1"),
-        )
-
-        self.docs = dict(zip(self.keys, tokens))
-        self.next(self.join)
-
-    @step
-    def pipeline2(self):
+    def pipeline(self):
+        """Run the NLP pipeline, returning tokenised documents."""
 
         nlp = spacy_pipeline()
 
@@ -234,12 +115,6 @@ class GlassDescPreprocFlow(FlowSpec):
         )
 
         self.docs = dict(zip(self.keys, tokens))
-        self.next(self.join)
-
-    @step
-    def join(self, inputs):
-        self.docs_v1 = inputs.pipeline1.docs
-        self.docs_v2 = inputs.pipeline2.docs
         self.next(self.end)
 
     @step
