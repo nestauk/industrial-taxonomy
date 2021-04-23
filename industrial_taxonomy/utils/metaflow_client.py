@@ -1,7 +1,9 @@
-import pickle
-import os
+"""Utils to get and cache the results of metaflows."""
 import logging
+import os
+import pickle
 from pathlib import Path
+from typing import Callable
 
 from dotenv import find_dotenv, load_dotenv
 from metaflow import Flow, Run
@@ -12,7 +14,7 @@ logger = logging.getLogger(__file__)
 
 
 def _get_temp_dir():
-    """Find `temp_dir` env var or return None"""
+    """Find `temp_dir` env var or return None."""
     load_dotenv(find_dotenv())
     try:
         return os.environ["temp_dir"]
@@ -20,8 +22,8 @@ def _get_temp_dir():
         return None
 
 
-def cache_getter_fn(f):
-    """Cache `f` output as pickle if `temp_dir` env var is set"""
+def cache_getter_fn(f: Callable):
+    """Cache `f` output as pickle if `temp_dir` env var is set."""
 
     def inner(*args, **kwargs):
         temp_dir = _get_temp_dir()
@@ -56,11 +58,14 @@ def flow_getter(flow: str, run_id=None) -> MetaflowData:
     """Get data from a metaflow Run, checking it is valid.
 
     Args:
-        flow (str): Metaflow flow name
+        flow (str): Metaflow flow name.
         run_id (int, optional): Metaflow run id. If None, get the latest successful run.
 
     Returns:
-        Data from Run(flow/run_id)
+        Data from Run(flow/run_id).
+
+    Raises:
+        ValueError: If the run was not successful.
     """
     if run_id is None:
         run_id = Flow(flow).latest_successful_run.id

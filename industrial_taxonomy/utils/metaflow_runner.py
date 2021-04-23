@@ -1,12 +1,13 @@
+"""Utils to execute a metaflow w/ subprocess & update config w/ successful run ID's."""
 import logging
-import yaml
 from itertools import chain
 from pathlib import Path
 from shlex import quote
-from subprocess import Popen, CalledProcessError
+from subprocess import CalledProcessError, Popen
 from typing import List
 
 import toolz.curried as t
+import yaml
 from filelock import FileLock
 
 from industrial_taxonomy import project_dir as PROJECT_DIR
@@ -16,18 +17,20 @@ logger = logging.getLogger(__file__)
 
 
 def execute_flow(flow_file: Path, params: dict, metaflow_args: dict) -> int:
-    """Execute flow in `flow_file` with `params`
+    """Execute flow in `flow_file` with `params`.
 
     Args:
-        flow_file (`pathlib.Path`): File containing metaflow
-        params (`dict`): Keys are flow parameter names (command-line notation,
+        flow_file: File containing metaflow
+        params: Keys are flow parameter names (command-line notation,
              `--`), values are parameter values (as strings).
+        metaflow_args: Keys are metaflow parameter names passed before run
+            (command-line notation, `--`), values are parameter values (as strings).
 
     Returns:
-        `int` - run_id of flow
+        run_id of flow
 
     Raises:
-        `CalledProcessError`
+        CalledProcessError: When flow execution fails
     """
     run_id_file = flow_file.parents[0] / ".run_id"
     cmd = " ".join(
@@ -65,14 +68,14 @@ def execute_flow(flow_file: Path, params: dict, metaflow_args: dict) -> int:
 
 
 def update_model_config(key_path: List[str], value: object) -> None:
-    """Update subsection of `model_config.yaml`
+    """Update subsection of `model_config.yaml`.
 
     Reads and writes under a file-lock so that multiple completing flows
     do not over-write one another.
 
     Args:
-        key_path (`list`): Path in dictionary to update
-        value (`object`): Value to put in `key_path`
+        key_path: Path in dictionary to update
+        value: Value to put in `key_path`
     """
     fname = PROJECT_DIR / "industrial_taxonomy" / "model_config.yaml"
     lock = FileLock(str(fname) + ".lock")
