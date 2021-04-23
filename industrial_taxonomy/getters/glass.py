@@ -1,4 +1,6 @@
 """Data getters for Glass business website data."""
+import logging
+
 import pandas as pd
 from metaflow import namespace
 
@@ -63,3 +65,9 @@ def get_description_tokens() -> pd.DataFrame:
             "EscoeNlpFlow", run_id=run_id
         ).documents.items()
     }
+
+
+@cache_getter_fn
+def get_description_tokens_v2() -> pd.DataFrame:
+    """Get tokens output from `GlassDescPreprocFlow` spacy pipeline."""
+    return flow_getter("GlassDescPreprocFlow").docs_v2
