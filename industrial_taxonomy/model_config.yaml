@@ -3,11 +3,14 @@ flows:
     run_id: 890
   glass:
     run_id: 414
-  glass_desc_preproc:
+  nlp_flow:
     params:
-      n_docs: 100000
+      # Can redefine the entities to be detected, by uncommenting below setting
+      # entity_mappings:
+      #   ORG: ORGANISATION
+      # n_docs: 10000
       n_gram: 2
-      test_mode: true
-    run_id: 1012
+      n_process: 2
+    run_id: 1619186850421496
 params:
   match_threshold: 60

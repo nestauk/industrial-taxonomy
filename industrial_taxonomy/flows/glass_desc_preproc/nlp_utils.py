@@ -2,14 +2,13 @@
 from itertools import product
 from typing import Any, Dict, Iterable, List, Optional, Set
 
+import spacy
 import toolz.curried as t
 from gensim import models
 from gensim.corpora import Dictionary
 from spacy.lang.en import STOP_WORDS
-
-# STOP_WORDS = set(
-#     stopwords.words("english") + list(string.punctuation) + ["\\n"] + ["quot"]
-# )
+from spacy.tokens import Doc, Token
+from spacy.language import Language
 
 SECOND_ORDER_STOP_WORDS: Set[str] = t.pipe(
     STOP_WORDS,
@@ -18,6 +17,29 @@ SECOND_ORDER_STOP_WORDS: Set[str] = t.pipe(
     set,
     lambda stops: stops | STOP_WORDS,
 )
+
+
+ENTS = {
+    "CARDINAL": "CARDINAL",
+    "DATE": "DATE",
+    "GPE": "GPE",
+    "LOC": "LOC",
+    "MONEY": "MONEY",
+    "NORP": "NORP",  # ?
+    "ORDINAL": "ORDINAL",
+    "ORG": "ORG",
+    "PERCENT": "PERCENT",
+    "PERSON": "PERSON",
+    "QUANTITY": "QUANTITY",
+    "TIME": "TIME",
+    # Undesirable / empricially too inaccurate:
+    #   "EVENT",
+    #   "FAC",
+    #   "LANGUAGE",
+    #   "LAW",
+    #   "PRODUCT",  # Loses too much info, we're interested in industry
+    #   "WORK_OF_ART",
+}
 
 
 def make_ngrams(
@@ -30,10 +52,8 @@ def make_ngrams(
         n: The `n` in n-gram.
         phrase_kws: Passed to `gensim.models.Phrases`.
 
-    Return:
+    Returns:
         N-grams
-
-    #UTILS
     """
     assert isinstance(n, int)
     if n < 2:
@@ -43,7 +63,7 @@ def make_ngrams(
         "scoring": "npmi",
         "threshold": 0.25,
         "min_count": 2,
-        "delimiter": b"_",
+        "delimiter": "_",
     }
     phrase_kws = t.merge(def_phrase_kws, phrase_kws or {})
 
@@ -89,4 +109,29 @@ def filter_frequency(
     return t.pipe(
         documents,
         t.map(lambda document: [token for token in document if token in dct.token2id]),
+    )
+
+
+def spacy_pipeline() -> Language:
+    """Spacy NLP pipeline - large english model with entity merging."""
+    nlp = spacy.load("en_core_web_lg")
+    nlp.add_pipe("merge_entities")
+    return nlp
+
+
+def bag_of_words(doc: Doc, entity_mappings: Dict[str, str] = ENTS) -> List[str]:
+    """Convert spacy document to bag of words for topic modelling."""
+
+    def extract_text(token: Token) -> str:
+        """Extract text from a spacy token."""
+        if token.ent_type_ in entity_mappings:
+            return entity_mappings[token.ent_type_]
+        else:
+            return token.lemma_
+
+    return t.pipe(
+        doc,
+        t.filter(lambda x: not (x.is_stop or x.is_punct or x.is_space)),
+        t.map(extract_text),
+        list,
     )
