@@ -8,9 +8,7 @@ dependencies:
   # Tooling requirements (don't edit)
   - pandoc
   - pandoc-crossref
-  - jq
   # Put any conda dependencies HERE
-  - graph-tool
 
   - pip:
     - numpy
@@ -22,23 +20,18 @@ dependencies:
     # Put any pip dependencies HERE (and no conda ones anywhere below)
     - spacy
     - gensim
-    - nltk
     - altair_saver
     - sh
-    - git+https://github.com/nestauk/research_daps@4e654f9
     - https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.0.0/en_core_web_lg-3.0.0.tar.gz
 
     # Tooling requirements (don't edit)
-    - jupyter
-    - jupyterlab
+    - ipykernel
     - filelock
     - tqdm
     - tables
     - black
     - blackcellmagic
     - click
-    - Sphinx
-    - sphinxcontrib-napoleon
     - awscli
     - flake8
     - flake8-black
@@ -47,10 +40,3 @@ dependencies:
     - mypy
     - jupytext
     - tornado>=5.0  # Stops luigi breaking jupyter
-    # These probably aren't needed
-    - pymysql
-    - sqlalchemy
-    - coverage
-    - jupyter_contrib_nbextensions
-    - jupyter_nbextensions_configurator
-    - pyyaml
