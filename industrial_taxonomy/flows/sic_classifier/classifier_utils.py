@@ -206,7 +206,7 @@ def create_org_data(match_threshold, sic_level=4):
             .drop_duplicates('description', keep='last')
            )
 
-    orgs[f'SIC_code'] = orgs[f'SIC5_code'].str[:level]
+    orgs[f'SIC_code'] = orgs[f'SIC5_code'].str[:sic_level]
     orgs = orgs[['description', f'SIC_code']]
     orgs = (orgs.reset_index().
             rename(columns={'description': 'text', 'SIC_code': 'label'}))

@@ -92,6 +92,7 @@ target/
 /data/external/
 /data/interim/
 /data/processed/
+/data/metaflow_cache/
 
 # Models
 /models/
