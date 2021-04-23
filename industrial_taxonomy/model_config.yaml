@@ -3,5 +3,21 @@ flows:
     run_id: 890
   glass:
     run_id: 414
+  glass_desc_preproc:
+    params:
+      n_docs: 100000
+      n_gram: 2
+      test_mode: false
+    run_id: 1012
+  topsbm_v1:
+    params:
+      n_docs: -1
+    run_id: 1020
+  topsbm_v2:
+    params:
+      n_docs: -1
+    run_id: 1025
+  sic:
+    run_id: 1059
 params:
   match_threshold: 60

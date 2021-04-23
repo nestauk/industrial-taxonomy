@@ -1,4 +1,6 @@
 """Data getters for Glass business website data."""
+import logging
+
 import pandas as pd
 from metaflow import namespace
 
@@ -51,3 +53,19 @@ def get_organisation_description() -> pd.DataFrame:
 def get_organisation_metadata() -> pd.DataFrame:
     """Metadata for Glass businesses (longitudinal)."""
     return GETTER.organisationmetadata
+
+
+@cache_getter_fn
+def get_description_tokens_v1() -> pd.DataFrame:
+    """Get tokens output from `GlassDescPreprocFlow` simple pipeline.
+
+    DEPRECATED!
+    """
+    logging.warning("THIS PIPELINE IS DEPRECATED! Use `get_description_tokens_v2`")
+    return flow_getter("GlassDescPreprocFlow").docs_v1
+
+
+@cache_getter_fn
+def get_description_tokens_v2() -> pd.DataFrame:
+    """Get tokens output from `GlassDescPreprocFlow` spacy pipeline."""
+    return flow_getter("GlassDescPreprocFlow").docs_v2
