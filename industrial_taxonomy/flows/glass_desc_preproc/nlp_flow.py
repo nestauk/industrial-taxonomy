@@ -1,23 +1,11 @@
 """Tokenises and ngrams Glass organisation descriptions."""
 import json
-from typing import Any, Generator
+from typing import Generator
 
 import toolz.curried as t
 from metaflow import FlowSpec, step, Parameter, IncludeFile, JSONType, conda_base
 
-from nlp_utils import (
-    make_ngrams,
-    filter_frequency,
-    post_token_filter,
-    spacy_pipeline,
-    bag_of_words as bag_of_words_,
-)
-
-
-@t.curry
-def log_(msg: str, x: Any, how=print) -> Any:
-    how(msg)
-    return x
+from nlp_utils import spacy_pipeline, ngram_pipeline, bag_of_words
 
 
 @conda_base(
@@ -44,7 +32,8 @@ class EscoeNlpFlow(FlowSpec):
     )
     entity_mappings = Parameter(
         "entity-mappings",
-        help="",
+        help="JSON string, mapping spacy entity types to the phrase to substitute"
+        "their lemmatisation with",
         type=JSONType,
         default=None,
     )
@@ -72,33 +61,23 @@ class EscoeNlpFlow(FlowSpec):
         self.keys = list(data.keys())
         print(f"Received {len(data)} documents")
 
-        nlp = spacy_pipeline()
-        bag_of_words = t.curry(bag_of_words_, entity_mappings=self.entity_mappings)
+        spacyify = t.curry(spacy_pipeline().pipe, n_process=self.n_process)
+
         tokens = t.pipe(
             self.pop_documents(),
-            # Step: Remove HTML
-            # TODO ?
+            # TODO Step: Remove HTML ?
             # Step: Spacy
-            t.curry(nlp.pipe, n_process=self.n_process),
-            # Step: bag of words
-            t.map(bag_of_words),
+            spacyify,
+            # Step: Spacy -> (ordered) Bag of words
+            t.map(bag_of_words(entity_mappings=None)),
+            # Step: construct n-grams
             list,
-            log_("Converted to Bag of Words"),
-            # # Filter low frequency terms (want to keep high frequency terms)
-            filter_frequency(kwargs={"no_above": 1}),
-            list,
-            # N-gram
-            t.curry(make_ngrams, n=self.n_gram),
-            # Filter ngrams: combination of stopwords, e.g. `of_the`
-            t.map(t.compose(list, post_token_filter)),
-            list,
-            # Filter ngrams:  low (and very high) frequency terms
-            filter_frequency,
-            list,
+            ngram_pipeline(n_gram=self.n_gram),
         )
 
         self.documents = dict(zip(self.keys, tokens))
         print(f"Processed {len(self.documents)} documents")
+        print(len(self.documents), len(self.keys))
         assert len(self.documents) == len(self.keys), (
             "Number of document ID's and processed documents does not match... "
             f"{len(self.keys)} != {len(self.documents)}"
@@ -112,20 +91,3 @@ class EscoeNlpFlow(FlowSpec):
 
 if __name__ == "__main__":
     EscoeNlpFlow()
-# else:
-#     # %%
-
-#     nlp = spacy_pipeline()
-#     with open("input_data.json") as f:
-#         documents = list(json.load(f).values())
-
-#     # %%
-
-#     bag_of_words_(nlp(documents[0]))
-#     # %%
-
-#     print("curry")
-#     bag_of_words = t.curry(bag_of_words_, entity_mappings)
-#     bag_of_words(nlp(documents[0]))
-
-# %%

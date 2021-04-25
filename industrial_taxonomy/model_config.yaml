@@ -5,9 +5,8 @@ flows:
     run_id: 414
   nlp_flow:
     params:
-      # n-docs: 100
-      n-gram: 2
-      n-process: 2
-    run_id: 1619190063148436
+      n-gram: 3
+      n-process: 1
+    run_id: 1105
 params:
   match_threshold: 60

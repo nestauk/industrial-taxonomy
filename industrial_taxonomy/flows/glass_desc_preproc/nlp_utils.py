@@ -1,6 +1,6 @@
 """Generic NLP utils."""
 from itertools import product
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, Generator, List, Optional, Set
 
 import spacy
 import toolz.curried as t
@@ -96,10 +96,26 @@ def spacy_pipeline() -> Language:
     return nlp
 
 
+@t.curry
 def bag_of_words(
     doc: Doc, entity_mappings: Optional[Dict[str, str]] = None
 ) -> List[str]:
-    """Convert spacy document to bag of words for topic modelling."""
+    """Convert spacy document to bag of words.
+
+    Args:
+        doc: Spacy document.
+        entity_mappings: Mapping between spacy entity types and the
+            phrase to use in place of the lemmatised token.
+
+    Returns:
+        List of tokens based on the spacy Doc.
+
+        Filters tokens that are stopwords, punctuation, and whitespace.
+
+        If a detected entity of a type in `entity_mappings`,
+        replace token with the value from that mapping;
+        otherwise extracts the lemmatisation of a token.
+    """
 
     entity_mappings_: Dict[str, str] = entity_mappings or {
         "CARDINAL": "CARDINAL",
@@ -134,5 +150,24 @@ def bag_of_words(
         doc,
         t.filter(lambda x: not (x.is_stop or x.is_punct or x.is_space)),
         t.map(extract_text),
+        list,
+    )
+
+
+@t.curry
+def ngram_pipeline(docs: List[List[str]], n_gram: int) -> List[List[str]]:
+    """Pipeline to turn tokens into a list of n-grams."""
+    return t.pipe(
+        docs,
+        # Filter low frequency terms (want to keep high frequency terms)
+        filter_frequency(kwargs={"no_above": 1}),
+        list,
+        # N-gram based on statistical co-occurrence
+        t.curry(make_ngrams, n=n_gram),
+        # Filter ngrams: combination of stopwords, e.g. `of_the`
+        t.map(t.compose(list, post_token_filter)),
+        list,
+        # Filter ngrams:  low (and very high) frequency terms
+        filter_frequency,
         list,
     )

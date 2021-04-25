@@ -1,3 +1,7 @@
+"""NLP pipeline for Glass-House descriptions.
+
+Takes ~1 hour on 567K documents running with `n-process` as 2.
+"""
 import json
 import logging
 from pathlib import Path
@@ -57,9 +61,9 @@ if __name__ == "__main__":
         flow_file,
         cmd_params,
         metaflow_args={
-            "--datastore": "local",
-            "--metadata": "local",
-            # "--with": "batch",
+            # "--datastore": "local",
+            # "--metadata": "local",
+            "--with": "batch:cpu=1,memory=32000",
             "--environment": "conda",
         },
     )
