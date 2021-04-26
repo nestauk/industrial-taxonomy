@@ -1,6 +1,6 @@
-"""Generic NLP utils."""
+"""Core NLP pipeline functionality for `nlp_flow.EscoeNlpFlow`."""
 from itertools import product
-from typing import Any, Dict, Iterable, Generator, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 import spacy
 import toolz.curried as t
@@ -19,22 +19,21 @@ SECOND_ORDER_STOP_WORDS: Set[str] = t.pipe(
 )
 
 
-def make_ngrams(
+def build_ngrams(
     documents: List[List[str]], n: int = 2, phrase_kws: Optional[Dict[str, Any]] = None
 ) -> List[List[str]]:
     """Create ngrams using Gensim's phrases.
 
     Args:
-        documents: Tokenized documents.
+        documents: List of tokenised documents.
         n: The `n` in n-gram.
         phrase_kws: Passed to `gensim.models.Phrases`.
 
     Returns:
-        N-grams
+        List of n-grammed documents.
     """
-    assert isinstance(n, int)
     if n < 2:
-        raise ValueError("Pass n >= 2 to generate n-grams")
+        return documents
 
     def_phrase_kws = {
         "scoring": "npmi",
@@ -55,22 +54,21 @@ def make_ngrams(
     return list(tokenised)
 
 
-def post_token_filter(tokens: Iterable[str]) -> Iterable[str]:
-    """Post n-gram token filter."""
-
-    def predicate(token: str) -> bool:
-        return (
+def _token_filter(tokens: Iterable[str]) -> Iterable[str]:
+    """Filter short n-grams and bi-grams that are just stopwords."""
+    return filter(
+        lambda token: (
             # No short words
             (not len(token) <= 2)
             # No stopwords
             and (token not in SECOND_ORDER_STOP_WORDS)
-        )
-
-    return filter(predicate, tokens)
+        ),
+        tokens,
+    )
 
 
 @t.curry
-def filter_frequency(
+def _filter_frequency(
     documents: List[str], kwargs: Optional[Dict[str, Any]] = None
 ) -> Iterable[str]:
     """Filter `documents` based on token frequency corpus."""
@@ -90,17 +88,21 @@ def filter_frequency(
 
 
 def spacy_pipeline() -> Language:
-    """Spacy NLP pipeline - large english model with entity merging."""
+    """Spacy NLP pipeline - large english model with entity merging.
+
+    Returns:
+        A spacy language model.
+    """
     nlp = spacy.load("en_core_web_lg")
     nlp.add_pipe("merge_entities")
     return nlp
 
 
 @t.curry
-def bag_of_words(
+def spacy_to_tokens(
     doc: Doc, entity_mappings: Optional[Dict[str, str]] = None
 ) -> List[str]:
-    """Convert spacy document to bag of words.
+    """Convert spacy document to list of tokens.
 
     Args:
         doc: Spacy document.
@@ -155,19 +157,27 @@ def bag_of_words(
 
 
 @t.curry
-def ngram_pipeline(docs: List[List[str]], n_gram: int) -> List[List[str]]:
-    """Pipeline to turn tokens into a list of n-grams."""
+def ngram_pipeline(docs: List[List[str]], n: int) -> List[List[str]]:
+    """Pipeline to turn tokens into a list of n-grams.
+
+    Args:
+        docs: List of document tokens.
+        n: the n in n-gram.
+
+    Returns:
+        List of n-grammed documents.
+    """
     return t.pipe(
         docs,
         # Filter low frequency terms (want to keep high frequency terms)
-        filter_frequency(kwargs={"no_above": 1}),
+        _filter_frequency(kwargs={"no_above": 1}),
         list,
         # N-gram based on statistical co-occurrence
-        t.curry(make_ngrams, n=n_gram),
+        t.curry(build_ngrams, n=n),
         # Filter ngrams: combination of stopwords, e.g. `of_the`
-        t.map(t.compose(list, post_token_filter)),
+        t.map(t.compose(list, _token_filter)),
         list,
         # Filter ngrams:  low (and very high) frequency terms
-        filter_frequency,
+        _filter_frequency,
         list,
     )

@@ -1,11 +1,23 @@
-"""Tokenises and ngrams Glass organisation descriptions."""
+"""Tokenises and ngrams documents.
+
+- Run documents through a spacy pipeline
+  (large english model with entity merging)
+- Convert to bag of words
+  (using either lemmatisation or by remapping certain entities to a common token
+   - configured by `entity_mappings` param)
+- Filter low frequency words
+  (note: purely done for computational efficiency to avoid explosion of n-grams)
+- Generate n-grams using statistical co-occurrence (gensim)
+- Filter low and high frequency n-grams
+- Filter very short n-grams or bi-grams that are purely stop words
+"""
 import json
 from typing import Generator
 
 import toolz.curried as t
 from metaflow import FlowSpec, step, Parameter, IncludeFile, JSONType, conda_base
 
-from nlp_utils import spacy_pipeline, ngram_pipeline, bag_of_words
+from nlp_utils import spacy_pipeline, ngram_pipeline, spacy_to_tokens
 
 
 @conda_base(
@@ -69,10 +81,10 @@ class EscoeNlpFlow(FlowSpec):
             # Step: Spacy
             spacyify,
             # Step: Spacy -> (ordered) Bag of words
-            t.map(bag_of_words(entity_mappings=None)),
+            t.map(spacy_to_tokens(entity_mappings=None)),
             # Step: construct n-grams
             list,
-            ngram_pipeline(n_gram=self.n_gram),
+            ngram_pipeline(n=self.n_gram),
         )
 
         self.documents = dict(zip(self.keys, tokens))
