@@ -1,6 +1,7 @@
-"""NLP pipeline for Glass-House descriptions.
+"""Run NLP pipeline for Glass-House descriptions.
 
-Takes ~1 hour on 567K documents running with `n-process` as 2.
+Takes ~2 hours on 567K documents running with `n-process` as 1.
+(Careful setting `n-process` higher on a local machine due to memory usage)
 """
 import json
 import logging
@@ -16,26 +17,24 @@ logger = logging.getLogger(__name__)
 
 
 def generate_input_data(match_threshold: int, n_docs: Optional[int] = None) -> Path:
+    """Output descriptions after matching to companies house and thresholding."""
     path = Path("input_data.json").resolve()
-    if path.exists():
-        return path
-    else:
-        (
-            get_organisation_description()
-            # Only orgs with a companies house match
-            .merge(
-                get_glass_house()
-                .query(f"score > {match_threshold}")
-                .drop(["company_number"], axis=1),
-                on="org_id",
-            )
-            .sort_values("score", ascending=False)
-            .drop(["score"], axis=1)
-            .drop_duplicates(subset=["org_id"], keep="last")
-            .set_index("org_id")["description"]
-            .head(n_docs)  # head takes better matches (we are not random sampling)
-            .to_json(path)
+    (
+        get_organisation_description()
+        # Only orgs with a companies house match
+        .merge(
+            get_glass_house()
+            .query(f"score > {match_threshold}")
+            .drop(["company_number"], axis=1),
+            on="org_id",
         )
+        .sort_values("score", ascending=False)
+        .drop(["score"], axis=1)
+        .drop_duplicates(subset=["org_id"], keep="last")
+        .set_index("org_id")["description"]
+        .head(n_docs)  # head takes better matches (we are not random sampling)
+        .to_json(path)
+    )
 
     return path
 
