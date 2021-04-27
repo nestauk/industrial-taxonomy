@@ -17,14 +17,17 @@ dependencies:
   - gcc_linux-64  # [not darwin]
   - metaflow
   - networkx
-  - altair-saver
+  - nltk
   # Put any conda dependencies here
 
   - pip:
     # Put any pip dependencies here (and no conda ones anywhere below)
-  - communities
-  - webdriver-manager
-  # Tooling requirements (don't edit)
+    - communities
+    - webdriver-manager
+    - altair-saver
+    - rake_nltk
+    - keybert
+    # Tooling requirements (don't edit)
     - tornado>=5.0  # Stops luigi breaking jupyter
   - tqdm
   - pyyaml

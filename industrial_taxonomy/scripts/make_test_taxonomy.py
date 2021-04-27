@@ -86,7 +86,7 @@ def make_kws_report():
 
 def kw_in_descr(desc: str, kw: str) -> bool:
     """True if a kw is in a description"""
-    return kw in desc
+    return ' '+kw+' ' in desc
 
 
 def get_edges(description: str, terms: list) -> list:

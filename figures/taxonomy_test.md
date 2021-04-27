@@ -59,7 +59,7 @@ We use open source implementations of these three algorithms in order to test th
 
 Figure 1 present the steps in our pipeline.
 
-![Figure: Data processing and analyis pipeline](extract_pipeline.png)
+![Figure: Data processing and analyis pipeline](https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/extract_pipeline.png)
 
 ### a. Creation of industry vocabulary
 
@@ -84,7 +84,7 @@ Some observations:
 * The frequency distribution is highly skewed. Most keywords appear in very few documents (the top frequency quartile ranges between 2 and 4 words depending on the method).
 * In terms of performance, RAKE and YAKE are significantly faster than KeyBERT. RAKE takes 20 seconds to run over 10,000 `7490` company descriptions, YAKE takes 13 minutes and KeyBERT four hours (see figure 2, noting the logarithmic scale in the horizontal axis).
 
-![Figure 2: Extraction algorithm performance](png/kw_perf.png)
+![Figure 2: Extraction algorithm performance](https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/extr_perf.png)
 
 ### b. Filtering of terms
 
@@ -127,11 +127,11 @@ In Figure 3 we show the most frequent KW/KP in our corpus by SIC code and keywor
 
 It also appear that, in general, KeyBERT is better at capturing longer and more detailed KPs describing what a business does.
 
-![Figure 3: KW/KP frequencies](png/kw_freqs.png)
+![Figure 3: KW/KP frequencies](https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/kw_freqs.png)
 
 In Figure 4 we present the same information but only including terms that are not featured in UNSPSC according to our naive filter. It shows that while implementing the filter would help us to remove some irrelevant terms such as the location of a business in the UK, they also would lead us to lose many KW/KPs that are informative about what a business does and therefore relevant for the construction of our taxonomy. For this reason, we have decided not to apply the UNSPSC filter and keep all KW/KPs.
 
-![Figure 4: KW/KP frequencies (not featured in UNSPSC)](png/kw_freqs_unspsc.png)
+![Figure 4: KW/KP frequencies (not featured in UNSPSC)](https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/kw_freqs_unspsc.png)
 
 ### c. Network building and community extraction
 
@@ -151,7 +151,7 @@ These preliminary results suggest that the approach that we have piloted here ha
      * `6201`: Communities 9, 14, 16
      * `7490`: Communities 3,4,6,10,17,18,22
 
-| community   | keywords                                                                                                                                                                                                                                                                                                        |
+| No.   | keywords                                                                                                                                                                                                                                                                                                        |
 |:------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **0**       | 2016 profession built environment clear collect consultancy services bring full range technical support consultancy firm idea today development house end software delivery robotic process automation experience working wide range software consultancy found allows us hard work software development hou... |
 | **1**       | access founder host limit machine learning managing director right time test control data science transform network usa computer systems director latest software sap version extensive experience artificial intelligence code ireland stock control systems ltd. logic power data systems practice managem... |
@@ -176,7 +176,7 @@ These preliminary results suggest that the approach that we have piloted here ha
 **Table 3: Output KW/KP communities for SIC code `6201`**
 
 
-| community   | keywords                                                                                                                                                                                                                                                                                                        |
+| No.   | keywords                                                                                                                                                                                                                                                                                                        |
 |:------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **0**       | aberdeen equipment manufacturers passion core development projects united arab emirates portable appliance testing event fully qualified gas industry group key conservation volunteers ltd. member network oil oil and gas locksmith services radiation protection providing support rail reach share speci... |
 | **1**       | customer care age party wall etc young people social social enterprise social enterprises continuous professional development social media pet message across dog friendly service take pride domestic and commercial home counties young traditional values agency specialising taken care interior interio... |

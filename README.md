@@ -25,7 +25,6 @@ Run `python industrial_taxonomy/scripts/make_test_taxonomy.py` to build a networ
 
 Control the sectors used in these experiments in `industrial_taxonomy/model_config.yaml`.
 
-
 ## Code-style
 
 Please run `make lint` to format your code to a common style, and to lint code with flake8.
