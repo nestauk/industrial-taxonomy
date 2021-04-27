@@ -18,6 +18,8 @@ dependencies:
   - metaflow
   - networkx
   - nltk
+  - graph-tool
+  - xlrd
   # Put any conda dependencies here
 
   - pip:
