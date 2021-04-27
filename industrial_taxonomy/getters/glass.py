@@ -57,4 +57,4 @@ def get_organisation_metadata() -> pd.DataFrame:
 def get_description_tokens() -> pd.DataFrame:
     """Get tokens output from `GlassDescPreprocFlow` spacy pipeline."""
     run_id = industrial_taxonomy.config["flows"]["nlp_flow"]["run_id"]
-    return flow_getter("EscoeNlpFlow", run_id=run_id).docs
+    return flow_getter("EscoeNlpFlow", run_id=run_id).documents
