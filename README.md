@@ -15,15 +15,21 @@ Adding `temp_dir` in a `.env` file, e.g. `temp_dir=/Users/<username>/GIT/industr
 
 Note: metaflow does do some limited caching by itself (i.e. without setting `temp_dir`) but is not as consistent and will not persist between reboots.
 
-## Functionality
+## Pipeline components
 
-### Experimental keyword-extraction and keyword community detection.
+### Entity recognition and n-gramming of glass descriptions
 
-Run `python industrial_taxonomy/scripts/extract_description_keywords.py` to extract keywords from a sample of test sectors.
+- Load: 
+  ```python
+  from industrial_taxonomy.getters.glass import get_description_tokens
 
-Run `python industrial_taxonomy/scripts/make_test_taxonomy.py` to build a network of keyword co-occurrences and extract keyword communities indicative of sectors.
-
-Control the sectors used in these experiments in `industrial_taxonomy/model_config.yaml`.
+  get_description_tokens
+  ```
+- Configure:
+  - Flow parameters - `flows.nlp_flow.params` in `model_config.yaml`
+  - Flow execution environment - `metaflow_args` in `industrial_taxonomy/flows/glass_description_ngrams/run.py`
+- Run with: `python industrial_taxonomy/flows/glass_description_ngrams/run.py`
+  - Note - Runs with AWS Batch
 
 ## Code-style
 
