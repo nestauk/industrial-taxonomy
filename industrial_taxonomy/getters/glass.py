@@ -51,3 +51,15 @@ def get_organisation_description() -> pd.DataFrame:
 def get_organisation_metadata() -> pd.DataFrame:
     """Metadata for Glass businesses (longitudinal)."""
     return GETTER.organisationmetadata
+
+
+@cache_getter_fn
+def get_description_tokens() -> pd.DataFrame:
+    """Get tokens output from `EscoeNlpFlow` spacy pipeline."""
+    run_id = industrial_taxonomy.config["flows"]["nlp_flow"]["run_id"]
+    return {
+        int(org_id): document_tokens  # Ensure `org_id` is an `int`
+        for org_id, document_tokens in flow_getter(
+            "EscoeNlpFlow", run_id=run_id
+        ).documents.items()
+    }

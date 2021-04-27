@@ -15,6 +15,22 @@ Adding `temp_dir` in a `.env` file, e.g. `temp_dir=/Users/<username>/GIT/industr
 
 Note: metaflow does do some limited caching by itself (i.e. without setting `temp_dir`) but is not as consistent and will not persist between reboots.
 
+## Pipeline components
+
+### Entity recognition and n-gramming of glass descriptions
+
+- Load: 
+  ```python
+  from industrial_taxonomy.getters.glass import get_description_tokens
+
+  get_description_tokens
+  ```
+- Configure:
+  - Flow parameters - `flows.nlp_flow.params` in `model_config.yaml`
+  - Flow execution environment - `metaflow_args` in `industrial_taxonomy/flows/glass_description_ngrams/run.py`
+- Run with: `python industrial_taxonomy/flows/glass_description_ngrams/run.py`
+  - Note - Runs with AWS Batch
+
 ## Code-style
 
 Please run `make lint` to format your code to a common style, and to lint code with flake8.
