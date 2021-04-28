@@ -49,7 +49,7 @@ class OrderedDataset(Dataset):
     """
 
     def __init__(self, tokenizer: PreTrainedModel,
-            samples: List[Sample], config: dict, class_lookup: dict) -> None:
+            samples: List[Sample], config: dict, label_lookup: dict) -> None:
         """
         Args:
             tokenizer (transformers.PreTrainedTokenizer): Pretrained tokenizer
@@ -57,7 +57,7 @@ class OrderedDataset(Dataset):
             samples (list): The samples to be included in the dataset
         """
         self.tokenizer = tokenizer
-        self.class_lookup = class_lookup
+        self.label_lookup = label_lookup
         self.config = config
         self.current = 0
         self.features = self._sort_samples(samples)
@@ -82,8 +82,8 @@ class OrderedDataset(Dataset):
             text=sample.text,
             **self.config)
 
-        if self.class_lookup is not None:
-            label = self.class_lookup[sample.label]
+        if self.label_lookup is not None:
+            label = self.label_lookup.get(sample.label)
         else:
             label=sample.label
 

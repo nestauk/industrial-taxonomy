@@ -44,6 +44,32 @@ class TrainTextClassifier(FlowSpec):
                 dataset, encode_config, self.label_lookup)
         return encodings
 
+    def predict(self, dataset):
+        for sample in dataset:
+            if 'label' not in sample:
+                sample['label'] = None
+        encodings = self._encode(dataset)
+
+        inverse_label_lookup = {v: k for k, v in self.label_lookup.items()}
+
+        training_args_config = self.config["training_args"]
+
+        training_args = TrainingArguments(**training_args_config)
+        logger.info('Loading fine-tuned model')
+        trainer = Trainer(
+                model=self.model,
+                args=training_args,
+                data_collator=BatchCollator(self.tokenizer)
+                )
+
+        logger.info(f'Predicting labels for {len(self.train_encodings)} samples')
+        preds = trainer.predict(encodings)
+        pred_probs = softmax(preds.predictions, axis=1)
+        pred_labels = np.argmax(preds.predictions, axis=1)
+        pred_labels = [inverse_label_lookup[p] for p in pred_labels]
+
+        return pred_labels, pred_probs
+
     @step
     def start(self):
         tokenizer_config = self.config["tokenizer"]
@@ -127,6 +153,7 @@ class TrainTextClassifier(FlowSpec):
                 )
         logger.info(f'Training model with {len(self.train_encodings)} samples')
         trainer.train()
+        self.model = trainer.model
 
         trainer.save_model(training_args_config['output_dir'])
         self.next(self.end)
