@@ -33,6 +33,7 @@ flows:
     documents_path: /Users/George/nesta/industrial-taxonomy/data/raw/train_sample.json
     freeze_model: 'False'
     run_id: 1096
+    tag: the_big_doodle
   companies_house:
     run_id: 890
   glass:

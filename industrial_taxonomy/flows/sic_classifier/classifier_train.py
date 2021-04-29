@@ -40,9 +40,10 @@ class TrainTextClassifier(FlowSpec):
             type=JSONType,
             )
 
-    def _encode(self, dataset, tokenizer, encode_config):
+    def _encode(self, dataset):
+        encode_config = self.config["encode"]
         dataset = [Sample(**s) for s in dataset]
-        encodings = OrderedDataset(tokenizer, 
+        encodings = OrderedDataset(self.tokenizer, 
                 dataset, encode_config, self.label_lookup)
         return encodings
 
@@ -163,7 +164,7 @@ class TrainTextClassifier(FlowSpec):
 
         training_args = TrainingArguments(**training_args_config)
         trainer = Trainer(
-                model=self.model(self.freeze_model),
+                model=model(self.freeze_model),
                 args=training_args,
                 train_dataset=self.train_encodings,
                 eval_dataset=self.val_encodings,
