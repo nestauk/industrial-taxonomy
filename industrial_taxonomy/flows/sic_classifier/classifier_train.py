@@ -6,8 +6,11 @@ import json
 import logging
 from functools import partial
 from dataclasses import dataclass, field
+from pathlib import Path
 
-from metaflow import FlowSpec, step, Parameter, JSONType
+from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
+import numpy as np
+from scipy.special import softmax
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
@@ -37,32 +40,49 @@ class TrainTextClassifier(FlowSpec):
             type=JSONType,
             )
 
-    def _encode(self, dataset):
-        encode_config = self.config["encode"]
+    def _encode(self, dataset, tokenizer, encode_config):
         dataset = [Sample(**s) for s in dataset]
-        encodings = OrderedDataset(self.tokenizer, 
+        encodings = OrderedDataset(tokenizer, 
                 dataset, encode_config, self.label_lookup)
         return encodings
 
-    def predict(self, dataset):
+    @classmethod
+    def load_trained_model(cls, run_id):
+        run = Run(f"{cls.__name__}/{run_id}")
+        model = run.data.model
+        return model
+
+    @classmethod
+    def predict(cls, dataset, run_id, model=None):
+        run = Run(f"{cls.__name__}/{run_id}")
+        run_config = run.data.config
+
+        if model is None:
+            model = self.load_trained_model(run_id)
+
+        samples = []
         for sample in dataset:
             if 'label' not in sample:
                 sample['label'] = None
-        encodings = self._encode(dataset)
+            samples.append(Sample(**sample))
 
-        inverse_label_lookup = {v: k for k, v in self.label_lookup.items()}
-
-        training_args_config = self.config["training_args"]
-
-        training_args = TrainingArguments(**training_args_config)
-        logger.info('Loading fine-tuned model')
-        trainer = Trainer(
-                model=self.model,
-                args=training_args,
-                data_collator=BatchCollator(self.tokenizer)
+        label_lookup = run.data.label_lookup
+        tokenizer = run.data.tokenizer
+        encodings = OrderedDataset(
+                run.data.tokenizer,
+                samples,
+                run_config['encode'],
+                run.data.label_lookup
                 )
 
-        logger.info(f'Predicting labels for {len(self.train_encodings)} samples')
+        inverse_label_lookup = {v: k for k, v in run.data.label_lookup.items()}
+
+        logger.info('Loading fine-tuned model')
+        trainer = Trainer(
+                model=run.data.model,
+                data_collator=BatchCollator(run.data.tokenizer)
+                )
+        logger.info(f'Predicting labels for {len(samples)} samples')
         preds = trainer.predict(encodings)
         pred_probs = softmax(preds.predictions, axis=1)
         pred_labels = np.argmax(preds.predictions, axis=1)
@@ -92,7 +112,6 @@ class TrainTextClassifier(FlowSpec):
             if label not in self.label_lookup:
                 self.label_lookup[label] = i
                 i += 1
-#            doc['label'] = self.label_lookup[label]
 
         self.next(self.train_val_test_split)
 
@@ -139,7 +158,7 @@ class TrainTextClassifier(FlowSpec):
         model_config = self.config["model"]
         model_config["num_labels"] = len(self.label_lookup)
         logger.info('Loading pre-trained model')
-        self.model = partial(model_init, model_config)
+        model = partial(model_init, model_config)
         training_args_config = self.config["training_args"]
 
         training_args = TrainingArguments(**training_args_config)
