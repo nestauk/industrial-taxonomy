@@ -49,7 +49,7 @@ class OrderedDataset(Dataset):
     """
 
     def __init__(self, tokenizer: PreTrainedModel,
-            samples: List[Sample], config: dict, class_lookup: dict) -> None:
+            samples: List[Sample], config: dict, label_lookup: dict) -> None:
         """
         Args:
             tokenizer (transformers.PreTrainedTokenizer): Pretrained tokenizer
@@ -57,7 +57,7 @@ class OrderedDataset(Dataset):
             samples (list): The samples to be included in the dataset
         """
         self.tokenizer = tokenizer
-        self.class_lookup = class_lookup
+        self.label_lookup = label_lookup
         self.config = config
         self.current = 0
         self.features = self._sort_samples(samples)
@@ -66,7 +66,7 @@ class OrderedDataset(Dataset):
         """Encodes and sorts samples"""
         features = [self._encode(s) for s in samples]
         lens = [len(f.input_ids) for f in features]
-        _, features = (list(t) for t in zip(*sorted(zip(lens, features))))
+        features = [f for _, f in sorted(zip(lens, features), key=lambda t: t[0])]
         return features
         
     def _encode(self, sample: Sample) -> Features:
@@ -82,8 +82,8 @@ class OrderedDataset(Dataset):
             text=sample.text,
             **self.config)
 
-        if self.class_lookup is not None:
-            label = self.class_lookup[sample.label]
+        if self.label_lookup is not None:
+            label = self.label_lookup.get(sample.label)
         else:
             label=sample.label
 
@@ -105,10 +105,10 @@ class OrderedDataset(Dataset):
             self.current = 0
         sample = self.features[self.current]
         self.current += 1
-        return self.encode(sample)
+        return sample
 
     def __len__(self):
-        return len(self.sample)
+        return len(self.features)
 
 
 def pad_seq(seq: List[int], max_len: int, pad_value: int) -> List[int]:
@@ -173,18 +173,6 @@ def compute_metrics(pred):
         'recall': recall
     }   
 
-def load_trained_model(path, tokenizer, training_args):
-    model = AutoModelForSequenceClassification.from_pretrained(
-        path, return_dict=True)
-
-    trainer = Trainer(
-	model=model,
-	args=training_args,
-	data_collator=SmartCollator(tokenizer=tokenizer),
-	compute_metrics=compute_metrics,
-    )
-    return trainer
-
 @cache_getter_fn
 def create_org_data(match_threshold, sic_level=4):
     glass_house = get_glass_house()
@@ -206,7 +194,7 @@ def create_org_data(match_threshold, sic_level=4):
             .drop_duplicates('description', keep='last')
            )
 
-    orgs[f'SIC_code'] = orgs[f'SIC5_code'].str[:level]
+    orgs[f'SIC_code'] = orgs[f'SIC5_code'].str[:sic_level]
     orgs = orgs[['description', f'SIC_code']]
     orgs = (orgs.reset_index().
             rename(columns={'description': 'text', 'SIC_code': 'label'}))
