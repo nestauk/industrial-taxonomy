@@ -1,7 +1,9 @@
 flows:
+  companies_house:
+    run_id: 890
+  glass:
+    run_id: 414
   sic4_classifier:
-    documents_path: data/raw/train_sample.json
-    freeze_model: 'False'
     config:
       encode:
         add_special_tokens: true
@@ -17,32 +19,31 @@ flows:
       tokenizer:
         pretrained_model_name_or_path: distilbert-base-uncased
       train_eval_split:
+        eval_size: 0.25
         random_state: 42
         train_size: 0.75
-        eval_size: 0.25
       training_args:
-        output_dir: models/
         learning_rate: 1.0e-05
         logging_dir: ./logs
         logging_steps: 100
         num_train_epochs: 1
+        output_dir: models/
         per_device_eval_batch_size: 16
         per_device_train_batch_size: 8
         save_total_limit: 2
         warmup_steps: 500
         weight_decay: 0.01
-    run_id: 1096
+    documents_path: data/raw/sic4_train.json
+    freeze_model: false
+    run_id: 1146
   sic4_preprocessing:
-    sic_level: 4
-    match_threshold: 75
-    test: True
     config:
       train_test_split:
         random_state: 42
         train_size: 0.75
-  companies_house:
-    run_id: 890
-  glass:
-    run_id: 414
+    match_threshold: 75
+    run_id: 1145
+    sic_level: 4
+    test: false
 params:
   match_threshold: 60
