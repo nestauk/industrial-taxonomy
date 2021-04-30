@@ -12,7 +12,7 @@ if __name__ == "__main__":
     FLOW_ID = "sic4_classifier"
     task_config = config["flows"][FLOW_ID]
     output_dir = task_config["config"]["training_args"]["output_dir"]
-    task_config["config"]["training_args"]["output_dir"] = str(project_dir / output_dir) 
+    task_config["config"]["training_args"]["output_dir"] = str(project_dir / output_dir)
     flow_config = {
             '--documents_path': str(project_dir / task_config['documents_path']),
             '--freeze_model': str(task_config['freeze_model']),
