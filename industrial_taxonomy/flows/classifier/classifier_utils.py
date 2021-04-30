@@ -43,6 +43,7 @@ class Features:
     input_ids: List[int]
     attention_mask: List[int]
     label: int
+    index: int
     
 class OrderedDataset(Dataset):
     """A dataset that returns samples in the order that they were inserted.
@@ -89,7 +90,8 @@ class OrderedDataset(Dataset):
 
         return Features(input_ids=encode_dict['input_ids'],
                         attention_mask=encode_dict['attention_mask'],
-                        label=label
+                        label=label,
+                        index=sample.index
                        )
     
     def __getitem__(self, _) -> Features:
