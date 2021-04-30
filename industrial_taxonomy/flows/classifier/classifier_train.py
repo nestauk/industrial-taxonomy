@@ -12,7 +12,6 @@ from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
 import numpy as np
 from scipy.special import softmax
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
         TrainingArguments, Trainer)
 
