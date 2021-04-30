@@ -18,6 +18,8 @@ dependencies:
   - metaflow
   - xlrd
   - umap-learn
+  - transformers
+  - scikit-learn
   # Put any conda dependencies here
 
   - pip:
