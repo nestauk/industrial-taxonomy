@@ -14,11 +14,10 @@ flows:
         return_dict: true
       tokenizer:
         pretrained_model_name_or_path: distilbert-base-uncased
-      train_val_test_split:
+      train_eval_split:
         random_state: 42
-        test_size: 0.3
-        train_size: 0.5
-        val_size: 0.2
+        train_size: 0.75
+        val_size: 0.25
       training_args:
         learning_rate: 1.0e-05
         logging_dir: ./logs

@@ -114,24 +114,34 @@ class TrainTextClassifier(FlowSpec):
                 self.label_lookup[label] = i
                 i += 1
 
-        self.next(self.train_val_test_split)
+        self.next(self.train_eval_split)
 
+#     @step
+#     def train_val_test_split(self):
+#         """Splits the data into train, evaluation and test sets"""
+#         split_config = self.config["train_val_test_split"]
+#         train_size = split_config.pop('train_size')
+#         val_size = split_config.pop('val_size')
+#         test_size = split_config.pop('test_size')
+# 
+#         if sum([train_size, test_size, val_size]) > 1:
+#             raise ValueError('Sum of train, validation and test sizes must be \xe2 1')
+# 
+#         self.train_set, rest = train_test_split(self.documents, train_size=train_size,
+#                 test_size=val_size + test_size, **split_config)
+#         self.val_set, self.test_set = train_test_split(rest, train_size=val_size, 
+#                 test_size=test_size, **split_config)
+# 
+#         self.next(self.encode_train_set, self.encode_val_set)
+    
     @step
-    def train_val_test_split(self):
-        """Splits the data into train, evaluation and test sets"""
-        split_config = self.config["train_val_test_split"]
+    def train_eval_split(self):
+        """Splits the data into train and evaluation sets"""
+        split_config = self.config["train_eval_split"]
         train_size = split_config.pop('train_size')
         val_size = split_config.pop('val_size')
-        test_size = split_config.pop('test_size')
-
-        if sum([train_size, test_size, val_size]) > 1:
-            raise ValueError('Sum of train, validation and test sizes must be \xe2 1')
-
         self.train_set, rest = train_test_split(self.documents, train_size=train_size,
-                test_size=val_size + test_size, **split_config)
-        self.val_set, self.test_set = train_test_split(rest, train_size=val_size, 
-                test_size=test_size, **split_config)
-
+                test_size=val_size, **split_config)
         self.next(self.encode_train_set, self.encode_val_set)
 
     @step
@@ -175,7 +185,7 @@ class TrainTextClassifier(FlowSpec):
         trainer.train()
         self.model = trainer.model
 
-        trainer.save_model(training_args_config['output_dir'])
+#         trainer.save_model(training_args_config['output_dir'])
         self.next(self.end)
 
     @step

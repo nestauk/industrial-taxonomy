@@ -173,18 +173,6 @@ def compute_metrics(pred):
         'recall': recall
     }   
 
-def load_trained_model(path, tokenizer, training_args):
-    model = AutoModelForSequenceClassification.from_pretrained(
-        path, return_dict=True)
-
-    trainer = Trainer(
-	model=model,
-	args=training_args,
-	data_collator=SmartCollator(tokenizer=tokenizer),
-	compute_metrics=compute_metrics,
-    )
-    return trainer
-
 @cache_getter_fn
 def create_org_data(match_threshold, sic_level=4):
     glass_house = get_glass_house()
