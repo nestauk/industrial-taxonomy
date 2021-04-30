@@ -2,6 +2,8 @@ import logging
 import json
 from pathlib import Path
 
+from metaflow import Run
+
 from industrial_taxonomy import config, project_dir
 from industrial_taxonomy.utils.metaflow_runner import update_model_config, execute_flow
 from industrial_taxonomy.flows.classifier.classifier_utils import create_org_data 
