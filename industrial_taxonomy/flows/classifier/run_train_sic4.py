@@ -46,7 +46,7 @@ if __name__ == "__main__":
     documents_path = str(project_dir / task_config['documents_path'])
 
     with open(documents_path, 'w') as f:
-        json.dump(preprocess_run.data.train_data, f)
+        json.dump(preprocess_run.data.train_set, f)
 
     flow_config = {
             '--documents_path': documents_path,
