@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Building an industry code classifier with transformers using Glass and Companies house</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      background-color: #f0f0f0;
+      padding: .2em .4em;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      background-color: #f0f0f0;
+      padding: 1em;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Building an industry code classifier with transformers using Glass and Companies house</h1>
+</header>
+<h1 id="summary">1. Summary</h1>
+<p>In this section we describe the construction of a classification model that is able to assign companies 4-digit SIC codes based on their business descriptions. This is used to highlight some of the challenges associated with categorising companies with single industrial activities. The steps in this process are:</p>
+<ol type="1">
+<li>Train a supervised text classification model based on company descriptions from Glass AI and SIC codes from Companies House.</li>
+<li>Apply the model to a test set of company descriptions not used to build the model.</li>
+</ol>
+<h1 id="methodology">2. Methodology</h1>
+<p>The development of the classifier was treated as a supervised machine learning problem. In practice, there are no official datasets that contain company descriptions and their associated SIC codes. Therefore, we combined two sources of data to create our final training dataset. These are descriptions of companies obtained from their websites by Glass and the SIC code associated with each company from Companies House. These two datasets do not have innate fields that allow for direct joining therefore entries from Companies House were matched to their likely descriptions using a previously developed fuzzy matching approach.</p>
+<p>For the modelling itself, a transformer based approach has been taken. Transformers are a state-of-the-art neural network architecture that have shown to produce improved results on many language based machine learning tasks and have reduced the resources needed to create performant models. Importantly for this work, pre-trained models whose parameters have already been tuned on large volumes of text can be fine tuned for downstream tasks such as text classification. This can be done with relatively little data. It is this approach that we use here.</p>
+<p>For the SIC code classifier, we fine-tuned an English language DistilBERT model. An additional classification layer was added to this neural network and it was trained on over 300,000 company descriptions and their labels. The model was then applied to 50,000 unseen business descriptions and the predictions were compared to the “ground truth” labels.</p>
+<h2 id="results">2. Results</h2>
+<p>Evaluating a classification model with 615 possible output classes is not a trivial task never an easy task as overall accuracy metrics often do not capture the differences and tradeoffs in precision and recall of the many classes. Specifically in this task there are additional complicating factors:</p>
+<ol type="1">
+<li>The 4-digit SIC code labels in the training data are often not appropriate for the business description. It is unclear whether this is due to the fuzzy matching resulting in some mismatched data or poor labelling on Companies House.</li>
+<li>In some cases it is not possible to determine the purpose of the company from the website description provided by Glass AI. This might be because the text describes other attributes of the company such as its founding story, the description may be very short or the text may simply be website metadata.</li>
+<li>The dataset is highly imbalanced. With a large number of classes it is already challenging to optimise accuracy for all possible labels and this is exacerbated by a heavy class imbalance. Some labels are represented tens of thousands of times in the training data, many others are present fewer than ten times.</li>
+</ol>
+<p>Despite these limitations, there are useful insights that can be be gained from the outputs of the classifier and its predictions. In <span class="citation" data-cites="fig:predicted_sic4_representation_barh">[@fig:predicted_sic4_representation_barh]</span> we can see 20 predicted SIC codes that are overrepresented and 20 codes that are underrepresented compared to the actual codes associated with companies in the data. Only 95 of the 615 possible 4-digit SIC codes were produced by the classifier to label companies, suggesting that while the classifier believes some codes are very widely applicable, there are many codes that are challenging for the classifier to identify from company descriptions.</p>
+<p><img src="https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/predicted_sic4_representation_barh.png" alt="Over and underrepresented predicted 4-digit codes compared to the labelled data." />{#fig: predicted_sic4_representation_barh}</p>
+<p>For each company description, the classifier produces a vector of 4-digit SIC code probabilities. The code with the highest probability is chosen as the predicted label, however investigating those probabilities also yields useful insights as to the confidence of the classifier. We took all of the probabilities for the successfully predicted labels and aggregated them by 4-digit SIC code to obtain the mean. In this way are able to see which codes are generally predicted with higher or lower probabilities. We can see from <span class="citation" data-cites="fig">[@fig: mean_sic4_prediction_probability_barh]</span> that the codes with higher prediction probabilities tend to be more widely known whereas the areas with lower probabilities describe more niche activities.</p>
+<p><img src="https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/mean_sic4_prediction_probability_barh.png" alt="Mean prediction probability for companies with a predicted 4-digit SIC code." />{#fig: mean_sic4_prediction_probability_barh}</p>
+<p>While it might be reasonable to suspect that codes are overrepresented due to their frequency in the training data from which the classifier has learned, we see that this is not always the case. While there is a positive correlation between the frequency of 4-digit SIC codes in the training data and their representation among predicted codes, the relationship is weak and not linear. There are a number of sectors that have a high relatively high frequency, but are underrepresented and vice-versa. The codes highlighted in <span class="citation" data-cites="fig:predicted_sic4_representation_vs_training_frequency_scatter">[@fig:predicted_sic4_representation_vs_training_frequency_scatter]</span> show that the extremes consist of quite highly generalised activity descriptions, suggesting that the model recognises them as catch-all labels or not sufficiently specific to be used in comparison to other labels.</p>
+<figure>
+<img src="https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/predicted_sic4_representation_vs_training_frequency_scatter.png" id="fig:predicted_sic4_representation_vs_training_frequency_scatter" alt="Level of representation of predicted 4-digit SIC compared to their frequency in the training data." /><figcaption aria-hidden="true">Level of representation of predicted 4-digit SIC compared to their frequency in the training data.</figcaption>
+</figure>
+<p>There is also a relationship between the frequency of a code’s appearance in the training data and its average prediction probability on the test set. The trend in <span class="citation" data-cites="fig:mean_sic4_prediction_probability_vs_training_frequency_scatter">[@fig:mean_sic4_prediction_probability_vs_training_frequency_scatter]</span> shows that although there is a gradual trend with the log of a code’s frequency, there are similarly codes with a low frequency that have a high average prediction probability.</p>
+<figure>
+<img src="https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/mean_sic4_prediction_probability_vs_training_frequency_scatter.png" id="fig:mean_sic4_prediction_probability_vs_training_frequency_scatter" style="width:50.0%" alt="Mean prediction probabilities for 4-digit SIC codes compared to the frequency of codes in the training data." /><figcaption aria-hidden="true">Mean prediction probabilities for 4-digit SIC codes compared to the frequency of codes in the training data.</figcaption>
+</figure>
+<p>Finally, we assessed the coherence of the groups of company descriptions in our predicted categories using the silhouette score. This metric is normally reserved for assessing the quality of clusters when using an unsupervised machine learning method, however essentially it measures the extent to which points in a group are clustered with samples similar to themselves by looking at the inter-group and intra-group sample distances. A higher score means that points in a cluster are grouped tightly and are separated from other clusters. This corresponds to how similar the descriptions of companies are to each other within a group of companies with the same predicted 4-digit SIC code and how semantically separable they are from companies with different predicted codes.</p>
+<p>We encoded the company descriptions as 768 dimensional vectors with a variant of the BERT transformer pre-trained specifically for semantic similarity calculations and calculated the silhouette score for each sample within a specific SIC code before finding the mean. The codes with the top and bottom average scores are shown in <span class="citation" data-cites="fig:predicted_sic4_silhouette_barh">[@fig:predicted_sic4_silhouette_barh]</span> suggesting that the descriptions of specific but ubiquitous industries tend to cluster better in the semantic space created.</p>
+<figure>
+<img src="https://industrial-taxonomy.s3.eu-west-2.amazonaws.com/output/figures/predicted_sic4_silhouette_barh.png" id="fig:predicted_sic4_silhouette_barh" alt="Average sample silhouette score for embedded company descriptions aggregated by their predicted 4-digit SIC code." /><figcaption aria-hidden="true">Average sample silhouette score for embedded company descriptions aggregated by their predicted 4-digit SIC code.</figcaption>
+</figure>
+<h1 id="next-steps">3. Next Steps</h1>
+<p>There are two overarching goals from this point. The first is to improve the classifier through further cleaning of the training data and the second is to better establish the degree to which the labelling is limited by the existing SIC taxonomy.</p>
+<h2 id="data-cleaning">3.1 Data Cleaning</h2>
+<p>As mentioned in the previous section, there are SIC codes that bear no resemblance to the company descriptions they accompany. This may be because of errors in the Glass AI data or because of the fuzzy matching process used to link that dataset with Companies House. In either case, we could improve the training data by removing samples where the 4-digit SIC code label has a very low semantic similarity with the company description. This would require establishing a threshold by manual inspection of the data.</p>
+<h2 id="analysis-of-predictions">3.2 Analysis of Predictions</h2>
+<p>The predictions produced by the model on a test dataset can be used to understand the limitations of the existing taxonomy by developing analyses that take advantage of company descriptions and try to track down the source of errors in the classifier. There are of course multiple ways of approaching this. Here we suggest further ways of measuring the quality of the predicted labels and approaches for identifying the causes of the model’s decisions.</p>
+<p>In some cases, one industrial code may not be sufficient to describe a company’s activities. One analysis could be to identify where there are other possible labels that the model gave a high classification probability and to see how semantically similar that label is to the top label predicted. might have predicted. In cases where both labels have a high probability but a low semantic similarity, it may indicate that more than one label is required to adequately describe the organisation, and that possibly the company cuts across diverse industries.</p>
+<p>Another could be to further explore the groups of companies in SIC code groups with a low silhouette score. This would help to identify whether there are groups of companies that are highly diverse in their activities but that business owners attempt to group under a single code.</p>
+<p>Additionally we could investigate how far away predicted codes are in the SIC taxonomy from the labelled codes. This would involve calculating the distance required to traverse from one code to another across the taxonomy tree and would tell us how whether the company description captures activities from a different industrial sector to the one capture by the labelled code.</p>
+<p>Once these further quantitative analyses have been carried out, we could take a more systematic approach to manually investigating the company descriptions and their predicted and labelled codes, particularly for codes or companies that lie at the extremes of the measures described in this report and for next steps. This would help elucidate the reasons behind the characteristics of companies that are very readily to classify and those that are more challenging, as well as the need for modifications to the taxonomy.</p>
+</body>
+</html>

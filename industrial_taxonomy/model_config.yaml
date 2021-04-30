@@ -3,5 +3,40 @@ flows:
     run_id: 890
   glass:
     run_id: 414
+  sic4_classifier_train:
+    match_threshold: 75
+    flow:
+      freeze_model: False
+      output_dir: "../models/" 
+      config:
+        encode: # for transformers.AutoTokenizer.__call__
+          add_pecial_tokens: True
+          max_length: 512
+          pad_to_max_length: True
+          return_token_type_ids: True
+          return_attention_mask: True
+          return_overflowing_tokens: False
+          return_special_tokens_mask: False
+        model: # for transformers.AutoModel
+          pretrained_model_name_or_path: 'distilbert-base-uncased'
+          return_dict: True
+        tokenizer: # for transformers.AutoTokenizer.from_pretrained
+          pretrained_model_name_or_path: 'distilbert-base-uncased'
+        training_args: # for tansformers.TrainingArguments
+          learning_rate: 1.0e-5
+          num_train_epochs: 1
+          per_device_train_batch_size: 8
+          per_device_eval_batch_size: 16
+          warmup_steps: 500  
+          weight_decay: 0.01
+          logging_dir: './logs'
+          logging_steps: 100
+          fp16: True
+          save_total_limit: 2
+        train_val_test_split: # split sizes + args for sklearn.model_selection.train_test_split
+          train_size: 0.001
+          val_size: 0.0005
+          test_size: 0.0005
+          random_state: 42
 params:
   match_threshold: 60
