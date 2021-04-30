@@ -129,20 +129,20 @@ class TrainTextClassifier(FlowSpec):
 # 
 #         self.train_set, rest = train_test_split(self.documents, train_size=train_size,
 #                 test_size=val_size + test_size, **split_config)
-#         self.val_set, self.test_set = train_test_split(rest, train_size=val_size, 
+#         self.eval_set, self.test_set = train_test_split(rest, train_size=val_size, 
 #                 test_size=test_size, **split_config)
 # 
-#         self.next(self.encode_train_set, self.encode_val_set)
+#         self.next(self.encode_train_set, self.encode.eval_set)
     
     @step
     def train_eval_split(self):
         """Splits the data into train and evaluation sets"""
         split_config = self.config["train_eval_split"]
         train_size = split_config.pop('train_size')
-        val_size = split_config.pop('val_size')
-        self.train_set, rest = train_test_split(self.documents, train_size=train_size,
-                test_size=val_size, **split_config)
-        self.next(self.encode_train_set, self.encode_val_set)
+        eval_size = split_config.pop('eval_size')
+        self.train_set, self.eval_set = train_test_split(self.documents, train_size=train_size,
+                test_size=eval_size, **split_config)
+        self.next(self.encode_train_set, self.encode_eval_set)
 
     @step
     def encode_train_set(self):
@@ -151,16 +151,16 @@ class TrainTextClassifier(FlowSpec):
         self.next(self.encodings_join)
 
     @step
-    def encode_val_set(self):
+    def encode_eval_set(self):
         """Encodes the evaluation dataset"""
-        self.encodings = self._encode(self.val_set)
+        self.encodings = self._encode(self.eval_set)
         self.next(self.encodings_join)
 
     @step
     def encodings_join(self, inputs):
         self.merge_artifacts(inputs, exclude=['encodings'])
         self.train_encodings = inputs.encode_train_set.encodings
-        self.val_encodings = inputs.encode_val_set.encodings
+        self.eval_encodings = inputs.encode_eval_set.encodings
         self.next(self.fine_tune)
 
     @step
@@ -177,7 +177,7 @@ class TrainTextClassifier(FlowSpec):
                 model=model(self.freeze_model),
                 args=training_args,
                 train_dataset=self.train_encodings,
-                eval_dataset=self.val_encodings,
+                eval_dataset=self.eval_encodings,
                 compute_metrics=compute_metrics,
                 data_collator=BatchCollator(self.tokenizer)
                 )
