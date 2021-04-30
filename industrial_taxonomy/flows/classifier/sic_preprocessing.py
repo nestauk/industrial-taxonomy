@@ -44,7 +44,7 @@ class SicPreprocess(FlowSpec):
 
     @step
     def split(self):
-        train_test_config = config['train_test_split']
+        train_test_config = self.config['train_test_split']
         self.train_set, self.test_set = train_test_split(
                 self.org_data,
                 **train_test_config
