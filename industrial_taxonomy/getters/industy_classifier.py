@@ -22,10 +22,9 @@ class IndustryPredictor:
 
     def _set_run_id(self, run_id):
         if run_id is None:
-            self.run_id = config["flows"][f"{self.task_id}"]["run_id"]
+            return config["flows"][f"{self.task_id}"]["run_id"]
         else:
-            self.run_id = run_id
-        return run_id
+            return run_id
 
     def predict(self, dataset):
         """Predicts the industry of a series of texts.
