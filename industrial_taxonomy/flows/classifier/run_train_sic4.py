@@ -2,25 +2,22 @@ import logging
 import json
 from pathlib import Path
 
-from industrial_taxonomy import config
+from industrial_taxonomy import config, project_dir
 from industrial_taxonomy.utils.metaflow_runner import update_model_config, execute_flow
-from industrial_taxonomy.flows.sic_classifier.classifier_utils import create_org_data 
+from industrial_taxonomy.flows.classifier.classifier_utils import create_org_data 
 
 logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
-    FLOW_ID = "classifier_train"
+    FLOW_ID = "sic4_classifier"
     task_config = config["flows"][FLOW_ID]
-#     flow_config = task_config.pop("flow")
     flow_config = {
-            '--documents_path': task_config['documents_path'],
+            '--documents_path': str(project_dir / task_config['documents_path']),
             '--freeze_model': str(task_config['freeze_model']),
-#             '--output_dir': flow_config['output_dir'],
             '--config': json.dumps(task_config['config'])
             }
 
     flow_file = Path(__file__).resolve().parents[0] / f"{FLOW_ID}.py"
-
     run_id = execute_flow(
             flow_file,
             flow_config,

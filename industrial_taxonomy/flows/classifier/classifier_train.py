@@ -16,12 +16,12 @@ from sklearn.preprocessing import LabelEncoder
 from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
         TrainingArguments, Trainer)
 
-from industrial_taxonomy.flows.sic_classifier.classifier_utils import (
+from industrial_taxonomy.flows.classifier.classifier_utils import (
        BatchCollator, OrderedDataset, compute_metrics, model_init, Sample) 
 
 logger = logging.getLogger(__name__)
 
-class TrainTextClassifier(FlowSpec):
+class TextClassifier(FlowSpec):
     documents_path = Parameter(
             "documents_path",
             help="Path to JSON training data",
@@ -48,18 +48,14 @@ class TrainTextClassifier(FlowSpec):
         return encodings
 
     @classmethod
-    def load_trained_model(cls, run_id):
+    def _load_trained_model(cls, run_id):
         run = Run(f"{cls.__name__}/{run_id}")
-        model = run.data.model
-        return model
+        return run.data.model
 
     @classmethod
-    def predict(cls, dataset, run_id, model=None):
+    def predict(cls, dataset, run_id, model):
         run = Run(f"{cls.__name__}/{run_id}")
         run_config = run.data.config
-
-        if model is None:
-            model = self.load_trained_model(run_id)
 
         samples = []
         for sample in dataset:
@@ -78,18 +74,18 @@ class TrainTextClassifier(FlowSpec):
 
         inverse_label_lookup = {v: k for k, v in run.data.label_lookup.items()}
 
-        logger.info('Loading fine-tuned model')
         trainer = Trainer(
-                model=run.data.model,
+                model=model,
                 data_collator=BatchCollator(run.data.tokenizer)
                 )
-        logger.info(f'Predicting labels for {len(samples)} samples')
         preds = trainer.predict(encodings)
         pred_probs = softmax(preds.predictions, axis=1)
         pred_labels = np.argmax(preds.predictions, axis=1)
         pred_labels = [inverse_label_lookup[p] for p in pred_labels]
 
-        return pred_labels, pred_probs
+        doc_ids = [e.index for e in encodings.features]
+
+        return pred_labels, pred_probs, doc_ids
 
     @step
     def start(self):

@@ -1,5 +1,7 @@
 flows:
-  classifier_train:
+  sic4_classifier:
+    documents_path: data/raw/train_sample.json
+    freeze_model: 'False'
     config:
       encode:
         add_special_tokens: true
@@ -23,16 +25,12 @@ flows:
         logging_dir: ./logs
         logging_steps: 100
         num_train_epochs: 1
-        output_dir: /Users/George/nesta/industrial-taxonomy/models/
         per_device_eval_batch_size: 16
         per_device_train_batch_size: 8
         save_total_limit: 2
         warmup_steps: 500
         weight_decay: 0.01
-    documents_path: /Users/George/nesta/industrial-taxonomy/data/raw/train_sample.json
-    freeze_model: 'False'
     run_id: 1096
-    tag: the_big_doodle
   companies_house:
     run_id: 890
   glass:
