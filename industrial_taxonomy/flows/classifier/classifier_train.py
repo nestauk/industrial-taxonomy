@@ -85,7 +85,7 @@ class TextClassifier(FlowSpec):
 
         doc_ids = [e.index for e in encodings.features]
 
-        return pred_labels, pred_probs, doc_ids
+        return pred_labels, pred_probs, doc_ids, inverse_label_lookup
 
     @step
     def start(self):

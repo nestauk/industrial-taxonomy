@@ -107,3 +107,6 @@ target/
 
 # Mypy cache
 .mypy_cache/
+
+# lockfiles from updating configs with flows
+*.lock
