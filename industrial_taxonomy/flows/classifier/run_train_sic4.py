@@ -17,7 +17,7 @@ if __name__ == "__main__":
             '--config': json.dumps(task_config['config'])
             }
 
-    flow_file = Path(__file__).resolve().parents[0] / f"{FLOW_ID}.py"
+    flow_file = Path(__file__).resolve().parents[0] / f"classifier_train.py"
     run_id = execute_flow(
             flow_file,
             flow_config,
