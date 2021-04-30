@@ -12,7 +12,6 @@ from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
 import numpy as np
 from scipy.special import softmax
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
         TrainingArguments, Trainer)
 
@@ -85,7 +84,7 @@ class TextClassifier(FlowSpec):
 
         doc_ids = [e.index for e in encodings.features]
 
-        return pred_labels, pred_probs, doc_ids
+        return pred_labels, pred_probs, doc_ids, inverse_label_lookup
 
     @step
     def start(self):
