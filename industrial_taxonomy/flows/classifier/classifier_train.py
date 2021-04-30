@@ -189,4 +189,4 @@ class TextClassifier(FlowSpec):
         pass
 
 if __name__ == "__main__":
-    TrainTextClassifier()
+    TextClassifier()
