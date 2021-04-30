@@ -21,6 +21,7 @@ flows:
         train_size: 0.75
         eval_size: 0.25
       training_args:
+        output_dir: /models/
         learning_rate: 1.0e-05
         logging_dir: ./logs
         logging_steps: 100
