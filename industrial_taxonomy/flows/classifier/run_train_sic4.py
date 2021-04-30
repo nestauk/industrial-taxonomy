@@ -27,5 +27,6 @@ if __name__ == "__main__":
             metaflow_args={}
             )
 
-    flow_config["run_id"] = run_id
+    task_config["run_id"] = run_id
+    task_config["config"]["training_args"]["output_dir"] = output_dir
     update_model_config(["flows", CONFIG_ID], task_config)
