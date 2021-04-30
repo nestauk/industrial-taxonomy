@@ -32,6 +32,14 @@ flows:
         warmup_steps: 500
         weight_decay: 0.01
     run_id: 1096
+  sic4_preprocessing:
+    sic_level: 4
+    match_threshold: 75
+    test: True
+    config:
+      train_test_split:
+        random_state: 42
+        train_size: 0.75
   companies_house:
     run_id: 890
   glass:

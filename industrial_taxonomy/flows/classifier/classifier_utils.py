@@ -175,7 +175,6 @@ def compute_metrics(pred):
         'recall': recall
     }   
 
-@cache_getter_fn
 def create_org_data(match_threshold, sic_level=4):
     glass_house = get_glass_house()
     org_descriptions = get_organisation_description()
