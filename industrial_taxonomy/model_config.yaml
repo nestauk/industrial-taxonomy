@@ -17,7 +17,7 @@ flows:
       train_eval_split:
         random_state: 42
         train_size: 0.75
-        val_size: 0.25
+        eval_size: 0.25
       training_args:
         learning_rate: 1.0e-05
         logging_dir: ./logs
