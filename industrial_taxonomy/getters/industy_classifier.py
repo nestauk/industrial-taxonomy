@@ -51,6 +51,6 @@ class IndustryPredictor:
 
         """
         logger.info(f'Predicting labels for {len(dataset)} samples')
-        pred_labels, pred_probs, doc_ids = TextClassifier.predict(
+        pred_labels, pred_probs, doc_ids, lookup = TextClassifier.predict(
                 dataset, self.run_id, self.model)
-        return pred_labels, pred_probs, doc_ids
+        return pred_labels, pred_probs, doc_ids, lookup
