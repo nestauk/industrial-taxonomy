@@ -84,7 +84,7 @@ class OrderedDataset(Dataset):
             **self.config)
 
         if self.label_lookup is not None:
-            label = self.label_lookup.get(sample.label)
+            label = self.label_lookup.get(sample.label, -1)
         else:
             label=sample.label
 
