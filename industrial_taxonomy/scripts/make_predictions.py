@@ -16,7 +16,9 @@ def save_predictions(predictions):
         pickle.dump(predictions, outfile)
 
 
+predictor = new_sector_predictor()
+
 data = get_new_sector()
-preds = new_sector_predictor(data)
+preds = predictor.predict(data)
 
 save_predictions(preds)
