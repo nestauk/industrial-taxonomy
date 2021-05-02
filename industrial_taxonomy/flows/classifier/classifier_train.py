@@ -59,7 +59,7 @@ class TextClassifier(FlowSpec):
         samples = []
         for sample in dataset:
             if 'label' not in sample:
-                sample['label'] = None
+                sample['label'] = -1
             samples.append(Sample(**sample))
 
         label_lookup = run.data.label_lookup
