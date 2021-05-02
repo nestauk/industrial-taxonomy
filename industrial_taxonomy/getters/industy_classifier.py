@@ -10,6 +10,11 @@ def sic4_predictor(run_id=None):
     """Generates an object for performaing 4-digit SIC code classifications"""
     return IndustryPredictor('sic4_classifier', run_id)
 
+def new_sector_predictor(run_id=None):
+    """Generates an object for performaing 4-digit SIC code classifications"""
+    return IndustryPredictor('new_sector_classifier', run_id)
+
+
 
 class IndustryPredictor:
     """Loads model from the Metaflow datastore based on a task"""
