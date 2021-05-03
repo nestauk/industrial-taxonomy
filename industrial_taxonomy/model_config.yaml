@@ -8,7 +8,7 @@ flows:
       flow_id: sic_preprocessing
       match_threshold: 75
       sic_level: 4
-      test: false
+      test: true
       config:
         train_test_split:
           random_state: 42
@@ -20,8 +20,8 @@ flows:
       config:
         encode:
           add_special_tokens: true
-          max_length: 64
-          pad_to_max_length: true
+          max_length: 512
+          pad_to_max_length: false # set to false if using dynamic padding
           return_attention_mask: true
           return_overflowing_tokens: false
           return_special_tokens_mask: false
