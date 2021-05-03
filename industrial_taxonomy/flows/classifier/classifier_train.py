@@ -83,7 +83,7 @@ class TextClassifier(FlowSpec):
         dataset = sort_by_char_len(self.train_set)
         samples = [Sample(**x) for x in dataset]
         self.dataset = IterableDataset(samples, self.tokenizer, **self.config["encode"])
-        self.dataset = _make_dataset(self.eval_set)
+        self.next(self.join_datasets)
 
     @step
     def join_datasets(self, inputs):

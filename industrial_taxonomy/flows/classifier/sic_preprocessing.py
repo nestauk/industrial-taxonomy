@@ -39,8 +39,21 @@ class SicPreprocess(FlowSpec):
         org_data = create_org_data(self.match_threshold, self.sic_level)
         if self.test:
             org_data = org_data[:500]
+
+        lookup = {}
+        i = 0
+        for sample in org_data:
+            label = sample['label']
+            if label not in lookup:
+                lookup[label] = i
+                i += 1
+            sample['label'] = lookup[label]
+
+        self.n_labels = len(lookup)
+        self.label_lookup = lookup
         self.org_data = org_data
-        self.next(self.split)
+
+        self.next(split)
 
     @step
     def split(self):
