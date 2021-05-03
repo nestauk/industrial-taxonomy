@@ -53,7 +53,7 @@ class TextClassifier(FlowSpec):
     @step
     def start(self):
         self.preproc_run = Flow(
-                f'{self.preproc_flow_class_name}/{preproc_run_id}').latest_run
+                f'{self.preproc_flow_class_name}/{self.preproc_run_id}').latest_run
         self.tokenizer = AutoTokenizer.from_pretrained(**self.config["tokenizer"])
         self.next(self.train_eval_split)
 

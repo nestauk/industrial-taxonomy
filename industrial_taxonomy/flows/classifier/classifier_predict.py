@@ -49,7 +49,7 @@ class TextClassifierPredict(FlowSpec):
     @step
     def start(self):
         self.train_run = Flow(
-                f'{self.train_flow_class_name}/{train_run_id}').latest_run
+                f'{self.train_flow_class_name}/{self.train_run_id}').latest_run
         self.next(self.make_test_set)
 
     @step
