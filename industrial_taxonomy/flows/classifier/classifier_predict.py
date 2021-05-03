@@ -8,7 +8,7 @@ from functools import partial
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
+from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run, Flow
 import numpy as np
 from scipy.special import softmax
 from sklearn.model_selection import train_test_split
