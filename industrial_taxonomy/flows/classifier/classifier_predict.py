@@ -48,11 +48,12 @@ class TextClassifierPredict(FlowSpec):
     @step
     def make_test_set(self):
         test_set = self.train_run.data.preproc_run.data.test_set
+        tokenizer = self.train_run.data.tokenizer
         dataset = sort_by_char_len(test_set)
         samples = [Sample(**x) for x in dataset]
         self.test_dataset = IterableDataset(
                 samples, 
-                self.tokenizer, 
+                tokenizer, 
                 train_run.data.config["encode"])
         self.next(self.predict)
 
