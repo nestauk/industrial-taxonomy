@@ -2,8 +2,10 @@ from industrial_taxonomy.getters.industy_classifier import new_sector_predictor
 import industrial_taxonomy
 import pickle
 import json
+import logging
 
 project_dir = industrial_taxonomy.project_dir
+logging.info(project_dir)
 
 def get_new_sector(category="test"):
     with open(f"{project_dir}/data/raw/new_sector_{category}.json", "r") as infile:
@@ -16,9 +18,11 @@ def save_predictions(predictions):
         pickle.dump(predictions, outfile)
 
 
-predictor = new_sector_predictor()
+if __name__=='__main'__:
 
-data = get_new_sector()
-preds = predictor.predict(data)
+    predictor = new_sector_predictor()
 
-save_predictions(preds)
+    data = get_new_sector()
+    preds = predictor.predict(data)
+
+    save_predictions(preds)
