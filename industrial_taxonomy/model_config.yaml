@@ -3,6 +3,8 @@ flows:
     run_id: 890
   glass:
     run_id: 414
+  sic4_embedder:
+    model: stsb-distilbert-base
   sic4_classifier:
     preproc:
       flow_id: sic_preprocessing
