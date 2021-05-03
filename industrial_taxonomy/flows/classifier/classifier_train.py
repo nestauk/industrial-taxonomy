@@ -104,7 +104,7 @@ class TextClassifier(FlowSpec):
                 compute_metrics=compute_metrics,
                 data_collator=BatchCollator(self.tokenizer)
                 )
-        logger.info(f'Training model with {len(self.train_encodings)} samples')
+        logger.info(f'Training model with {len(self.train_dataset)} samples')
         trainer.train()
         self.model = trainer.model
 
