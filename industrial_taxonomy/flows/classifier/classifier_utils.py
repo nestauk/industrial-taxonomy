@@ -132,7 +132,7 @@ class IterableDataset(Dataset):
                        )
     
     def __getitem__(self, _) -> Features:
-        if self.current == len(self.sample):
+        if self.current == len(self.samples):
             self.current = 0
         example = self.samples[self.current]
         self.current += 1
