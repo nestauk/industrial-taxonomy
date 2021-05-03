@@ -5,7 +5,6 @@ import json
 import logging
 
 project_dir = industrial_taxonomy.project_dir
-print(project_dir)
 
 def get_new_sector(category="test"):
     with open(f"{project_dir}/data/raw/new_sector_test.json", "r") as infile:
@@ -18,7 +17,7 @@ def save_predictions(predictions):
         pickle.dump(predictions, outfile)
 
 
-if __name__=='__main'__:
+if __name__=='__main__':
 
     predictor = new_sector_predictor()
 
