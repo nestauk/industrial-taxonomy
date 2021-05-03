@@ -8,7 +8,7 @@ from functools import partial
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run, Flow
+from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
 import numpy as np
 from scipy.special import softmax
 from sklearn.model_selection import train_test_split
@@ -39,17 +39,10 @@ class TextClassifierPredict(FlowSpec):
             default=True
             )
 
-    def _make_dataset(self, dataset):
-        tokenizer_config = self.train_run.data.config["tokenizer"]
-        encode_config = self.train_run.data.config["encode"]
-        tokenizer = AutoTokenizer.from_pretrained(**tokenizer_config)
-        samples = [Sample(**x) for x in dataset]
-        return IterableDataset(samples, tokenizer, encode_config)
-
     @step
     def start(self):
-        self.train_run = Flow(
-                f'{self.train_flow_class_name}/{self.train_run_id}').latest_run
+        self.train_run = Run(
+                f'{self.train_flow_class_name}/{self.train_run_id}')
         self.next(self.make_test_set)
 
     @step

@@ -8,7 +8,7 @@ from functools import partial
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run, Flow
+from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
 import numpy as np
 from scipy.special import softmax
 from sklearn.model_selection import train_test_split
@@ -22,11 +22,6 @@ from industrial_taxonomy.flows.classifier.classifier_utils import (
 logger = logging.getLogger(__name__)
 
 class TextClassifier(FlowSpec):
-#     documents_path = Parameter(
-#             "documents_path",
-#             help="Path to JSON training data",
-#             type=str,
-#             )
     freeze_model = Parameter(
             "freeze_model",
             help="If True, layers before classification layer will be frozen",
@@ -52,8 +47,8 @@ class TextClassifier(FlowSpec):
 
     @step
     def start(self):
-        self.preproc_run = Flow(
-                f'{self.preproc_flow_class_name}/{self.preproc_run_id}').latest_run
+        self.preproc_run = Run(
+                f'{self.preproc_flow_class_name}/{self.preproc_run_id}')
         self.tokenizer = AutoTokenizer.from_pretrained(**self.config["tokenizer"])
         self.next(self.train_eval_split)
 
