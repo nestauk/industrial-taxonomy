@@ -114,7 +114,7 @@ class OrderedDataset(Dataset):
 
 class IterableDataset(Dataset):
     def __init__(self, samples: List[Sample],
-                tokenizer: PreTrainedTokenizer,
+                tokenizer: PreTrainedTokenizerBase,
                 encode_kwargs: dict) -> None:
         self.tokenizer = tokenizer
         self.samples: List[Sample] = samples
