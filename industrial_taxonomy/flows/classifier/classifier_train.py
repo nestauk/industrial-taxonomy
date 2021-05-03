@@ -82,7 +82,7 @@ class TextClassifier(FlowSpec):
 
     @step
     def join_datasets(self, inputs):
-        self.merge_artifacts(inputs, exclude=['datasets'])
+        self.merge_artifacts(inputs, exclude=['dataset'])
         self.train_dataset = inputs.make_train_set.dataset
         self.eval_dataset = inputs.make_eval_set.dataset
         self.next(self.fine_tune)
