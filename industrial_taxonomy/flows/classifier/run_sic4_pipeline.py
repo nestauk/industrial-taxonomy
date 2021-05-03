@@ -39,7 +39,7 @@ if __name__ == "__main__":
     train_config = config["flows"][FLOW_ID]["train"]
     train_flow_config = {
             '--freeze_model': str(train_config['freeze_model']),
-            '--preproc_run_id': str(train_run_id),
+            '--preproc_run_id': str(preproc_run_id),
             '--preproc_flow_class_name': PREPROC_CLASS_NAME,
             '--config': json.dumps(train_config['config'])
             }
