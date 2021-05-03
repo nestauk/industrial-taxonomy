@@ -53,7 +53,7 @@ class SicPreprocess(FlowSpec):
         self.label_lookup = lookup
         self.org_data = org_data
 
-        self.next(split)
+        self.next(self.split)
 
     @step
     def split(self):
