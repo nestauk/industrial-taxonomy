@@ -53,7 +53,7 @@ class TextClassifierPredict(FlowSpec):
         self.test_dataset = IterableDataset(
                 samples, 
                 self.tokenizer, 
-                **train_run.data.config["encode"])
+                train_run.data.config["encode"])
         self.next(self.predict)
 
     @step 
