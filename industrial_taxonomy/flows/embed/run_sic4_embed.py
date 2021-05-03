@@ -8,10 +8,8 @@ from industrial_taxonomy.utils.metaflow_runner import update_model_config, execu
 
 if __name__ == "__main__":
     FLOW_ID = 'sic4_embedder'
-    PREPROC_CLASS_NAME = 'SicPreprocess'
+    preproc_run_id = config['flows']['sic4_classifier']['preproc']['run_id']
     
-    preproc_run_id = Flow(PREPROC_CLASS_NAME).latest_run.run_id
-
     embed_config = config["flows"][FLOW_ID]
     embed_flow_config = {
             '--model': embed_config['model'],
