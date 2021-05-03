@@ -27,7 +27,7 @@ class Embedder(FlowSpec):
     @step
     def embed(self):
         model = SentenceTransformer(self.model)
-        texts = (t['text'] for t in preproc_run.data.org_data)
+        texts = (t['text'] for t in self.preproc_run.data.org_data)
 
         self.encodings = model.encode(texts)
 
