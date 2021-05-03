@@ -18,12 +18,13 @@ class Embedder(FlowSpec):
             help="Run ID of the preprocessing flow",
             type=int
             )
-
+    @step
     def start(self):
         self.preproc_run = Run(
                 f'SicPreprocess/{self.preproc_run_id}')
         self.next(self.embed)
-
+    
+    @step
     def embed(self):
         model = SentenceTransformer(self.model)
         texts = (t['text'] for t in preproc_run.data.org_data)
@@ -32,6 +33,7 @@ class Embedder(FlowSpec):
 
         self.next(self.end)
 
+    @step
     def end(self):
         pass
 
