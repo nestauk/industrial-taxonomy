@@ -118,12 +118,13 @@ class IterableDataset(Dataset):
                 encode_kwargs: dict) -> None:
         self.tokenizer = tokenizer
         self.samples: List[Sample] = samples
+        self.encode_kwargs = encode_kwargs
         self.current = 0
         
     def encode(self, sample: Sample) -> Features:
         encode_dict = self.tokenizer(
             text=sample.text,
-            **encode_kwargs,
+            **self.encode_kwargs,
         )
         return Features(input_ids=encode_dict['input_ids'],
                         attention_mask=encode_dict['attention_mask'],
