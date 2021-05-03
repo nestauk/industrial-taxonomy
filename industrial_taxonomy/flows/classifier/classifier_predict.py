@@ -17,7 +17,7 @@ from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
 
 from industrial_taxonomy.flows.classifier.classifier_utils import (
        BatchCollator, IterableDataset, compute_metrics, model_init,
-       sort_by_char_len) 
+       sort_by_char_len, Sample) 
 
 logger = logging.getLogger(__name__)
 
