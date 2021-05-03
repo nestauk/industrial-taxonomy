@@ -40,7 +40,7 @@ if __name__ == "__main__":
     train_flow_config = {
             '--freeze_model': str(train_config['freeze_model']),
             '--preproc_run_id': str(train_run_id),
-            '--preproc_flow_class_name': PREPROC_CLASS_NAME
+            '--preproc_flow_class_name': PREPROC_CLASS_NAME,
             '--config': json.dumps(train_config['config'])
             }
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     predict_config = config["flows"][FLOW_ID]["predict"]
     predict_flow_config = {
             '--predict_proba': str(predict_config['predict_proba']),
-            '--train_run_id': str(train_run_id)
+            '--train_run_id': str(train_run_id),
             '--train_flow_class_name': TRAIN_CLASS_NAME
             }
 
