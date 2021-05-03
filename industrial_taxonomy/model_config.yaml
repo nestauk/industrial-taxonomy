@@ -12,7 +12,7 @@ flows:
       config:
         train_test_split:
           random_state: 42
-          train_size: 0.75
+          train_size: 0.8
       run_id: 1145
     train:
       flow_id: classifier_train
