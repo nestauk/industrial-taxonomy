@@ -8,7 +8,7 @@ project_dir = industrial_taxonomy.project_dir
 print(project_dir)
 
 def get_new_sector(category="test"):
-    with open(f"{project_dir}/data/raw/new_sector_{category}.json", "r") as infile:
+    with open(f"{project_dir}/data/raw/new_sector_test.json", "r") as infile:
         data = json.load(infile)
     return data
 
