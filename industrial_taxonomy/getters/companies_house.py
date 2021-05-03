@@ -46,4 +46,3 @@ def get_sector() -> pd.DataFrame:
 @cache_getter_fn
 def get_name() -> pd.DataFrame:
     return GETTER.organisationname
-

@@ -9,26 +9,17 @@ from industrial_taxonomy.flows.classifier.classifier_utils import create_org_dat
 
 class SicPreprocess(FlowSpec):
     sic_level = Parameter(
-            "sic_level",
-            help="SIC Level to use",
-            type=int,
-            )
+        "sic_level",
+        help="SIC Level to use",
+        type=int,
+    )
     match_threshold = Parameter(
-            "match_threshold",
-            help="Glass + CH fuzzy matching score threshold",
-            type=int
-            )
-    config = Parameter(
-            "config",
-            help="Params for functions",
-            type=JSONType
-            )
+        "match_threshold", help="Glass + CH fuzzy matching score threshold", type=int
+    )
+    config = Parameter("config", help="Params for functions", type=JSONType)
     test = Parameter(
-            "test",
-            help="Run in test mode (only 500 samples)",
-            type=bool,
-            default=False
-            )
+        "test", help="Run in test mode (only 500 samples)", type=bool, default=False
+    )
 
     @step
     def start(self):
@@ -44,16 +35,16 @@ class SicPreprocess(FlowSpec):
 
     @step
     def split(self):
-        train_test_config = self.config['train_test_split']
+        train_test_config = self.config["train_test_split"]
         self.train_set, self.test_set = train_test_split(
-                self.org_data,
-                **train_test_config
-                )
+            self.org_data, **train_test_config
+        )
         self.next(self.end)
 
     @step
     def end(self):
         pass
+
 
 if __name__ == "__main__":
     SicPreprocess()

@@ -132,4 +132,3 @@ if __name__ == "__main__":
         name_lookup = load_sic_taxonomy().pipe(extract_sic_code_description, "Division")
         with open(_SIC_LOOKUP_FILE, "w") as outfile:
             json.dump(name_lookup, outfile)
-

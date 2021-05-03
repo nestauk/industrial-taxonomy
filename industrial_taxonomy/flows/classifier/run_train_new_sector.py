@@ -4,7 +4,8 @@ from pathlib import Path
 
 from industrial_taxonomy import config, project_dir
 from industrial_taxonomy.utils.metaflow_runner import update_model_config, execute_flow
-#from industrial_taxonomy.flows.classifier.classifier_utils import create_org_data 
+
+# from industrial_taxonomy.flows.classifier.classifier_utils import create_org_data
 
 logger = logging.getLogger(__name__)
 
@@ -15,17 +16,13 @@ if __name__ == "__main__":
     output_dir = task_config["config"]["training_args"]["output_dir"]
     task_config["config"]["training_args"]["output_dir"] = str(project_dir / output_dir)
     flow_config = {
-            '--documents_path': str(project_dir / task_config['documents_path']),
-            '--freeze_model': str(task_config['freeze_model']),
-            '--config': json.dumps(task_config['config'])
-            }
+        "--documents_path": str(project_dir / task_config["documents_path"]),
+        "--freeze_model": str(task_config["freeze_model"]),
+        "--config": json.dumps(task_config["config"]),
+    }
 
     flow_file = Path(__file__).resolve().parents[0] / f"{FLOW_ID}.py"
-    run_id = execute_flow(
-            flow_file,
-            flow_config,
-            metaflow_args={}
-            )
+    run_id = execute_flow(flow_file, flow_config, metaflow_args={})
 
     task_config["run_id"] = run_id
     task_config["config"]["training_args"]["output_dir"] = output_dir
@@ -40,7 +37,7 @@ if __name__ == "__main__":
 
 # from industrial_taxonomy import config, project_dir
 # from industrial_taxonomy.utils.metaflow_runner import update_model_config, execute_flow
-# from industrial_taxonomy.flows.classifier.classifier_utils import create_org_data 
+# from industrial_taxonomy.flows.classifier.classifier_utils import create_org_data
 
 # logger = logging.getLogger(__name__)
 
@@ -68,7 +65,7 @@ if __name__ == "__main__":
 #     return run_id
 
 # if __name__ == "__main__":
-#     preprocess_run_id = preprocess() 
+#     preprocess_run_id = preprocess()
 #     preprocess_run = Run(f"SicPreprocess/{preprocess_run_id}")
 
 #     FLOW_ID = "classifier_train"
@@ -76,7 +73,7 @@ if __name__ == "__main__":
 #     task_config = config["flows"][CONFIG_ID]
 #     output_dir = task_config["config"]["training_args"]["output_dir"]
 #     task_config["config"]["training_args"]["output_dir"] = str(project_dir / output_dir)
-    
+
 #     documents_path = str(project_dir / task_config['documents_path'])
 
 #     with open(documents_path, 'w') as f:
@@ -98,4 +95,3 @@ if __name__ == "__main__":
 #     task_config["run_id"] = run_id
 #     task_config["config"]["training_args"]["output_dir"] = output_dir
 #     update_model_config(["flows", CONFIG_ID], task_config)
-

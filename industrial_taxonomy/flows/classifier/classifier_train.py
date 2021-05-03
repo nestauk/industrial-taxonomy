@@ -12,38 +12,48 @@ from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
 import numpy as np
 from scipy.special import softmax
 from sklearn.model_selection import train_test_split
-from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
-        TrainingArguments, Trainer)
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    TrainingArguments,
+    Trainer,
+)
 
 from industrial_taxonomy.flows.classifier.classifier_utils import (
-       BatchCollator, OrderedDataset, compute_metrics, model_init, Sample) 
+    BatchCollator,
+    OrderedDataset,
+    compute_metrics,
+    model_init,
+    Sample,
+)
 
 logger = logging.getLogger(__name__)
 
+
 class TextClassifier(FlowSpec):
     documents_path = Parameter(
-            "documents_path",
-            help="Path to JSON training data",
-            type=str,
-            )
+        "documents_path",
+        help="Path to JSON training data",
+        type=str,
+    )
     freeze_model = Parameter(
-            "freeze_model",
-            help="If True, layers before classification layer will be frozen",
-            type=bool,
-            default=False
-            )
+        "freeze_model",
+        help="If True, layers before classification layer will be frozen",
+        type=bool,
+        default=False,
+    )
     config = Parameter(
-            "config",
-            help=("Config containing params for Trainer, TrainingArguments "
-                  "and model"),
-            type=JSONType,
-            )
+        "config",
+        help=("Config containing params for Trainer, TrainingArguments " "and model"),
+        type=JSONType,
+    )
 
     def _encode(self, dataset):
         encode_config = self.config["encode"]
         dataset = [Sample(**s) for s in dataset]
-        encodings = OrderedDataset(self.tokenizer, 
-                dataset, encode_config, self.label_lookup)
+        encodings = OrderedDataset(
+            self.tokenizer, dataset, encode_config, self.label_lookup
+        )
         return encodings
 
     @classmethod
@@ -58,25 +68,19 @@ class TextClassifier(FlowSpec):
 
         samples = []
         for sample in dataset:
-            if 'label' not in sample:
-                sample['label'] = -1
+            if "label" not in sample:
+                sample["label"] = -1
             samples.append(Sample(**sample))
 
         label_lookup = run.data.label_lookup
         tokenizer = run.data.tokenizer
         encodings = OrderedDataset(
-                run.data.tokenizer,
-                samples,
-                run_config['encode'],
-                run.data.label_lookup
-                )
+            run.data.tokenizer, samples, run_config["encode"], run.data.label_lookup
+        )
 
         inverse_label_lookup = {v: k for k, v in run.data.label_lookup.items()}
 
-        trainer = Trainer(
-                model=model,
-                data_collator=BatchCollator(run.data.tokenizer)
-                )
+        trainer = Trainer(model=model, data_collator=BatchCollator(run.data.tokenizer))
         preds = trainer.predict(encodings)
         pred_probs = softmax(preds.predictions, axis=1)
         pred_labels = np.argmax(preds.predictions, axis=1)
@@ -90,7 +94,7 @@ class TextClassifier(FlowSpec):
     def start(self):
         tokenizer_config = self.config["tokenizer"]
 
-        with open(self.documents_path, 'r') as f:
+        with open(self.documents_path, "r") as f:
             self.documents = json.load(f)
 
         self.tokenizer = AutoTokenizer.from_pretrained(**tokenizer_config)
@@ -99,12 +103,11 @@ class TextClassifier(FlowSpec):
 
     @step
     def generate_label_lookup(self):
-        """Maps sample labels to unique integer IDs and creates a lookup
-        """
+        """Maps sample labels to unique integer IDs and creates a lookup"""
         self.label_lookup = dict()
         i = 0
         for doc in self.documents:
-            label = doc['label']
+            label = doc["label"]
             if label not in self.label_lookup:
                 self.label_lookup[label] = i
                 i += 1
@@ -115,10 +118,11 @@ class TextClassifier(FlowSpec):
     def train_eval_split(self):
         """Splits the data into train and evaluation sets"""
         split_config = self.config["train_eval_split"]
-        train_size = split_config.pop('train_size')
-        eval_size = split_config.pop('eval_size')
-        self.train_set, self.eval_set = train_test_split(self.documents, train_size=train_size,
-                test_size=eval_size, **split_config)
+        train_size = split_config.pop("train_size")
+        eval_size = split_config.pop("eval_size")
+        self.train_set, self.eval_set = train_test_split(
+            self.documents, train_size=train_size, test_size=eval_size, **split_config
+        )
         self.next(self.encode_train_set, self.encode_eval_set)
 
     @step
@@ -135,7 +139,7 @@ class TextClassifier(FlowSpec):
 
     @step
     def encodings_join(self, inputs):
-        self.merge_artifacts(inputs, exclude=['encodings'])
+        self.merge_artifacts(inputs, exclude=["encodings"])
         self.train_encodings = inputs.encode_train_set.encodings
         self.eval_encodings = inputs.encode_eval_set.encodings
         self.next(self.fine_tune)
@@ -145,20 +149,20 @@ class TextClassifier(FlowSpec):
 
         model_config = self.config["model"]
         model_config["num_labels"] = len(self.label_lookup)
-        logger.info('Loading pre-trained model')
+        logger.info("Loading pre-trained model")
         model = partial(model_init, model_config)
         training_args_config = self.config["training_args"]
 
         training_args = TrainingArguments(**training_args_config)
         trainer = Trainer(
-                model=model(self.freeze_model),
-                args=training_args,
-                train_dataset=self.train_encodings,
-                eval_dataset=self.eval_encodings,
-                compute_metrics=compute_metrics,
-                data_collator=BatchCollator(self.tokenizer)
-                )
-        logger.info(f'Training model with {len(self.train_encodings)} samples')
+            model=model(self.freeze_model),
+            args=training_args,
+            train_dataset=self.train_encodings,
+            eval_dataset=self.eval_encodings,
+            compute_metrics=compute_metrics,
+            data_collator=BatchCollator(self.tokenizer),
+        )
+        logger.info(f"Training model with {len(self.train_encodings)} samples")
         trainer.train()
         self.model = trainer.model
 
@@ -167,6 +171,7 @@ class TextClassifier(FlowSpec):
     @step
     def end(self):
         pass
+
 
 if __name__ == "__main__":
     TextClassifier()
