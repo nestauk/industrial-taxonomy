@@ -7,7 +7,6 @@ import logging
 from functools import partial
 from dataclasses import dataclass, field
 from pathlib import Path
-from toolz.functools import pipe
 
 from metaflow import FlowSpec, step, Parameter, JSONType, S3, Run
 import numpy as np
