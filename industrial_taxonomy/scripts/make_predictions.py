@@ -5,7 +5,7 @@ import json
 import logging
 
 project_dir = industrial_taxonomy.project_dir
-logging.info(project_dir)
+print(project_dir)
 
 def get_new_sector(category="test"):
     with open(f"{project_dir}/data/raw/new_sector_{category}.json", "r") as infile:
