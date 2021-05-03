@@ -4,24 +4,26 @@ flows:
   glass:
     run_id: 414
   sic4_classifier:
+    predict:
+      flow_id: classifier_predict
+      predict_proba: true
+      run_id: 1197
     preproc:
-      flow_id: sic_preprocessing
-      match_threshold: 75
-      sic_level: 4
-      test: true
       config:
         train_test_split:
           random_state: 42
           train_size: 0.8
-      run_id: 1145
+      flow_id: sic_preprocessing
+      match_threshold: 75
+      run_id: 1195
+      sic_level: 4
+      test: false
     train:
-      flow_id: classifier_train
-      freeze_model: false
       config:
         encode:
           add_special_tokens: true
           max_length: 512
-          pad_to_max_length: false # set to false if using dynamic padding
+          pad_to_max_length: false
           return_attention_mask: true
           return_overflowing_tokens: false
           return_special_tokens_mask: false
@@ -47,9 +49,8 @@ flows:
           save_total_limit: 2
           warmup_steps: 500
           weight_decay: 0.01
-      run_id: 1146
-    predict:
-      flow_id: classifier_predict
-      predict_proba: true
+      flow_id: classifier_train
+      freeze_model: false
+      run_id: 1196
 params:
   match_threshold: 60
