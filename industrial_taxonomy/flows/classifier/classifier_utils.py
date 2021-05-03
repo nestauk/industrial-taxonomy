@@ -129,6 +129,7 @@ class IterableDataset(Dataset):
         return Features(input_ids=encode_dict['input_ids'],
                         attention_mask=encode_dict['attention_mask'],
                         label=sample.label,
+                        index=sample.index
                        )
     
     def __getitem__(self, _) -> Features:
