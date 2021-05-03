@@ -4,46 +4,51 @@ flows:
   glass:
     run_id: 414
   sic4_classifier:
-    config:
-      encode:
-        add_special_tokens: true
-        max_length: 64
-        pad_to_max_length: true
-        return_attention_mask: true
-        return_overflowing_tokens: false
-        return_special_tokens_mask: false
-        return_token_type_ids: true
-      model:
-        pretrained_model_name_or_path: distilbert-base-uncased
-        return_dict: true
-      tokenizer:
-        pretrained_model_name_or_path: distilbert-base-uncased
-      train_eval_split:
-        eval_size: 0.25
-        random_state: 42
-        train_size: 0.75
-      training_args:
-        learning_rate: 1.0e-05
-        logging_dir: ./logs
-        logging_steps: 100
-        num_train_epochs: 1
-        output_dir: models/
-        per_device_eval_batch_size: 16
-        per_device_train_batch_size: 8
-        save_total_limit: 2
-        warmup_steps: 500
-        weight_decay: 0.01
-    documents_path: data/raw/sic4_train.json
-    freeze_model: false
-    run_id: 1146
-  sic4_preprocessing:
-    config:
-      train_test_split:
-        random_state: 42
-        train_size: 0.75
-    match_threshold: 75
-    run_id: 1145
-    sic_level: 4
-    test: false
+    preproc:
+      flow_id: sic_preprocessing
+      match_threshold: 75
+      sic_level: 4
+      test: false
+      config:
+        train_test_split:
+          random_state: 42
+          train_size: 0.75
+      run_id: 1145
+    train:
+      flow_id: classifier_train
+      freeze_model: false
+      config:
+        encode:
+          add_special_tokens: true
+          max_length: 64
+          pad_to_max_length: true
+          return_attention_mask: true
+          return_overflowing_tokens: false
+          return_special_tokens_mask: false
+          return_token_type_ids: true
+        model:
+          pretrained_model_name_or_path: distilbert-base-uncased
+          return_dict: true
+        tokenizer:
+          pretrained_model_name_or_path: distilbert-base-uncased
+        train_eval_split:
+          eval_size: 0.25
+          random_state: 42
+          train_size: 0.75
+        training_args:
+          learning_rate: 1.0e-05
+          logging_dir: ./logs
+          logging_steps: 100
+          num_train_epochs: 1
+          output_dir: models/
+          per_device_eval_batch_size: 16
+          per_device_train_batch_size: 8
+          save_total_limit: 2
+          warmup_steps: 500
+          weight_decay: 0.01
+      run_id: 1146
+    predict:
+      flow_id: classifier_predict
+      predict_proba: true
 params:
   match_threshold: 60

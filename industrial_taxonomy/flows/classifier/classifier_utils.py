@@ -112,6 +112,33 @@ class OrderedDataset(Dataset):
     def __len__(self):
         return len(self.features)
 
+class IterableDataset(Dataset):
+    def __init__(self, samples: List[Sample],
+                tokenizer: PreTrainedTokenizer,
+                encode_kwargs: dict) -> None:
+        self.tokenizer = tokenizer
+        self.samples: List[Sample] = samples
+        self.current = 0
+        
+    def encode(self, sample: Sample) -> Features:
+        encode_dict = self.tokenizer(
+            text=sample.text,
+            **encode_kwargs,
+        )
+        return Features(input_ids=encode_dict['input_ids'],
+                        attention_mask=encode_dict['attention_mask'],
+                        label=sample.label,
+                       )
+    
+    def __getitem__(self, _) -> Features:
+        if self.current == len(self.sample):
+            self.current = 0
+        example = self.samples[self.current]
+        self.current += 1
+        return self.encode(example)
+
+    def __len__(self):
+        return len(self.rows)
 
 def pad_seq(seq: List[int], max_len: int, pad_value: int) -> List[int]:
     """Pads a tokenized sequence to the maximum length with a filler token.
@@ -200,4 +227,7 @@ def create_org_data(match_threshold, sic_level=4):
     orgs = (orgs.reset_index().
             rename(columns={'description': 'text', 'SIC_code': 'label'}))
     return orgs.to_dict(orient='records')
+
+def sort_by_char_len(dataset):
+    return (d for d in sorted(dataset, key=lambda s: len(s['text'])))
 
