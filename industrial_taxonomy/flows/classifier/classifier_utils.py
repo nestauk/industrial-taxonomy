@@ -139,7 +139,7 @@ class IterableDataset(Dataset):
         return self.encode(example)
 
     def __len__(self):
-        return len(self.rows)
+        return len(self.samples)
 
 def pad_seq(seq: List[int], max_len: int, pad_value: int) -> List[int]:
     """Pads a tokenized sequence to the maximum length with a filler token.
