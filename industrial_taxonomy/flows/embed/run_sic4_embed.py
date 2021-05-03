@@ -16,6 +16,7 @@ if __name__ == "__main__":
     embed_flow_config = {
             '--model': embed_config['model'],
             '--preproc_flow_run_id': str(preproc_run_id)
+            }
  
     flow_file = (Path(__file__).resolve().parents[0] / "embed.py")
     embed_run_id = execute_flow(
