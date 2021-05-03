@@ -99,8 +99,8 @@ class TextClassifier(FlowSpec):
         trainer = Trainer(
                 model=model(self.freeze_model),
                 args=training_args,
-                train_dataset=self.train_encodings,
-                eval_dataset=self.eval_encodings,
+                train_dataset=self.train_dataset,
+                eval_dataset=self.eval_dataset,
                 compute_metrics=compute_metrics,
                 data_collator=BatchCollator(self.tokenizer)
                 )
