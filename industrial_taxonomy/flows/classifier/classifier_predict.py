@@ -64,7 +64,7 @@ class TextClassifierPredict(FlowSpec):
                 data_collator=BatchCollator(self.train_run.data.tokenizer)
                 )
 
-        preds = trainer.predict(encodings)
+        preds = trainer.predict(self.test_dataset)
         self.pred_labels = np.argmax(preds.predictions, axis=1)
         if self.predict_proba:
             self.pred_probs = softmax(preds.predictions, axis=1)

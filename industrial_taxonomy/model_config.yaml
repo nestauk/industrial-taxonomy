@@ -26,6 +26,7 @@ flows:
           return_overflowing_tokens: false
           return_special_tokens_mask: false
           return_token_type_ids: true
+          truncation: true
         model:
           pretrained_model_name_or_path: distilbert-base-uncased
           return_dict: true
