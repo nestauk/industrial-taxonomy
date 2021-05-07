@@ -12,7 +12,6 @@ from industrial_taxonomy.getters.glass import (
 )
 from industrial_taxonomy.getters.glass_house import get_glass_house
 from industrial_taxonomy.getters.companies_house import get_sector
-from industrial_taxonomy.taxonomy import make_network_from_coocc, label_comms
 from industrial_taxonomy.utils.sic_utils import extract_sic_code_description
 from sklearn.feature_extraction.text import TfidfTransformer
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -74,8 +73,6 @@ def make_glass_for_taxonomy() -> pd.DataFrame:
 
     sect = get_sector()
 
-    descr = get_organisation_description
-
     glass_sector = (
         gh.query("score>=75")
         .merge(sect, on="company_number")
@@ -90,13 +87,17 @@ def make_glass_for_taxonomy() -> pd.DataFrame:
 
 
 def make_doc_term_matrix(
-    glass_sector: pd.DataFrame, sector: str = "sic4", tokens: str = "tokens_clean"
+    glass_sector: pd.DataFrame,
+    sector: str = "sic4",
+    tokens: str = "tokens_clean",
+    min_occurrence: int = 50,
 ) -> pd.DataFrame:
     """Create document - term matrix
     Args:
         glass_sector: table with glass tokenised descriptions and sectors
         sector: sector variable
         tokens: token variable
+        min_occurrence: minimum number of times a token needs to occur
     Returns:
         document term matrix with token counts per sic code
     """
@@ -114,7 +115,10 @@ def make_doc_term_matrix(
         [x for x in doc_term_mat.columns if x[0] in string.ascii_letters]
     ]
 
-    return doc_term_mat
+    term_counts = doc_term_mat.sum()
+    above_thres = term_counts.loc[term_counts > min_occurrence].index.tolist()
+
+    return doc_term_mat[above_thres]
 
 
 def make_tfidf_mat(doc_term_mat: pd.DataFrame) -> pd.DataFrame:
@@ -158,7 +162,7 @@ def extract_salient_terms(tfidf_mat: pd.DataFrame, q: float = 0.95) -> dict:
     return salient_terms
 
 
-def filter_salient_terms(salient_terms: dict, thres: float = 0.5) -> list:
+def filter_salient_terms(salient_terms: dict, thres: float = 0.2) -> list:
     """Identify salient terms that happen in many sectors
     Args:
         salient_terms: dict with salient terms per sector
@@ -183,7 +187,7 @@ def filter_salient_terms(salient_terms: dict, thres: float = 0.5) -> list:
     return not_very_salient
 
 
-def get_promo_terms(doc_term_mat: pd.DataFrame, thres: float = 0.5) -> set:
+def get_promo_terms(doc_term_mat: pd.DataFrame, thres: float = 0.4) -> set:
     """Identify promotional terms
     Args:
         doc_term_mat: document term matrix
@@ -205,7 +209,7 @@ def get_promo_terms(doc_term_mat: pd.DataFrame, thres: float = 0.5) -> set:
 
 def text_processing(
     glass_sector: pd.DataFrame,
-    salient_q: float = 0.95,
+    salient_q: float = 0.99,
     salient_filter_thres: float = 0.3,
     polarity_thres: float = 0.5,
 ) -> pd.DataFrame:
@@ -232,7 +236,7 @@ def text_processing(
     ]
     return glass_sector
 
-gs = make_glass_for_taxonomy()
-f = text_processing(gs)
-logging.info(f['token_filtered'].head())
 
+if __name__ == "__main__":
+    make_glass_for_taxonomy()
+    text_processing()
