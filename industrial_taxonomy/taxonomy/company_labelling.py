@@ -166,3 +166,20 @@ def assess_sector_homogeneity(token_list: list, w2v_model) -> float:
         results.append(w2v_model.wv.similarity(c[0], c[1]))
 
     return np.median(results)
+
+def make_comm_cooccurence_list(tag_counts_df:pd.DataFrame,thres:int=2)->dict:
+    '''Create dict of sector co-occurrences in company definitions
+    Args:
+        tag_counts_df: counts of each sector occurrence in a company
+        thres: presence threshold to consider a sector related to a company
+    Returns:
+        A dict looking up company ids and sectors that occur in them
+
+    '''
+    
+    res = {}
+    
+    for _id,vals in tag_counts_df.iterrows():
+        res[_id] = [x for x in vals.loc[vals>thres].index]
+    return res
+
