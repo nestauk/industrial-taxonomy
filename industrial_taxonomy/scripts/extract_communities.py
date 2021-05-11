@@ -11,6 +11,7 @@ from industrial_taxonomy.taxonomy.taxonomy_filtering import (
     make_glass_for_taxonomy,
     text_processing,
 )
+from industrial_taxonomy.getters.processing import get_config
 from industrial_taxonomy.taxonomy.taxonomy_community import extract_communities
 import industrial_taxonomy
 from industrial_taxonomy import config
@@ -20,7 +21,8 @@ project_dir = industrial_taxonomy.project_dir
 TOK_PATH = f"{project_dir}/data/processed/glass_tokenised.csv"
 
 
-params = config["community_extraction"]
+# params = config["community_extraction"]
+params = get_config("community_extraction")
 k_param = ensemble.Parameter(name="k", start=20, end=40, step=10)
 
 method_pars = {
@@ -72,7 +74,7 @@ def get_glass_tokenised():
 
     g = pd.read_csv(
         TOK_PATH,
-        dtype={'sic4':str},
+        dtype={"sic4": str},
         converters={
             "tokens": ast.literal_eval,
             "tokens_clean": ast.literal_eval,
@@ -80,6 +82,11 @@ def get_glass_tokenised():
         },
     )
     return g
+
+
+def get_summaries(summary_name):
+    table_loc = f"{project_dir}/data/processed/{summary_name}.csv"
+    return pd.read_csv(table_loc, dtype={"sic4": str})
 
 
 if __name__ == "__main__":

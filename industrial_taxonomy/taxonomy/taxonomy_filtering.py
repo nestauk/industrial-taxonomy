@@ -93,7 +93,7 @@ def make_doc_term_matrix(
     min_occurrence: int = 50,
 ) -> pd.DataFrame:
     """Create document - term matrix
-    Args:
+    Args:[]
         glass_sector: table with glass tokenised descriptions and sectors
         sector: sector variable
         tokens: token variable

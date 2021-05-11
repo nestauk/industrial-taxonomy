@@ -24,6 +24,7 @@ dependencies:
 
   - pip:
     # Put any pip dependencies here (and no conda ones anywhere below)
+    - wordcloud
     - communities
     - webdriver-manager
     - altair-saver

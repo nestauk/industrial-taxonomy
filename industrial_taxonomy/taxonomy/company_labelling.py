@@ -1,5 +1,7 @@
 # Functions to label companies with community tokens
 
+import pickle
+import gensim
 import json
 import pandas as pd
 import numpy as np
@@ -11,6 +13,13 @@ from industrial_taxonomy.taxonomy.taxonomy_filtering import (
 import industrial_taxonomy
 
 project_dir = industrial_taxonomy.project_dir
+MODEL_PATH = f"{project_dir}/models/w2v.p"
+
+
+def save_model(name):
+    with open(MODEL_PATH + f"/{name}.p", "rb") as infile:
+        model = pickle.load(infile)
+    return model
 
 
 def get_communities():
@@ -93,7 +102,7 @@ def label_row(row: pd.Series, threshold: int) -> str:
 
 
 def make_labelled_dataset(
-    glass_tagged: pd.DataFrame, occ_threshold: int, sector_size: int
+    glass_tagged: pd.DataFrame, occ_threshold: int
 ) -> pd.DataFrame:
     """Makes a tagged dataset
     Args:
@@ -107,7 +116,7 @@ def make_labelled_dataset(
     gt = glass_tagged.copy()
 
     gt["label"] = gt.apply(lambda x: label_row(x, occ_threshold), axis=1)
-    gt["label_2"] = post_filter(gt, sector_size)
+    # gt["label_2"] = post_filter(gt, sector_size)
     return gt
 
 
@@ -134,7 +143,7 @@ def get_salient_terms_community(
     )
 
     doc_term_new_sectors = make_tfidf_mat(
-        make_doc_term_matrix(labelled_, "label_2", "token_filtered")
+        make_doc_term_matrix(labelled_, "label", "token_filtered")
     )
 
     results = {}
@@ -167,19 +176,42 @@ def assess_sector_homogeneity(token_list: list, w2v_model) -> float:
 
     return np.median(results)
 
-def make_comm_cooccurence_list(tag_counts_df:pd.DataFrame,thres:int=2)->dict:
-    '''Create dict of sector co-occurrences in company definitions
+
+def get_all_sector_homogeneities(
+    comm_terms: dict, w2v_model: gensim.models.word2vec.Word2Vec
+) -> pd.DataFrame:
+    """Create lookup between communities, salient terms and internal homogeneities
+    Args:
+        comms_term: salient terms in a community
+        w2v model: vector representation of tokens in company descriptions
+    Returns:
+        median similarities in community names
+    """
+
+    salient_similarities = {
+        s: assess_sector_homogeneity(comm_terms[s], w2v_model)
+        for s in comm_terms.keys()
+    }
+    comm_terms_homogeneity = (
+        pd.Series(comm_terms)
+        .reset_index(name="salient_terms")
+        .assign(median_similarity=lambda x: x["index"].map(salient_similarities))
+    )
+    return comm_terms_homogeneity
+
+
+def make_comm_cooccurence_list(tag_counts_df: pd.DataFrame, thres: int = 2) -> dict:
+    """Create dict of sector co-occurrences in company definitions
     Args:
         tag_counts_df: counts of each sector occurrence in a company
         thres: presence threshold to consider a sector related to a company
     Returns:
         A dict looking up company ids and sectors that occur in them
 
-    '''
-    
-    res = {}
-    
-    for _id,vals in tag_counts_df.iterrows():
-        res[_id] = [x for x in vals.loc[vals>thres].index]
-    return res
+    """
 
+    res = {}
+
+    for _id, vals in tag_counts_df.iterrows():
+        res[_id] = [x for x in vals.loc[vals > thres].index]
+    return res
