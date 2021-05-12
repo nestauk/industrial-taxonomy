@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.10.0
+#       jupytext_version: 1.11.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -26,15 +26,17 @@ from sklearn.decomposition import TruncatedSVD
 
 from industrial_taxonomy.sic import make_sic_lookups
 
-import seaborn as sns
+# import seaborn as sns
 
 import altair as alt
+
+from industrial_taxonomy.utils.altair_s3 import export_chart
 
 # %%
 fig_save_opts = dict(dpi=300, bbox_inches='tight')
 
 # %%
-sns.set_context('notebook')
+# sns.set_context('notebook')
 
 # %%
 sic4_name_lookup, section_name_lookup, sic4_to_div_lookup = make_sic_lookups()
@@ -72,7 +74,10 @@ sic4_name_lookup, section_name_lookup, sic4_to_div_lookup = make_sic_lookups()
 #
 
 # %%
-from metaflow import Run, Metaflow
+from metaflow import Run, Metaflow, namespace
+
+# %%
+namespace('user:ubuntu')
 
 # %%
 from industrial_taxonomy import config
@@ -121,13 +126,16 @@ clf_report_df['SIC'] = (clf_report_df.index
                               + ': ' + clf_report_df['Name'])
 
 # %%
+clf_report_df
+
+# %%
 sic4_name_lookup['9609']
 
 # %%
 alt.Chart(clf_report_df.head(20)).mark_bar().encode(
-    x='f1-score',
-    y=alt.Y('SIC', sort='-x'),
-#     tooltip=['4-Digit SIC', 'Description'],
+    x=alt.Y('f1-score', sort='-x', axis=alt.Axis(title='F1 Score')),
+    y=alt.Y('SIC', sort='-x', axis=alt.Axis(title='4-Digit SIC Class')),
+    tooltip=['Name'],
 #     color=alt.Color('SIC Division', scale=alt.Scale(scheme='category20'))
 ).interactive().properties(
     width=600,
