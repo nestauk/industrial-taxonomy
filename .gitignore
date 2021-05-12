@@ -1,3 +1,5 @@
+*.key
+
 # Metaflow
 .metaflow
 metaflow.s3.*
@@ -105,8 +107,6 @@ target/
 *.swo
 *~
 
-# Mypy cache
-.mypy_cache/
-
 # lockfiles from updating configs with flows
 *.lock
+.mypy_cache/
