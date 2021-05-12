@@ -49,7 +49,7 @@ class SicPreprocess(FlowSpec):
         if self.test:
             org_data = org_data[:500]
 
-        if (not nec_companies) and (sic_level == 4):
+        if (not self.nec_companies) and (sic_level == 4):
             org_data = exclude_nec_orgs(org_data)
 
         lookup = {}
