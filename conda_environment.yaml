@@ -5,52 +5,56 @@ channels:
 dependencies:
   - pip
   - python=3.8
-  # Tooling requirements (don't edit)
-  - pandoc
-  - pandoc-crossref
-  - jq
-  # Put any conda dependencies HERE
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - jupyter
+  - jupyterlab
+  - ipython
+  - altair
+  - clang_osx-64  # [not linux]
+  - gcc_linux-64  # [not darwin]
+  - metaflow
+  # Put any conda dependencies here
   - graph-tool
 
   - pip:
-    - numpy
-    - scipy
-    - pandas
-    - matplotlib
-    - altair
-    - metaflow
-    # Put any pip dependencies HERE (and no conda ones anywhere below)
+    # Put any pip dependencies here (and no conda ones anywhere below)
+    - altair_saver
+    - sh
+    - s3fs
     - spacy
     - gensim
     - nltk
     - altair_saver
     - sh
-    - git+https://github.com/nestauk/research_daps@4e654f9
+    - git+https://github.com/nestauk/research_daps@24_topsbm
     - https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.0.0/en_core_web_lg-3.0.0.tar.gz
 
-    # Tooling requirements (don't edit)
-    - jupyter
-    - jupyterlab
-    - filelock
-    - tqdm
-    - tables
-    - black
-    - blackcellmagic
-    - click
-    - Sphinx
-    - sphinxcontrib-napoleon
-    - awscli
-    - flake8
-    - flake8-black
-    - python-dotenv>=0.5.1
-    - pytest
-    - mypy
-    - jupytext
+  # Tooling requirements (don't edit)
     - tornado>=5.0  # Stops luigi breaking jupyter
-    # These probably aren't needed
-    - pymysql
-    - sqlalchemy
-    - coverage
-    - jupyter_contrib_nbextensions
-    - jupyter_nbextensions_configurator
-    - pyyaml
+    - pandoc
+    - pandoc-crossref
+    - filelock
+  - tqdm
+  - pyyaml
+  - pytables
+  - black
+  - blackcellmagic
+  - pymysql
+  - sqlalchemy
+  - click
+  - Sphinx
+  - sphinxcontrib-napoleon
+  - coverage
+  - awscli
+  - flake8
+  - flake8-black
+  - python-dotenv>=0.5.1
+  - jupyter_contrib_nbextensions
+  - jupyter_nbextensions_configurator
+  - jq
+  - pytest
+  - mypy
+  - jupytext
