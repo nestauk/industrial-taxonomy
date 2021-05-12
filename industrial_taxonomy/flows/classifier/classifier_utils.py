@@ -17,7 +17,7 @@ from industrial_taxonomy.utils.metaflow_client import cache_getter_fn
 
 @dataclass
 class Sample:
-    """Sample of raw data
+    """A single sample of raw data
 
     Attributes:
         index (int): A UID for the sample.
@@ -33,7 +33,7 @@ class Sample:
 class Features:
     """Dataclass structure.
 
-    Holds sequence features and label.
+    Holds tokenized sequence features and label.
 
     Attributes:
         input_ids (list): Token IDs from a sequence.
@@ -45,32 +45,27 @@ class Features:
     label: int
     index: int
     
-class OrderedDataset(Dataset):
+
+class IterableDataset(Dataset):
     """A dataset that returns samples in the order that they were inserted.
     """
-
-    def __init__(self, tokenizer: PreTrainedModel,
-            samples: List[Sample], config: dict, label_lookup: dict) -> None:
+    def __init__(self, samples: List[Sample],
+                tokenizer: PreTrainedTokenizerBase,
+                encode_kwargs: dict) -> None:
         """
         Args:
+            samples (list): The samples to be included in the dataset
             tokenizer (transformers.PreTrainedTokenizer): Pretrained tokenizer
                 matching the transformer model in use.
-            samples (list): The samples to be included in the dataset
+            encode_kwargs (dict): A dict of params to be passed to the 
+                tokenizer for encoding text.
         """
         self.tokenizer = tokenizer
-        self.label_lookup = label_lookup
-        self.config = config
+        self.samples: List[Sample] = samples
+        self.encode_kwargs = encode_kwargs
         self.current = 0
-        self.features = self._sort_samples(samples)
         
-    def _sort_samples(self, samples):
-        """Encodes and sorts samples"""
-        features = [self._encode(s) for s in samples]
-        lens = [len(f.input_ids) for f in features]
-        features = [f for _, f in sorted(zip(lens, features), key=lambda t: t[0])]
-        return features
-        
-    def _encode(self, sample: Sample) -> Features:
+    def encode(self, sample: Sample) -> Features:
         """Tokenizes and encodes a sequence.
 
         Arguments:
@@ -81,16 +76,11 @@ class OrderedDataset(Dataset):
         """
         encode_dict = self.tokenizer(
             text=sample.text,
-            **self.config)
-
-        if self.label_lookup is not None:
-            label = self.label_lookup.get(sample.label, 0)
-        else:
-            label=sample.label
-
+            **self.encode_kwargs,
+        )
         return Features(input_ids=encode_dict['input_ids'],
                         attention_mask=encode_dict['attention_mask'],
-                        label=label,
+                        label=sample.label,
                         index=sample.index
                        )
     
@@ -103,36 +93,6 @@ class OrderedDataset(Dataset):
 
         Samples are returned encoded.
         """
-        if self.current == len(self.features):
-            self.current = 0
-        sample = self.features[self.current]
-        self.current += 1
-        return sample
-
-    def __len__(self):
-        return len(self.features)
-
-class IterableDataset(Dataset):
-    def __init__(self, samples: List[Sample],
-                tokenizer: PreTrainedTokenizerBase,
-                encode_kwargs: dict) -> None:
-        self.tokenizer = tokenizer
-        self.samples: List[Sample] = samples
-        self.encode_kwargs = encode_kwargs
-        self.current = 0
-        
-    def encode(self, sample: Sample) -> Features:
-        encode_dict = self.tokenizer(
-            text=sample.text,
-            **self.encode_kwargs,
-        )
-        return Features(input_ids=encode_dict['input_ids'],
-                        attention_mask=encode_dict['attention_mask'],
-                        label=sample.label,
-                        index=sample.index
-                       )
-    
-    def __getitem__(self, _) -> Features:
         if self.current == len(self.samples):
             self.current = 0
         example = self.samples[self.current]
@@ -140,6 +100,7 @@ class IterableDataset(Dataset):
         return self.encode(example)
 
     def __len__(self):
+        """Returns the number of samples in the dataset"""
         return len(self.samples)
 
 def pad_seq(seq: List[int], max_len: int, pad_value: int) -> List[int]:
@@ -182,6 +143,7 @@ class BatchCollator():
                }
 
 def model_init(model_kwargs, frozen=False):
+    """Initializes a model for sequence classification"""
     model = AutoModelForSequenceClassification.from_pretrained(**model_kwargs)
     if frozen:
         for param in model.base_model.parameters():
@@ -189,6 +151,7 @@ def model_init(model_kwargs, frozen=False):
     return model
 
 def compute_metrics(pred):
+    """Computes classification accuracy, f1-score, precision and recall"""
     labels = pred.label_ids
     preds = pred.predictions.argmax(-1)
     precision, recall, f1, _ = precision_recall_fscore_support(
@@ -205,6 +168,7 @@ def compute_metrics(pred):
     }   
 
 def create_org_data(match_threshold, sic_level=4):
+    """Get and match CH and Glass data, labelled with a specific SIC level"""
     glass_house = get_glass_house()
     org_descriptions = get_organisation_description()
     org_sectors = get_sector()
@@ -230,6 +194,8 @@ def create_org_data(match_threshold, sic_level=4):
             rename(columns={'description': 'text', 'SIC_code': 'label'}))
     return orgs.to_dict(orient='records')
 
-def sort_by_char_len(dataset):
-    return (d for d in sorted(dataset, key=lambda s: len(s['text'])))
+def sort_by_char_len(samples):
+    """Sorts samples by the character length of their `text` field in 
+    ascending order"""
+    return (s for s in sorted(samples, key=lambda s: len(s['text'])))
 
