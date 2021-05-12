@@ -55,5 +55,52 @@ flows:
   sic4_embedder:
     model: stsb-distilbert-base
     run_id: 1200
+  sic4_classifier_no_nec:
+    predict:
+      flow_id: classifier_predict
+      predict_proba: true
+    preproc:
+      config:
+        train_test_split:
+          random_state: 42
+          train_size: 0.8
+      flow_id: sic_preprocessing
+      match_threshold: 75
+      sic_level: 4
+      test: false
+      nec_codes: false
+    train:
+      config:
+        encode:
+          add_special_tokens: true
+          max_length: 512
+          pad_to_max_length: false
+          return_attention_mask: true
+          return_overflowing_tokens: false
+          return_special_tokens_mask: false
+          return_token_type_ids: true
+          truncation: true
+        model:
+          pretrained_model_name_or_path: distilbert-base-uncased
+          return_dict: true
+        tokenizer:
+          pretrained_model_name_or_path: distilbert-base-uncased
+        train_eval_split:
+          eval_size: 0.25
+          random_state: 42
+          train_size: 0.75
+        training_args:
+          learning_rate: 1.0e-05
+          logging_dir: ./logs
+          logging_steps: 100
+          num_train_epochs: 1
+          output_dir: models/
+          per_device_eval_batch_size: 16
+          per_device_train_batch_size: 8
+          save_total_limit: 2
+          warmup_steps: 500
+          weight_decay: 0.01
+      flow_id: classifier_train
+      freeze_model: false
 params:
   match_threshold: 60
