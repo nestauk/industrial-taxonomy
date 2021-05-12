@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 
 from industrial_taxonomy.flows.classifier.classifier_utils import (create_org_data, 
         exclude_nec_orgs) 
+from industrial_taxonomy.sic import make_sic_lookups
 
 
 class SicPreprocess(FlowSpec):
@@ -45,12 +46,16 @@ class SicPreprocess(FlowSpec):
     def load_match_glass_ch(self):
         """Load and match Glass and CH data and create a map SIC codes to 
         integer IDs"""
-        org_data = create_org_data(self.match_threshold, self.sic_level)
+        if (not self.nec_companies) and (self.sic_level == 4):
+            sic4_name_lookup, _, __ = make_sic_lookups()
+            non_nec_codes = [code for code, name in sic4_name_lookup.items()
+                    if not 'n.e.c' in name]
+
+        org_data = create_org_data(self.match_threshold, 
+                self.sic_level, 
+                non_nec_codes)
         if self.test:
             org_data = org_data[:500]
-
-        if (not self.nec_companies) and (self.sic_level == 4):
-            org_data = exclude_nec_orgs(org_data)
 
         lookup = {}
         i = 0

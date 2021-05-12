@@ -52,13 +52,11 @@ flows:
       flow_id: classifier_train
       freeze_model: false
       run_id: 1196
-  sic4_embedder:
-    model: stsb-distilbert-base
-    run_id: 1200
   sic4_classifier_no_nec:
     predict:
       flow_id: classifier_predict
       predict_proba: true
+      run_id: 1218
     preproc:
       config:
         train_test_split:
@@ -66,9 +64,10 @@ flows:
           train_size: 0.8
       flow_id: sic_preprocessing
       match_threshold: 75
+      nec_companies: false
+      run_id: 1216
       sic_level: 4
       test: false
-      nec_companies: false
     train:
       config:
         encode:
@@ -102,5 +101,9 @@ flows:
           weight_decay: 0.01
       flow_id: classifier_train
       freeze_model: false
+      run_id: 1217
+  sic4_embedder:
+    model: stsb-distilbert-base
+    run_id: 1200
 params:
   match_threshold: 60

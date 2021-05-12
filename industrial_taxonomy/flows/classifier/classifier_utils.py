@@ -13,7 +13,6 @@ from industrial_taxonomy.getters.glass import get_organisation_description
 from industrial_taxonomy.getters.companies_house import get_sector
 from industrial_taxonomy.getters.glass_house import get_glass_house
 from industrial_taxonomy.utils.metaflow_client import cache_getter_fn
-from industrial_taxonomy.sic import make_sic_lookups
 
 
 @dataclass
@@ -168,7 +167,7 @@ def compute_metrics(pred):
         'recall': recall
     }   
 
-def create_org_data(match_threshold, sic_level=4):
+def create_org_data(match_threshold, sic_level=4, exclude_codes=None):
     """Get and match CH and Glass data, labelled with a specific SIC level"""
     glass_house = get_glass_house()
     org_descriptions = get_organisation_description()
@@ -191,16 +190,17 @@ def create_org_data(match_threshold, sic_level=4):
 
     orgs[f'SIC_code'] = orgs[f'SIC5_code'].str[:sic_level]
     orgs = orgs[['description', f'SIC_code']]
+
+    if exclude_codes is not None:
+        orgs = exclude_nec_orgs(orgs, exclude_codes)
+
     orgs = (orgs.reset_index().
             rename(columns={'description': 'text', 'SIC_code': 'label'}))
     return orgs.to_dict(orient='records')
 
-def exclude_nec_orgs(org_data):
+def exclude_nec_orgs(org_data, codes):
     """Remove companies that have 'n.e.c' codes"""
-    sic4_name_lookup, _, __ = make_sic_lookups()
-    non_nec_codes = [code for code, name in sic4_name_lookup.items()
-            if not 'n.e.c' in name]
-    org_data = org_data[org_data['SIC_code'].isin(non_nec_codes)]
+    org_data = org_data[~org_data['SIC_code'].isin(codes)]
     return org_data
 
 def sort_by_char_len(samples):
