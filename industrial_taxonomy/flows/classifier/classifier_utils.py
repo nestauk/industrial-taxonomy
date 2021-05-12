@@ -13,6 +13,7 @@ from industrial_taxonomy.getters.glass import get_organisation_description
 from industrial_taxonomy.getters.companies_house import get_sector
 from industrial_taxonomy.getters.glass_house import get_glass_house
 from industrial_taxonomy.utils.metaflow_client import cache_getter_fn
+from industrial_taxonomy.sic import make_sic_lookups
 
 
 @dataclass
@@ -193,6 +194,14 @@ def create_org_data(match_threshold, sic_level=4):
     orgs = (orgs.reset_index().
             rename(columns={'description': 'text', 'SIC_code': 'label'}))
     return orgs.to_dict(orient='records')
+
+def exclude_nec_orgs(org_data):
+    """Remove companies that have 'n.e.c' codes"""
+    sic4_name_lookup, _, __ = make_sic_lookups()
+    non_nec_codes = [code for code, name in sic4_name_lookup.items()
+            if not 'n.e.c' in name]
+    org_data = org_data[org_data['SIC_code'].isin(non_nec_codes)]
+    return org_data
 
 def sort_by_char_len(samples):
     """Sorts samples by the character length of their `text` field in 
