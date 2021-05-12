@@ -11,10 +11,12 @@ import toolz.curried as t
 from scipy.spatial.distance import pdist, squareform
 
 from industrial_taxonomy.getters.sic import level_lookup
-from industrial_taxonomy.getters.topsbm import get_topsbm_v2
+from industrial_taxonomy.getters.topsbm import get_topsbm
 from industrial_taxonomy.queries.sector import get_glass_SIC_sectors
 from industrial_taxonomy.utils.altair_s3 import export_chart
-from topsbm_utils import group_topsbm_by_sector as group_topsbm_by_sector_
+from industrial_taxonomy.scripts.topsbm_utils import (
+    group_topsbm_by_sector as group_topsbm_by_sector_,
+)
 
 group_topsbm_by_sector = group_topsbm_by_sector_(cluster_type="word")
 logger = logging.getLogger(__name__)
@@ -85,7 +87,7 @@ if __name__ == "__main__":
     model_levels = [1]
     SIC_level = 2
     sector = get_glass_SIC_sectors()
-    model = get_topsbm_v2()
+    model = get_topsbm()
     model_name = "spacy"
 
     similarities = {}

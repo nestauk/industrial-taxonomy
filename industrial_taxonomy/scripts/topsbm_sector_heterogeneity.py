@@ -9,11 +9,13 @@ import tqdm
 from scipy.stats import entropy
 
 from industrial_taxonomy.getters.sic import level_lookup
-from industrial_taxonomy.getters.topsbm import get_topsbm_v2
+from industrial_taxonomy.getters.topsbm import get_topsbm
 from industrial_taxonomy.queries.sector import get_glass_SIC_sectors
 from industrial_taxonomy.utils.altair_s3 import export_chart
 from industrial_taxonomy.utils.econ_geo import location_quotient
-from industrial_taxonomy.scripts.topsbm_utils import group_topsbm_by_sector as group_topsbm_by_sector_
+from industrial_taxonomy.scripts.topsbm_utils import (
+    group_topsbm_by_sector as group_topsbm_by_sector_,
+)
 
 
 alt.data_transformers.disable_max_rows()
@@ -222,7 +224,7 @@ def plot_sector_entropy_static(sector_entropy: pd.DataFrame, n: int = 10) -> alt
 if __name__ == "__main__":
     group_topsbm_by_sector = group_topsbm_by_sector_(cluster_type="word")
 
-    model = get_topsbm_v2()
+    model = get_topsbm()
     sector = get_glass_SIC_sectors()
 
     model_levels = [0, 1, 2]

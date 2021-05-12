@@ -14,11 +14,7 @@ flows:
       n_gram: 2
       test_mode: false
     run_id: 1012
-  topsbm_v1:
-    params:
-      n_docs: -1
-    run_id: 1020
-  topsbm_v2:
+  topsbm:
     params:
       n_docs: -1
     run_id: 1025

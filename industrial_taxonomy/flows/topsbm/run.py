@@ -1,6 +1,5 @@
 """Runs TopSBM flow on Glass descriptions."""
 import json
-import random
 from pathlib import Path
 from uuid import uuid4
 
@@ -23,7 +22,7 @@ def generate_documents() -> Path:
 
 if __name__ == "__main__":
 
-    flow_id = "topsbm_v2"
+    flow_id = "topsbm"
     config_ = config["flows"][flow_id]
     params = config_["params"]
 
@@ -44,3 +43,4 @@ if __name__ == "__main__":
 
     config_["run_id"] = run_id
     update_model_config(["flows", flow_id], config_)
+
