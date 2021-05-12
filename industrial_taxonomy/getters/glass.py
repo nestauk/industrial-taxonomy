@@ -70,4 +70,5 @@ def get_description_tokens() -> pd.DataFrame:
 @cache_getter_fn
 def get_description_tokens_v2() -> pd.DataFrame:
     """Get tokens output from `GlassDescPreprocFlow` spacy pipeline."""
-    return flow_getter("GlassDescPreprocFlow").docs_v2
+    run_id = industrial_taxonomy.config["flows"]["glass_desc_preproc"]["run_id"]
+    return flow_getter("GlassDescPreprocFlow", run_id=run_id).docs_v2
