@@ -20,6 +20,7 @@ dependencies:
   - umap-learn
   - transformers
   - scikit-learn
+  - scikit-bio
   # Put any conda dependencies here
 
   - pip:
