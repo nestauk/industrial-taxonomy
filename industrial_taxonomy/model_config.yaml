@@ -24,7 +24,7 @@ taxonomy_test:
   test_file: description_kws_6201_7490
 community_extraction:
     min_sector_size: 1000
-    salient_filter_thres: 0.1
+    salient_filter_thres: 0.4
 company_tagging:
     occ_thres_label: 4
     occ_thres_tag: 4

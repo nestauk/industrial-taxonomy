@@ -28,7 +28,7 @@ import industrial_taxonomy
 
 project_dir = industrial_taxonomy.project_dir
 
-D2V_PATH = f"{project_dir}/models/d2v.p"
+D2V_PATH = f"{project_dir}/models/d2v_v2.p"
 
 if __name__ == "__main__":
     logging.info("Reading data")
@@ -65,10 +65,10 @@ if __name__ == "__main__":
             for _, r in glass_tok.iterrows()
         ]
         d2v = train_d2v(tagged_docs)
-        save_model(d2v, "d2v")
+        save_model(d2v, "d2v_v2")
     else:
         logging.info("Loading d2v model")
-        d2v = load_model("d2v")
+        d2v = load_model("d2v_v2")
 
     labelled_average_vectors = make_average_docvecs(labelled_set_high_homog, d2v)
 

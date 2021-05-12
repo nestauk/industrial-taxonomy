@@ -18,7 +18,7 @@ from industrial_taxonomy import config
 
 project_dir = industrial_taxonomy.project_dir
 
-TOK_PATH = f"{project_dir}/data/processed/glass_tokenised.csv"
+TOK_PATH = f"{project_dir}/data/processed/glass_tokenised_V2.csv"
 
 
 # params = config["community_extraction"]
@@ -29,13 +29,18 @@ method_pars = {
     algorithms.louvain: [
         ensemble.Parameter(name="resolution", start=0.7, end=1, step=0.1)
     ],
+    algorithms.leiden:[ensemble.BoolParameter(name='weights',value='weight')],
+    #algorithms.em:[k_param],
+    #algorithms.async_fluid:[k_param],
+    algorithms.agdl: [ensemble.Parameter(name="number_communities", start=20, end=50, step=10),
+    ensemble.Parameter(name="kc", start=4, end=10, step=2)],
     algorithms.chinesewhispers: [],
-    algorithms.girvan_newman: [
-        ensemble.Parameter(name="level", start=20, end=40, step=10)
-    ],
+    # algorithms.girvan_newman: [
+    #     ensemble.Parameter(name="level", start=20, end=50, step=15)
+    # ],
     algorithms.label_propagation: [],
     algorithms.markov_clustering: [],
-    algorithms.sbm_dl: [ensemble.Parameter(name="B_min", start=20, end=50, step=10)],
+    algorithms.sbm_dl_nested: [ensemble.Parameter(name="B_min", start=20, end=50, step=10)],
 }
 
 
@@ -95,6 +100,7 @@ if __name__ == "__main__":
         logging.info("reading preprocessed data")
         glass_processed = get_glass_tokenised()
     else:
+        logging.info("Making tokenised data")
         glass = make_glass_for_taxonomy()
         glass_processed = text_processing(glass, params["salient_filter_thres"])
         logging.info(glass_processed[["tokens_clean", "token_filtered"]].head())

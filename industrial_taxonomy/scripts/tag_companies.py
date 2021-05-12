@@ -21,7 +21,7 @@ from industrial_taxonomy import config
 params = config["company_tagging"]
 
 project_dir = industrial_taxonomy.project_dir
-MODEL_PATH = f"{project_dir}/models/w2v.p"
+MODEL_PATH = f"{project_dir}/models/w2v_v2.p"
 HOMOG_PATH = f"{project_dir}/data/processed/title_homog.csv"
 LABELLED_PATH = f"{project_dir}/data/processed/glass_comm_labelled.csv"
 
