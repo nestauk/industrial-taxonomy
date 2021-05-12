@@ -36,6 +36,8 @@ class SicPreprocess(FlowSpec):
 
     @step
     def load_match_glass_ch(self):
+        """Load and match Glass and CH data and create a map SIC codes to 
+        integer IDs"""
         org_data = create_org_data(self.match_threshold, self.sic_level)
         if self.test:
             org_data = org_data[:500]
@@ -57,6 +59,7 @@ class SicPreprocess(FlowSpec):
 
     @step
     def split(self):
+        """Split the data into train and test data"""
         train_test_config = self.config['train_test_split']
         self.train_set, self.test_set = train_test_split(
                 self.org_data,

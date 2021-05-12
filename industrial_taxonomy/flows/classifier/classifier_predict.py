@@ -47,6 +47,8 @@ class TextClassifierPredict(FlowSpec):
 
     @step
     def make_test_set(self):
+        """Fetches the test data and transforms it into a transformers.Trainer 
+        compatible dataset."""
         test_set = self.train_run.data.preproc_run.data.test_set
         tokenizer = self.train_run.data.tokenizer
         dataset = sort_by_char_len(test_set)
@@ -59,6 +61,8 @@ class TextClassifierPredict(FlowSpec):
 
     @step 
     def predict(self):
+        """Fetches a fine-tuned model from training run and applies it to the
+        test data to produce predicted labels and probabilities"""
         trainer = Trainer(
                 model=self.train_run.data.model,
                 data_collator=BatchCollator(self.train_run.data.tokenizer)
