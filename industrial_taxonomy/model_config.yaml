@@ -68,7 +68,7 @@ flows:
       match_threshold: 75
       sic_level: 4
       test: false
-      nec_codes: false
+      nec_companies: false
     train:
       config:
         encode:

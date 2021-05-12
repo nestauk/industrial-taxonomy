@@ -22,7 +22,7 @@ if __name__ == "__main__":
             '--match_threshold': str(preproc_config['match_threshold']),
             '--sic_level': str(preproc_config['sic_level']),
             '--test': str(preproc_config["test"]),
-            '--nec_codes': str(preproc_config["nec_codes"],
+            '--nec_companies': str(preproc_config["nec_companies"]),
             '--config': json.dumps(preproc_config['config'])
             }
 
