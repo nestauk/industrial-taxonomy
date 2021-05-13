@@ -43,10 +43,11 @@ if __name__ == "__main__":
         flow_file,
         cmd_params,
         metaflow_args={
-            "--with": "batch:memory=64000,image=metaflow-graph-tool",
+            "--with": "batch:memory=64000,queue=job-queue-nesta-metaflow-test,image=metaflow-graph-tool",
+            # "--datastore": "local",
+            # "--metadata": "local",
         },
     )
 
     config_["run_id"] = run_id
     update_model_config(["flows", flow_id], config_)
-
