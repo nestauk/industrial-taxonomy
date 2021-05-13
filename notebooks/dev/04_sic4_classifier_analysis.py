@@ -8,7 +8,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.11.1
+#       jupytext_version: 1.10.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -33,7 +33,16 @@ import altair as alt
 from industrial_taxonomy.utils.altair_s3 import export_chart
 
 # %%
-fig_save_opts = dict(dpi=300, bbox_inches='tight')
+from industrial_taxonomy.utils.altair_save_utils import save_altair, google_chrome_driver_setup
+
+# %%
+driver = google_chrome_driver_setup()
+
+# %%
+import os
+
+# %%
+fig_path = os.path.join(project_dir, 'reports/tables_figures')
 
 # %%
 # sns.set_context('notebook')
@@ -75,8 +84,6 @@ sic4_name_lookup, section_name_lookup, sic4_to_div_lookup = make_sic_lookups()
 
 # %%
 from metaflow import Run, Metaflow, namespace
-
-# %%
 namespace('user:ubuntu')
 
 # %%
@@ -132,10 +139,10 @@ clf_report_df
 sic4_name_lookup['9609']
 
 # %%
-alt.Chart(clf_report_df.head(20)).mark_bar().encode(
+chart = alt.Chart(clf_report_df.head(20)).mark_bar().encode(
     x=alt.Y('f1-score', sort='-x', axis=alt.Axis(title='F1 Score')),
     y=alt.Y('SIC', sort='-x', axis=alt.Axis(title='4-Digit SIC Class')),
-    tooltip=['Name'],
+    tooltip=['Name', 'f1-score'],
 #     color=alt.Color('SIC Division', scale=alt.Scale(scheme='category20'))
 ).interactive().properties(
     width=600,
@@ -146,7 +153,14 @@ alt.Chart(clf_report_df.head(20)).mark_bar().encode(
 )
 
 # %%
-clf_report_df.tail(10)
+chart
+
+# %%
+save_altair(chart, 'sic4_vs_f1-score_barh', driver, fig_path)
+
+# %%
+low_f1_high_support = clf_report_df[clf_report_df['support'] > 200].sort_values('f1-score').dropna().head(10)
+low_f1_high_support = low_f1_high_support[['']]
 
 # %% [markdown]
 # There is no obvious categorisation of the 4-digit codes based on their classification.
@@ -173,10 +187,25 @@ true_shannon_scores['Description'] = true_shannon_scores.index.map(sic4_name_loo
 true_shannon_scores = true_shannon_scores.rename(columns={0: 'Shannon'})
 
 # %%
-true_shannon_scores.head(10)
+high_shannon = true_shannon_scores.head(10)
+high_shannon['Shannon'] = high_shannon['Shannon'].apply(lambda x: np.round(x, 2))
+high_shannon
 
 # %%
-true_shannon_scores.dropna().tail(10)
+low_shannon = true_shannon_scores[true_shannon_scores['Shannon'] > 0].dropna().tail(10)
+low_shannon['Shannon'] = low_shannon['Shannon'].apply(lambda x: np.round(x, 2))
+low_shannon
+
+# %%
+(high_shannon
+ .reset_index()
+ .rename(columns={'index': 'SIC4'})[['SIC4', 'Description', 'Shannon']]
+ .to_markdown(os.path.join(fig_path, 'high_shannon_preds.md'), index=False))
+
+(low_shannon
+ .reset_index()
+ .rename(columns={'index': 'SIC4'})[['SIC4', 'Description', 'Shannon']]
+ .to_markdown(os.path.join(fig_path, 'low_shannon_preds.md'), index=False))
 
 
 # %% [markdown]
@@ -267,7 +296,18 @@ test_agg_df['SIC Division'] = test_agg_df.index.map(sic4_to_div_lookup)
 test_agg_df['4-Digit SIC'] = test_agg_df.index
 
 # %%
-alt.Chart(test_agg_df).mark_circle(size=60).encode(
+high_shannon = test_agg_df[['4-Digit SIC', 'Description', 'Shannon', 'Silhouette Score']]
+high_shannon = high_shannon.rename(columns={'4-Digit SIC': 'SIC4', 'Silhouette Score': 'Silhouette'})
+high_shannon['Shannon'] = high_shannon['Shannon'].apply(lambda x: np.round(x, 2))
+high_shannon['Silhouette'] = high_shannon['Silhouette'].apply(lambda x: np.round(x, 2))
+high_shannon.head(10).to_markdown(os.path.join(fig_path, 'high_shannon_preds.md'), index=False)
+
+# %%
+high_shannon[high_shannon['Shannon'] > 0].dropna().tail(10).to_markdown(
+    os.path.join(fig_path, 'low_shannon_preds.md'), index=False)
+
+# %%
+chart = alt.Chart(test_agg_df).mark_circle(size=60).encode(
     x='Silhouette Score',
     y='Shannon',
     tooltip=['4-Digit SIC', 'Description'],
@@ -280,27 +320,16 @@ alt.Chart(test_agg_df).mark_circle(size=60).encode(
     titleFontSize=14
 )
 
+save_altair(chart, 'pred_shannon_vs_test_silhouette_scatter', driver, fig_path)
+
+chart
+
 # %% [markdown]
 # We can see that there is a negative correlation between the mean sample Silhouette score of the company description embeddings and the Shannon scores of their predicted labels. This suggests either that sectors with more dispersed company descriptions tend to become resolved into alternative, more appropriate sectors, or that the model is just very poor at identifying those sectors. Or that these sectors are growing because they are absorbing companies from other sectors that are poorly defined or have a large overlap.
 
 # %%
 test_agg_df = test_agg_df.join(clf_report_df)
 test_agg_df = test_agg_df.rename(columns={'precision': 'Precision', 'recall': 'Recall'})
-
-# %%
-alt.Chart(test_agg_df).mark_circle(size=60).encode(
-    x='Precision',
-    y='Recall',
-    tooltip=['4-Digit SIC', 'Description'],
-#     size='Silhouette Score'
-#     color=alt.Color('SIC Division', scale=alt.Scale(scheme='category20'))
-).interactive().properties(
-    width=600,
-    height=400
-).configure_axis(
-    labelFontSize=14,
-    titleFontSize=14
-)
 
 # %% [markdown]
 # - 6910 Legal activities - high precision, high recall
@@ -346,11 +375,46 @@ for x in c.most_common(5):
     print(str(np.round((x[1] / s) * 100, 1)) + '% -', x[0] + ':', sic4_name_lookup[x[0]])
 
 # %%
-c = Counter(chain(*nns_labels[get_test_ilocs('4753')]))
+c = Counter(chain(*nns_labels[get_test_ilocs('1105')]))
 s = sum(c.values())
 for x in c.most_common(6):
     if x[0] in sic4_name_lookup:
         print(str(np.round((x[1] / s) * 100, 1)) + '% -', x[0] + ':', sic4_name_lookup[x[0]])
+
+# %%
+np.sum(np.array(test_labels) == nns_labels[:,0])
+
+# %%
+nns_df = pd.DataFrame(data={'label': test_labels, 'nn': nns_labels[:, 0]})
+
+# %%
+overlaps = pd.Series()
+
+for label, group in nns_df.groupby(test_labels):
+    pc = (group['nn'] == label).sum() / group.shape[0]
+    overlaps[label] = pc
+
+# %%
+test_agg_df['Same SIC NN'] = overlaps
+
+# %%
+chart = alt.Chart(test_agg_df).mark_circle(size=60).encode(
+    x='Precision',
+    y='Recall',
+    tooltip=['4-Digit SIC', 'Description'],
+    size='Same SIC NN'
+#     color=alt.Color('SIC Division', scale=alt.Scale(scheme='category20'))
+).interactive().properties(
+    width=600,
+    height=400
+).configure_axis(
+    labelFontSize=14,
+    titleFontSize=14
+)
+
+save_altair(chart, 'recall_vs_precision', driver, fig_path)
+
+chart
 
 # %%
 from umap import UMAP
@@ -367,22 +431,54 @@ umap = UMAP()
 umap_vecs = umap.fit_transform(svd_vecs)
 
 # %%
-fig, ax = plt.subplots(figsize=(10, 10))
+fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(15, 15))
 
-ax.scatter(
-    umap_vecs[:, 0], 
-    umap_vecs[:, 1],
-    alpha=0.1,
-    label='All other codes'
-)
-ax.scatter(
-    umap_vecs[:, 0][[True if l == '8299' else False for l in test_labels]],
-    umap_vecs[:, 1][[True if l == '8299' else False for l in test_labels]],
-    alpha=0.3,
-    label='8299: Other business support service activities n.e.c.'
-           )
-ax.axis('off')
-ax.legend()
+codes = ['8299', '9609', '7022', '7490']
+colors = ['C0', 'C1', 'C2', 'C3']
+
+for code, col, ax in zip(codes, colors, axs.ravel()):
+
+    ax.scatter(
+        umap_vecs[:, 0], 
+        umap_vecs[:, 1],
+        alpha=0.05,
+        label='All other codes',
+        color='gray'
+    )
+    ax.scatter(
+        umap_vecs[:, 0][[True if l == code else False for l in test_labels]],
+        umap_vecs[:, 1][[True if l == code else False for l in test_labels]],
+        alpha=0.2,
+        label=f'{code}: {sic4_name_lookup[code]}',
+        color=col
+               )
+    ax.axis('off')
+    ax.legend()
+plt.savefig(os.path.join(fig_path, 'dispersed_codes_embedding.png'), dpi=150)
+
+# %%
+nns_df = nns_df.reset_index()
+nns_df['nn_id'] = nns
+
+# %%
+nns_df[nns_df['label'] != nns_df['nn']].sample(1)
+
+# %%
+
+# %%
+print('3512', sic4_name_lookup['3512'])
+print(test_dataset.samples[36479], '\n')
+
+print('4321', sic4_name_lookup['4321'])
+print(test_dataset.samples[52665])
+
+# %%
+sample = nns_df[nns_df['label'] != nns_df['nn']].sample(1)
+print(sic4_name_lookup[sample['label'].to_numpy()[0]])
+print(test_dataset.samples[sample['index'].to_numpy()[0]])
+print('')
+print(sic4_name_lookup[sample['nn'].to_numpy()[0]])
+print(test_dataset.samples[sample['nn_id'].to_numpy()[0]])
 
 # %%
 Counter(test_labels).most_common(10)
