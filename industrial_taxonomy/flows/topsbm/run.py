@@ -3,19 +3,25 @@ import json
 from pathlib import Path
 from uuid import uuid4
 
-from research_daps.flows.topsbm import topsbm
+from toolz.curried import take, pipe
+import research_daps.flows.topsbm.topsbm as topsbm
 
 from industrial_taxonomy import config
-from industrial_taxonomy.getters.glass import get_description_tokens_v2
+from industrial_taxonomy.getters.glass import get_description_tokens
 from industrial_taxonomy.utils.metaflow_runner import update_model_config, execute_flow
 
 
-def generate_documents() -> Path:
+def generate_documents(n_docs: int) -> Path:
     """Generate notice tokens."""
 
-    path = Path(f"{uuid4()}.json").resolve()
+    path = Path(f"{str(uuid4())[:8]}_topsbm.json").resolve()
     with open(path, "w") as f:
-        json.dump(get_description_tokens_v2(), f)
+        pipe(
+            get_description_tokens().items(),
+            take(n_docs),
+            dict,
+            lambda data: json.dump(data, f),
+        )
 
     return path
 
@@ -26,7 +32,7 @@ if __name__ == "__main__":
     config_ = config["flows"][flow_id]
     params = config_["params"]
 
-    filepath = generate_documents()
+    filepath = generate_documents(params["n_docs"])
 
     cmd_params = {
         "--n-docs": str(params["n_docs"]),

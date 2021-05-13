@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 import toolz.curried as t
-from research_daps.flows.topsbm.sbmtm import sbmtm as Sbmtm
+from research_daps.flows.topsbm.sbmtm import Sbmtm
 
 
 @t.curry
@@ -25,8 +25,7 @@ def group_topsbm_by_sector(
     """
     if cluster_type not in {"document", "word"}:
         raise ValueError("`cluster_type` must be 'document' or 'word'")
-    # _, _, dict_groups = model.get_groups(L)
-    dict_groups = model.get_groups(L)
+    _, _, dict_groups = model.get_groups(L)
     p_tX_d = dict_groups["p_td_d" if cluster_type == "document" else "p_tw_d"]
 
     cluster_prob = pd.DataFrame(  # Rows: organisations | Columns: clusters | Values:
