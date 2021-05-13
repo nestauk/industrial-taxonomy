@@ -69,7 +69,8 @@ def html(
         output = Path(inputs[0]).with_suffix(".html")
 
     metadata_file = Path(project_dir) / "output/html_metadata.yaml"
-    _pandoc(inputs, output, metadata_file, self_contained=True, toc=True, citeproc=True)
+    _pandoc(inputs, output, metadata_file, self_contained=True, toc=True,
+            citeproc=True, mathml=True)
 
     typer.secho(f"Report output at file://{output.resolve()}", bg="green", fg="black")
 
