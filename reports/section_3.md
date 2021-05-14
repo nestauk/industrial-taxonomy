@@ -66,36 +66,48 @@ By comparing these two metrics we can see the degree to which companies within a
 
 ![Comparing the silhouette score of company description embeddings and Shannon index of predictions for each 4-digit SIC code shows that SIC codes with less well defined semantic space are more likely generate a diverse array of predictions.](tables_figures/pred_shannon_vs_test_silhouette_scatter.png){#fig:silhouette_shannon}
 
-However, a low Shannon index, driven by a high silhouette score does not necessarily mean that companies in that sector are well classified. 
-Sectors with more dispersed company descriptions are resolved into more appropriate sectors
+However, a low Shannon index, driven by a high silhouette score does not necessarily mean that companies in that sector are well classified. In fact it may mean that companies in a SIC code with those characteristics are almost entirely misclassified into a single other code. A high Shannon index is also not necessarily a bad outcome, despite the fact that it points to apparent misclassification. For example, companies in a sector with a lower silhouette score might be resolved into a larger number of more appropriate sectors through the classifier's predictions. 
 
+In [#tbl:shannon_silhouette] we can see that those sectors with a high Shannon index are those that are very non-specific and often uninformative, including several "n.e.c." codes. This suggests that many of the companies that were orignally labelled with these sectors might be reclassified by the model into what it believes are more appropriate sectors.
 
+|   SIC4 | Description                                                    |   Shannon |   Silhouette |
+|-------:|:---------------------------------------------------------------|----------:|-------------:|
+|   9609 | Other personal service activities n.e.c.                       |      5.32 |        -0.29 |
+|   8299 | Other business support service activities n.e.c.               |      5.27 |        -0.28 |
+|   7010 | Activities of head offices                                     |      5.08 |        -0.29 |
+|   6420 | Activities of holding companies                                |      4.85 |        -0.27 |
+|   4799 | Other retail sale not in stores, stalls or markets             |      4.44 |        -0.3  |
+|   8110 | Combined facilities support activities                         |      4.33 |        -0.24 |
+|   7490 | Other professional, scientific and technical activities n.e.c. |      4.26 |        -0.26 |
+|   4719 | Other retail sale in non-specialised stores                    |      4.24 |        -0.3  |
+|   6820 | Renting and operating of own or leased real estate             |      4.19 |        -0.26 |
+|   6399 | Other information service activities n.e.c.                    |      4.18 |        -0.23 |
+|   ...  | ...                                                             |      ...  |        ...   |
+|   3091 | Manufacture of motorcycles                                        |      0.81 |        -0.19 |
+|   3220 | Manufacture of musical instruments                                |      0.81 |        -0.26 |
+|   3512 | Transmission of electricity                                       |      0.81 |        -0.24 |
+|   2594 | Manufacture of fasteners and screw machine products               |      0.73 |        -0.1  |
+|   1071 | Manufacture of bread; manufacture of fresh pastry goods and cakes |      0.67 |        -0.15 |
+|   2311 | Manufacture of flat glass                                         |      0.65 |        -0.21 |
+|   2219 | Manufacture of other rubber products                              |      0.62 |        -0.15 |
+|   2363 | Manufacture of ready-mixed concrete                               |      0.59 |        -0.17 |
+|   8623 | Dental practice activities                                        |      0.59 |         0.08 |
+|   1083 | Processing of tea and coffee                                      |      0.39 |        -0.21 |
 
+: The top and bottom 10 4-digit SIC codes sorted by the Shannon index of their predicted codes. Only codes with non-zero Shannon indices are shown. {#tbl:shannon_silhouette}
 
+As the F1 score is the harmonic mean of precision and recall, it provides a view of model performance that attempts to balance these two measures of accuracy. This obscurs the fact that for this task, there are codes which do not necessarily share the same level of performance across both metrics. To visualise the distribution of SIC codes across the dimensions of precision and recall, we plot the model performance according to these values in [#fig:precision_recall]. The resulting distribution suggests that there are two notable modes of classification - those where either precision or recall dominates. Codes that have a high recall and a low precision will be the result of a high proportion of false positives, suggesting that companies with in other sectors might have descriptions that semantically similar to a large number of companies within the code. Codes that have a high precision and low recall suggest that there are sectors which have a well-defined core of companies with semantically similar descriptions, but other companies which the classifier believes fall better into other categories.
 
-As the F1 score is the harmonic mean of precision and recall, it provides a view of model performance that attempts to balance these two measures of accuracy. This obscurs the fact that for this task, there are codes which do not necessarily share the same level of performance across both metrics. 
+In addition to the precision and recall positions of the codes, [#fig:precision_recall] also uses the size of the points to highlight the degree of semantic overlap between companies labelled with that code. We placed the DistilBERT embeddings described above into a FAISS index to perform an efficient nearest neighbours search in semantic space. For each 4-digit SIC code, we calculated the proportion of companies whose nearest neighbour is also in the same code, which is shown on the chart. In general, we can see that a higher accuracy, in terms of either precision or recall, occurs in sectors where the intra-code semantic overlap is higher, however there are some exceptions. An extension here would be to calculate metrics that account for both the overlap and dispersity to analyse whether it is indeed clusters with a tight semantically congruous core that result in high precision and vice-versa.
 
-## 2.3 Discussion
+![The precision and recall metrics show that some SIC codes are dominated by different classification characteristics, likely to be driven by the degree and type of semantic overlap with companies in other codes.](tables_figures/recall_vs_precision.png){#fig:precision_recall}
 
-## 2.4 Conclusion
+Overall, it is clear that there are sources of misalignment between many company's descriptions and the SIC codes that they are labelled with, and that lead to the prediction errors. A final demonstration of the impact of this is a visualisation of 4 of the less specific SIC codes across the semantic space of all company descriptions, namely 8299, 9609, 7022 and 7490. The 768 dimensional vectors are projected down to 2 dimensions for visualisation purposes via dimensionality reduction using the UMAP algorithm. Although it is not advised to draw conclusions about the exact relationship between two points according to their relative positions, due to fluctuations in the density of the space, some global trends can be determined. In this case, it is immediately clear that these codes are highly dispersed among companies with descriptions that cover the semantic space, and are neighbours to companies from a wide range of other sectors. This is likely to have a very large impact on the ability of the model to learn distinct patterns in the company descriptions belonging to these sectors, but also the sectors they they overlap with.
 
+![Comparing the silhouette score of company description embeddings and Shannon index of predictions for each 4-digit SIC code shows that SIC codes with less well defined semantic space are more likely generate a diverse array of predictions.](tables_figures/recall_vs_precision.png){#fig:precision_recall}
 
+## 2.3 Conclusion
 
+In this section we have demonstrated the challenge for state-of-the-art natural language classification to identify the appropriate SIC code for a company based on a labelled dataset. We show that this is in large part due to the degree and nature of semantic overlap of company descriptions within and between labels according to Companies House. In some cases, we believe that this is a result of uninformative codes being applied to companies that better belong to another, more specific sectoral label. In other cases, it is because a single label is inadequate to describe the company's activities as described by themselves on their business website. While it might be sufficient to use two or more existing codes to describe such companies, it might also be the case that a suitable code does not yet exist. In other cases, the error stems from companies being unintentionally mislabelled on Companies House due to a lack of guidance and clarity in the process of selecting an industrial code when establishing or updating a company's records. As one example, we found two companies in the dataset offering domestic and commercial electrical installations and testing with one labelled as belonging to 3512: Transmission of electricity and the other as 4321: Electrical installation. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-3512 Transmission of electricity
-Sample(index=135032, text='O’Hanlon Electrical Ltd (OEL) was established in 1976 by founder Brendan O’Hanlon. OEL has over 39 years of experience offering Electrical Building Services: Electrical installations, Electrical maintenance and Electrical Testing to Public, Commercial, Industrial and Private sector clients across the UK and Ireland. We are a leading electrical contractor, offering an industry recognised reputation for electrical contracting providing a professional service, delivering installations on time, to customer’s exact requirements and at a competitive price, making us a popular choice for our clients. Our offices are located just off Junction 14 on the M1 Motorway.', label=480) 
-
-4321 Electrical installation
-Sample(index=586584, text='Alan Benfield Ltd since its creation 40\xa0years ago in 1976 has established its credentials as one of the Midlands leading Electrical Contractors. Our extensive experience in a vast array of electrical services from Domestic to Industrial, from Data and Voice Installations to LV Switchgear and Distribution. Managing Director Paul Waldron and his team offer the very best in expertise and knowledge to provide the most cost effective solution to your electrical needs using the latest technology. Using our state of the art CAD facility we can provide Electrical Design and Lighting Design along with Testing and Inspection certification. As a CHAS compliant Company and Construction Line member we provide all necessary Health and Safety documentation for all our projects no matter how small. We constantly update our employee training programme to ensure high compliance and low risk. With an extensive local client database Alan Benfield Ltd consistently hits the mark in aiming to provide the very best in Electrical Contracting and Maintenance.', label=21)
+In conclusion, the data does not permit our model to satisfactorily learn how to classify companies according to their descriptions. This is a result of both typical limitations encountered in machine learning, such as class imbalance, as well as the nature of the SIC-2007 taxonomy and its application to companies in the UK.
