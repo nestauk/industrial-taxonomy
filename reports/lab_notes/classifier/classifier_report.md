@@ -94,3 +94,11 @@ How do we reverse engineer some of the sources of error to find out where they h
 
 
 What values do SIC codes embed? Whose priorities do they represent? Why do we care about creating a data driven taxonomy? Whose interests does this serve?
+
+
+
+3512 Transmission of electricity
+Sample(index=135032, text='O’Hanlon Electrical Ltd (OEL) was established in 1976 by founder Brendan O’Hanlon. OEL has over 39 years of experience offering Electrical Building Services: Electrical installations, Electrical maintenance and Electrical Testing to Public, Commercial, Industrial and Private sector clients across the UK and Ireland. We are a leading electrical contractor, offering an industry recognised reputation for electrical contracting providing a professional service, delivering installations on time, to customer’s exact requirements and at a competitive price, making us a popular choice for our clients. Our offices are located just off Junction 14 on the M1 Motorway.', label=480) 
+
+4321 Electrical installation
+Sample(index=586584, text='Alan Benfield Ltd since its creation 40\xa0years ago in 1976 has established its credentials as one of the Midlands leading Electrical Contractors. Our extensive experience in a vast array of electrical services from Domestic to Industrial, from Data and Voice Installations to LV Switchgear and Distribution. Managing Director Paul Waldron and his team offer the very best in expertise and knowledge to provide the most cost effective solution to your electrical needs using the latest technology. Using our state of the art CAD facility we can provide Electrical Design and Lighting Design along with Testing and Inspection certification. As a CHAS compliant Company and Construction Line member we provide all necessary Health and Safety documentation for all our projects no matter how small. We constantly update our employee training programme to ensure high compliance and low risk. With an extensive local client database Alan Benfield Ltd consistently hits the mark in aiming to provide the very best in Electrical Contracting and Maintenance.', label=21)
