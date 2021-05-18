@@ -1,24 +1,4 @@
----
-title: "Using text data to build a bottom-up industrial taxonomy for the UK"
-subtitle: "An exploratory study"
-author:
-    - "Alex Bishop"
-    - "Juan Mateos-Garcia"
-    - "George Richardson"
-date:
-    - 11 May 2021
-figPrefix:
-  - "figure"
-  - "figures"
-tblPrefix:
-  - "table"
-  - "tables"
-secPrefix:
-  - "section"
-  - "sections"
-bibliography: /bibliography.bib
----
-# Introduction
+# Introduction {#sec:introduction}
 
 The Standard Industrial Classification (SIC) provides an organising framework for the analysis of the sectoral composition of the UK economy [@hughes2019implementation]. It consists of a hierarchy of industrial codes that describe the economic activities of firms at increasing levels of resolution (see @tbl:1 for an example).
 
@@ -54,12 +34,12 @@ In order to do this, we match a dataset of business website descriptions obtaine
 
 The structure for the report is thus:
 
-Section 2 introduces our data and how we have processed it with a special focus on the fuzzy matching algorithm we have developed in order to combine business website descriptions with Companies House.
+Section 2 introduces our data and how we have processed it with a special focus on the fuzzy matching algorithm we have developed in order to combine business website descriptions with Companies House and the nature language processing pipeline we use to process company descriptions.
 
 Section 3 presents the results of a supervised machine learning analysis where we train a predictive model on our labelled dataset in order to determine the extent to which it is possible to predict 4-digit SIC codes using the text in business descriptions, and the explanation for various instances of misclassification.
 
 Section 4 presents the results of an unsupervised machine learning analysis where we train a hierarchical topic model on our labelled dataset with the goal of assessing the semantic homogeneity / heterogeneity of 4-digit SIC codes (i.e. the extent to which they contain companies with widely varying descriptions of their activities) as well as semantic overlaps between codes in different parts of the SIC taxonomy.
 
-Having 'dissected' the SIC taxonomy using data science methods and diagnosed some of limitations, Section 5 trials an experimental, iterative strategy to build a bottom-up industrial taxonomy that addresses some of them. In order to do this, we use network analysis techniques to identify "new sectors" as communities of frequently co-occurring terms in company descriptions. We then create a labelled dataset of companies with a strong presence of terms belonging to specific "new sector communities" and then classify other companies into these new sectors based on their semantic similarity to them. 
+Having 'dissected' the SIC taxonomy using machine learning methods and diagnosed some of limitations, Section 5 trials an experimental, iterative strategy to build a bottom-up industrial taxonomy that addresses some of them. In order to do this, we use network analysis techniques to identify "new sectors" as communities of frequently co-occurring terms in company descriptions. We then create a labelled dataset of companies with a strong presence of terms belonging to specific "new sector communities" and then classify other companies into these new sectors based on their semantic similarity to them. 
 
 Section 6 presents conclusions and next steps.
