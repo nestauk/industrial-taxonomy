@@ -126,8 +126,6 @@ In order to do this, we build a Natural Language Processing (NLP) pipeline using
 For example: `"I went to the Eiffel tower and visited my friend Jacques"` -> `["went", "GPE", "visit", "friend", "PERSON"
 `]
 
-### Pipeline steps
-
 Steps 1-8 are performed or rely on information extracted using the Spacy `en_core_web_lg` model, whilst steps 9-10 are performed or rely on information extracted using Gensim.
 
 1. Tokenisation
@@ -148,9 +146,11 @@ Steps 1-8 are performed or rely on information extracted using the Spacy `en_cor
    - Words with low and very high frequency (those occurring less than 10 times and in more than 90% of documents)
 
 
-### Token lemmatisation/remapping {#sec:remapping}
+[^NPMI]: NPMI $\in [-1, 1]$ where a value of: -1 indicates tokens never occur together; 0 indicates independence; and 1 indicates complete co-occurrence.
 
-Tokens that are entities in the following categories are renamed to correspond to their entity category (uppercased):
+#### Token lemmatisation/remapping {#sec:remapping}
+
+In step 8 tokens that are entities in the following categories are renamed to correspond to their entity category (uppercased):
 
  - CARDINAL
  - DATE
@@ -169,7 +169,7 @@ We hypothesised that replacing these entities with their entity type name helps 
 
 The alternative is that individual dates, people, organisation names etc. are too infrequent in the corpus to contribute information to the topic modelling approach.
 
-Several entity categories such as `WORK_OF_ART`, `LANGUAGE`, `LAW`, `EVENT` were excluded as an empirical assessment of the classifications appeared inaccurate.
+Several entity categories such as `WORK_OF_ART`, `LANGUAGE`, `LAW`, `EVENT` were excluded as an empirical assessment of the classifications on sample business descriptions appeared inaccurate.
 
 Furthermore, `PRODUCT` was left out because in this problem context (generating an industrial taxonomy) this is valuable information that we do not wish to homogenise.
 

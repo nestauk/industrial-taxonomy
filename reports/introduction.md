@@ -1,6 +1,7 @@
+
 # Introduction {#sec:introduction}
 
-The Standard Industrial Classification (SIC) provides an organising framework for the analysis of the sectoral composition of the UK economy [@hughes2019implementation]. It consists of a hierarchy of industrial codes that describe the economic activities of firms at increasing levels of resolution (see @tbl:1 for an example).
+The Standard Industrial Classification (SIC) provides an organising framework for the analysis of the sectoral composition of the UK economy [@hughes2009implementation]. It consists of a hierarchy of industrial codes that describe the economic activities of firms at increasing levels of resolution (see @tbl:1 for an example).
 
 |Section     | Division      | Group        | Class        |
 |------------|---------------|--------------|------------ |
@@ -34,7 +35,7 @@ In order to do this, we match a dataset of business website descriptions obtaine
 
 The structure for the report is thus:
 
-Section 2 introduces our data and how we have processed it with a special focus on the fuzzy matching algorithm we have developed in order to combine business website descriptions with Companies House and the nature language processing pipeline we use to process company descriptions.
+Section 2 introduces our data and how we have processed it with a special focus on the fuzzy matching algorithm we have developed in order to combine business website descriptions with Companies House and the natural language processing pipeline we use to process company descriptions.
 
 Section 3 presents the results of a supervised machine learning analysis where we train a predictive model on our labelled dataset in order to determine the extent to which it is possible to predict 4-digit SIC codes using the text in business descriptions, and the explanation for various instances of misclassification.
 

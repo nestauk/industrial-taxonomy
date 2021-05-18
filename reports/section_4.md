@@ -39,7 +39,7 @@ higher levels better pick out higher-order structure.
 ![Cosine similarity between SIC divisions similarities (Level 2)](tables_figures/topsbm/SIC2_similarity-model_L2.png){#fig:sim-L2 .altair}
 
 
-The diagonal block-structure (particuarly visible in [@fig:sim-L2]) corresponds to the SIC taxonomy structure; however there is also significant off-diagonal structure which highlights the richness of novel data-sources such as business website descriptions.
+The diagonal block-structure (particularly visible in [@fig:sim-L2]) corresponds to the SIC taxonomy structure; however there is also significant off-diagonal structure which highlights the richness of novel data-sources such as business website descriptions.
 
 For example, divisions 10-15 (broadly the manufacture of food, beverage, and clothes) are highly similar to divisons 56 (food and beverage service activities) and divisions 46-47 (wholesale and retail trade).
 Many similar intuitive relationships exist across related extraction, manufacturing, and services industries in disparate parts of the SIC taxonomy.

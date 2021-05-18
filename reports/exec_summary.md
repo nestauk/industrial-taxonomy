@@ -17,9 +17,12 @@ secPrefix:
   - "section"
   - "sections"
 bibliography: /bibliography.bib
+toc-depth: 2
+toc: true
+secnumdepth: 3
 ---
 
-# Executive summary
+# Executive summary {-}
 
 A growing number of economic policy agendas in the UK demand accurate, detailed and timely statistics about the industrial composition of the economy. This requires an industrial taxonomy that reflects existing industries and emerging ones enabling accurate classification of companies into sectors to produce economic indicators that can be used to inform policy. 
 
@@ -36,4 +39,4 @@ The results confirm our priors about the limitations of the SIC taxonomy current
 
 Our emerging results also illustrate the potential of a bottom-up industrial taxonomy for generating sectoral categories that can be used to measure notable economic activities for example related to sustainability and the green economy, or the development and adoption of emerging techbologies.  A downside of this approach is that our pipeline is complex and requires tuning at multiple stages, creating potential concerns about robustness and explainability of results. We also find significant challenges(i.e. high error rates) when we try to label companies into the categories of this new taxonomy. 
 
-We conclude by setting out potential avenues to overcome these limitations and deploy, in a forthcoming ESoE project, a bottom-up industrial taxonomy to analyse the UK economy in a way that demonstrates the value added of the methodology we have piloted here.
+We conclude by setting out potential avenues to overcome these limitations and deploy, in a forthcoming ESCoE project, a bottom-up industrial taxonomy to analyse the UK economy in a way that demonstrates the value added of the methodology we have piloted here.
