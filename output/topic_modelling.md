@@ -1,157 +1,89 @@
-# Topic modelling {#sec:topic_modelling}
+# Hierarchical Topic modelling {#sec:topsbm}
 
-## TopSBM pipeline {#sec:topsbm}
+In this section, we present an unsupervised machine learning analysis by which we train a hierarchical topic model on the processed Glass descriptions.
+This allows us to assess the semantic heterogeneity of 4-digit SIC codes
+(i.e. the extent to which they contain companies with widely varying descriptions of their activities)
+as well as semantic overlaps between codes in different parts of the SIC taxonomy.
 
-We train a TopSBM [@topSBM] topic model
- on our pre-processed collection of business descriptions.
+The hierarchical topic model approach used is the TopSBM [@topSBM] model.
 This approach confers multiple advantages over the more traditional Latent Dirichlet Allocation (LDA) [@LDA] frequently used in the literature such as automatically selecting the number of topics; yielding a hierarchy of topics; permitting a more heterogeneous topic mixture than is permitted by LDA; and, crucially for the analysis of [@sec:similarities] generating document clusters.
+Theese benefits are not without cost - due to the high memory use[^ram] of this methodology we use only $100000$ Glass descriptions (those with the highest match score to Companies House are selected) to fit the model.
 
-RAM intensive => batch on subset of documents
+[^ram]: Fitting the model on $100000$ documents required use of a machine with 64GB RAM.
 
-### Model fit and hierarchy
+| Level | Number of topics | Number of clusters |
+| ----: | ---------------: | -----------------: |
+|     0 |              384 |                370 |
+|     1 |               74 |                 56 |
+|     2 |               11 |                 11 |
+|     3 |                2 |                  3 |
 
-| Model   |   Level |   Number of topics | Number of clusters |
-|:--------|--------:|-----------:|-------------:|
-| spacy   |       0 |        348 |          301 |
-| spacy   |       1 |         68 |           54 |
-| spacy   |       2 |         10 |           10 |
-| spacy   |       3 |          3 |            3 |
-: Number of topics and number of document clusters for top 4 levels of its hierarchy {#tbl:hierarchy}
-
-| Model | $log(MDL)$ |
-| ---- | ---- |
-| Spacy | 16.80 |
-: Log of the minimum description length (MDL) - lower is better. {#tbl:mdl}
-
-
-| Topic 0   | Topic 1      | Topic 2      | Topic 3       | Topic 4     | Topic 5   | Topic 6    | Topic 7    | Topic 8      | Topic 9     |
-|:----------|:-------------|:-------------|:--------------|:------------|:----------|:-----------|:-----------|:-------------|:------------|
-| child     | GPE_GPE      | provide      | home          | service     | ORG       | vehicle    | building   | customer     | network     |
-| school    | LOC          | client       | local         | business    | DATE      | car        | garden     | product      | financial   |
-| community | people       | help         | event         | company     | GPE       | delivery   | clean      | supply       | agency      |
-| course    | NORP         | team         | site          | project     | work      | stock      | cleaning   | market       | marketing   |
-| learn     | staff        | support      | family        | industry    | PERSON    | shop       | kitchen    | equipment    | software    |
-| student   | care         | experience   | PERSON_PERSON | solution    | offer     | item       | furniture  | brand        | insurance   |
-| treatment | large        | range        | house         | system      | need      | hire       | energy     | job          | datum       |
-| charity   | member       | quality      | produce       | property    | CARDINAL  | selection  | door       | installation | recruitment |
-| patient   | want         | area         | facility      | development | include   | store      | electrical | supplier     | legal       |
-| education | organisation | professional | serve         | require     | time      | collection | water      | repair       | finance     |
-: Top 10 words for each topic at level 2 of the hierarchy {#tbl:topwords-spacy}
-
+: Number of topics and number of document clusters for top 4 levels of the fitted model's hierarchy. {#tbl:hierarchy}
 
 ## SIC similarities {#sec:similarities}
 
-### Level 0
+[@Fig:sim-L0;@fig:sim-L1;@fig:sim-L2] show the cosine similarity between SIC divisions calculated using the three most granular levels ([@tbl:hierarchy]) respectively of our hierarchical topic model.
+
+The similarities are calculated by aggregating documents into SIC codes (division level) and calculating the cosine similarity between the document cluster distribution of divisions.
+We choose the division level to discuss this component of analysis at because it is the most granular level of the SIC taxonomy at which it is feasible to visualise and compare pairwise similarities.
+The most appropriate level of our model hierarchy to analyse SIC similarity at is more subjective -
+lower levels pick out very strong relationships which hold in the presence of a finer topic/cluster structure, whereas 
+higher levels better pick out higher-order structure.
+
+![Cosine similarity between SIC divisions similarities (Level 0)](figures/topsbm/SIC2_similarity-model_L0.png){#fig:sim-L0 .altair}
 
 
-![Level 0](figures/topsbm/SIC2_similarity_spacy-model_L0.png){#fig:spacy-L0 .altair}
-
-At the most granular level of the cluster hierarchy...
-
-Within section structure:
-
-- Section A (Agriculture, Forestry and Fishing)
-  - Low similarity except between 01 (Crop and animal production...) and 03 (Fishing...) in spacy model
-- Section B: Mining and Quarrying
-  - Block structure evident
-  - Finer structure of similarity within section differs between models except between 06 (Extraction of petrol and gas) and 09 (Mining support service activities)
-- Section C: Manufacturing
-  - As a large section there are several sub-blocks evident
-  - 32 (Other manufacturing) shares modestly high similarity across the full section
-  - 13-15,31 (relating to textiles, clothes, and furniture) have obvious cohesive block structure
-  - 10-12 (food, drink, tobacco) have some structure under the spacy model; however food is seen as more similar to tobacco than to drink!
-  - 20,22-30,32-33 share a relatively cohesive block
-  - 21 (Pharma manufacturing) is only similar to 21 (manufacture of chemicals) and 32 (other manufacturing)
-- Section E: WATER SUPPLY; SEWERAGE, WASTE MANAGEMENT AND REMEDIATION ACTIVITIES
-  - Weak block structure
-  - 36 (water collection) less similar to other divisions
-- Section F: CONSTRUCTION
-  - Very strong block structure captured
-- Section G: WHOLESALE AND RETAIL TRADE; REPAIR OF MOTOR VEHICLES AND MOTORCYCLES
-  - 46 (wholesale trade) and 47 (retail trade) very similar
-  - 45 (wholesale trade and retail trade of motor vehicles) distinct from 46 and 47
-- Section H: TRANSPORTATION AND STORAGE
-  - Very strong block structure across section
-- Section I: ACCOMMODATION AND FOOD SERVICE ACTIVITIES
-  - Very strong block structure across section
-- Section J: INFORMATION AND COMMUNICATION
-  - Obvious mixed block structure
-  - Telecomms (61), IT services (63), and computer programming (62) cluster strongly together
-  - 59 and 60 cluster together
-- Section K: FINANCIAL AND INSURANCE ACTIVITIES
-  - Strong clustering
-- Section M: PROFESSIONAL, SCIENTIFIC AND TECHNICAL ACTIVITIES
-  - 70 (Head offices / management consultancy) and 74 (Other activities) are highly similarly to other divisions within the section but otherwise similarity is low
-- Section N: ADMINISTRATIVE AND SUPPORT SERVICE ACTIVITIES
-  - Little block structure evident, 82 (Office admin/support) is moderately similar to other divisions within the section but no other division is similar to another
-- Section Q: HUMAN HEALTH AND SOCIAL WORK ACTIVITIES
-  - Strong clustering
-- Section R: ARTS, ENTERTAINMENT AND RECREATION
-  - Some divisions show similarity but block structure is weak (particularly under the simple model)
-- Section S: OTHER SERVICE ACTIVITIES
-  - Very weak similarity. Expected as divisions within this section are not obviously related.
-- Section T: ACTIVITIES OF HOUSEHOLDS AS EMPLOYERS; UNDIFFERENTIATED GOODS- AND SERVICES-PRODUCING ACTIVITIES OF HOUSEHOLDS FOR OWN USE
-  - Very weak similarity between the two divisions
-
-Selection of interesting cross-section relationships:
-
-- 01 (Crop and animal production, hunting...) and 03 (Fishing...) are highly related to 55 (Accomodation) and to a lesser extent 56 (Food and beverage services)
-- Mining and quarrying are weakly similar to various Manufacturing activities, in particular 08 (Other mining/quarrying) is highly similar to 23 (Manufacture non-metallic minerals)
-- Manufacturing section is similar to 46 and 47 (wholesale and retail trade)
-- Section J (ICT) and Section M (Professional, Scientific, Technical activities) share high similarity
-- 77 (Rental and leasing) is similar to divisions in sections G (trade) and H (Transport and storage). This is more strongly picked up by the spacy model.
-- 82 (Office support/admin) is similar to many divisions across all sections
-- Divison 99 which includes unclassified organisations as well as extraterritorial organisations and bodies has high simiarities to 82 (Office admin/support), 74 (Other Professional, Scientific, technical) activities, 46 and 47 (trade), 32 (other manufacturing) and others. Similarities here could be an indication about what types of businesses are misclassified.
-
-### Level 1
-
-Level 1 shows a stronger structure than that of level 0.
-Furthermore, the two models begin to exhibit different behaviour from one another.
-
-Some examples of extra structure that is revealed:
-
-- Particularly under the spacy model, 45 (motor vehicle trade) is highly similar to section H (transportation and storage).
-- Under the spacy model Section L (Real estate) is highly similar to Section K (Financial and insurance activities)
-- Under the spacy model (and to a much lesser extent the simple model), Sections C,D,E,F share much more structure.
-- Divisions 10-12 (Food, drink, tobacco) are much more strongly related to 56 (Food and beverage services) in particular
-- Section B (mining and quarrying) has high degrees of similarity with secondary sector sections as well as section M (Scientific and technical activities).
-- The spacy model picks up a high similarity: between 72 (Scientific R&D) and 21 (Pharma manufacture); between 73 (Advertising) and 18 (Printing and reproduction of recorded media)
-- The simple model picks up a high similarity between 49 (Land transport) and 79 (Travel and tour activities)
-
-![SIC similarities (Level 1)](figures/topsbm/SIC2_similarity_spacy-model_L1.png){#fig:spacy-L1 .altair}
-
-### Level 2
-
-The level 1 spacy model structure looks similar to a superposition of the simple model's level 1 and level 2 structure, hinting at a possible reason for some of the differences seen at level 1.
-Continuing in the spirit of level 1, the spacy model exhibits a higher level of structure again.
-
-The general observations seen at level 0 and 1 remain relevant; however the connectedness of sections is much higher.
-
-Some interesting differences between the two models become more apparent now:
-
-- Under the spacy model, 45-53 (trade, transportation and storage) are highly similar to 10-15 (manufacture of food, drinks and clothes) and moderately similar to other secondary sector activities. 
-  However, under the simple model, 45-53 are much more similar to other secondary sector activities and some primary sector activities such as mining and quarrying than they are to 10-15.
-  Common sense falls quite strongly on the side of the spacy model here.
-- Under the spacy model Sections J, K, L, M (broadly high-paid tertiary-sector jobs) are highly similar to Section B (mining and quarrying) and 17-18 (manufacture of paper, printing, and recorded media). The first of these is peculiar and perhaps and artifact of the type of mining and quarrying companies which may have a web presence. The relation to 17-18 is highly logical.
-- Interestingly the spacy model picks up 75 (Veterinary activities) as highly similar to Section Q (Human health and social work activities)
+![Cosine similarity between SIC divisions similarities (Level 1)](figures/topsbm/SIC2_similarity-model_L1.png){#fig:sim-L1 .altair}
 
 
+![Cosine similarity between SIC divisions similarities (Level 2)](figures/topsbm/SIC2_similarity-model_L2.png){#fig:sim-L2 .altair}
 
-![SIC similarities (Level 2)](figures/topsbm/SIC2_similarity_spacy-model_L2.png){#fig:spacy-L2 .altair}
 
+The diagonal block-structure (particuarly visible in [@fig:sim-L2]) corresponds to the SIC taxonomy structure; however there is also significant off-diagonal structure which highlights the richness of novel data-sources such as business website descriptions.
+
+For example, divisions 10-15 (broadly the manufacture of food, beverage, and clothes) are highly similar to divisons 56 (food and beverage service activities) and divisions 46-47 (wholesale and retail trade).
+Many similar intuitive relationships exist across related extraction, manufacturing, and services industries in disparate parts of the SIC taxonomy.
+
+[@Tbl:list-of-sims] lists a few more intuitively similar SIC divisions which are not captured by the SIC taxonomy but are well-captured by the Glass data and topic modelling approach.
+
+| Division group 1                                                  | Division group 2                                                 |
+| ----------------------------------------------------------------- | :--------------------------------------------------------------- |
+| 21 - Manufacture of pharmaceutical products                       | 72 - Scientific R&D                                              |
+| 33 - Repair and installation of machinery and equipment           | 77 - Rental and leasing activities                               |
+| 33 - Repair and installation of machinery and equipment           | 95 - Repair of Computers and personal and household goods        |
+| 81 - Services to buildings and landscape activites                | 97 - Activities of households as employers of domestic personnel |
+| 59 - Motion picture, video and television programme production... | 90 - Creative arts and entertainment activities                  |
+
+: High similarity pairs of divisions not captured by the SIC taxonomy. {#tbl:list-of-sims}
+
+
+The fact that the SIC taxonomy doesn't capture these relationships is more a limitation of imposing a single hierarchy (in the form of a taxonomy) than a limitation of the SIC taxonomy itself.
+
+Finally, we note that many sectors possess a high degree of similarity to many (if not most) industries -
+ e.g. _Office administrative, office support, and other business support activities (82)_ - 
+ as they offer services which apply across industries.
+It may be the case that these services are offered across industries by one business or that each business may specialise in offering those support activities within a specific industry.
 
 ## SIC heterogeneity
 
-By aggregating the topic distributions by SIC, and calculating the entropy of the topic distributions for each SIC, we get one measure of the "heterogeneity" of sectors within the Glass data.
+By aggregating the topic distributions by SIC, and calculating the entropy of the topic distributions for each SIC, we create a measure of the "heterogeneity" of sectors within the Glass data.
+[@Fig:hetero-class] shows the ten most heterogeneous (highest entropy) and ten least heterogeneous SIC classes according to this measure.
+The most heterogeneous sectors such as _Other personal services not elsewhere classified_ are sectors that a company may be labelled as because their activity is not well-captured by an existing SIC code.
+Such sectors are prime candidates for reclassification in some way such as adding further levels of depth to the SIC taxonomy for these highly heterogeneous codes.
 
-![SIC heterogeneity at SIC division level](figures/topsbm/SIC2_entropy.png){#fig:hetero-division .altair}
+![Ten most heterogeneous (highest entropy) and ten least heterogeneous SIC classes calculated according to the entropy of the topic distributions of each SIC class.](figures/topsbm/SIC4_entropy.png){#fig:hetero-class .altair}
 
-<!-- ![SIC heterogeneity at SIC group level](figures/topsbm/SIC3_entropy.png){#fig:hetero-group .altair} -->
+[@Fig:hetero-topic-dist-division] plots the distribution of 'topic activity' for the 20 most heterogeneous sectors.
+The contribution towards 'topic activity' from each SIC code is expressed in terms of the fraction of the mean activity in each topic across all SIC codes -
+this highlights more important topics and de-emphasises topics which are common to many or all industries.
+Thus topics on the left of the figure correspond to the topics which are over-represented in heterogeneous SIC codes, which contain terms around digital marketing, consultancy, property management, recruitment, and finance.
 
-![SIC heterogeneity at SIC class level](figures/topsbm/SIC4_entropy.png){#fig:hetero-class .altair}
+![Distribution of topic activity amongst the top 20 most heterogeneous (according to entropy of the topic distributions with SIC codes) sectors. Activity for a topic-sector combination is expressed as a fraction of the mean activity of that topic across all sectors. Based on level 1 of the model hierarchy.](figures/topsbm/SIC4_hetero_topicdist_L1.png){#fig:hetero-topic-dist-division .altair}
 
-![Topic distribution amongst the top 10 and bottom 10 most heterogeneous (according to entropy of the topic distributions with SIC codes) sectors. Based on level 1 of the model hierarchy.](figures/topsbm/SIC2_entropy_topicdist_L1.png){#fig:hetero-topic-dist-division .altair}
+## Conclusion
 
-![Topic distribution amongst the top 10 and bottom 10 most heterogeneous (according to entropy of the topic distributions with SIC codes) sectors. Based on level 1 of the model hierarchy.](figures/topsbm/SIC4_entropy_topicdist_L1.png){#fig:hetero-topic-dist-class .altair}
+The analysis of this section has highlighted the rich structure which can be captured by business website description data - picking up both structure defined by the SIC taxonomy and structure that is not captured by the SIC taxonomy.
 
-# Appendix
+Furthermore, by analysing the heterogeneity of SIC codes (based on semantic overlap) we can identify the small parts of the SIC taxonomy that are less useful and may benefit from reclassification or a more granular description that captures emerging industries.
+
+The simultaneous construction of a hierarchy of topics and clusters would be a prime candidate for bottom-up taxonomy creation were it not for the fact that the method did not scale to the full Glass dataset.
