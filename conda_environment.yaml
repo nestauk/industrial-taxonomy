@@ -17,17 +17,26 @@ dependencies:
   - gcc_linux-64  # [not darwin]
   - metaflow
   # Put any conda dependencies here
+  - graph-tool
 
   - pip:
     # Put any pip dependencies here (and no conda ones anywhere below)
     - altair_saver
     - sh
     - s3fs
+    - spacy
+    - gensim
+    - nltk
+    - altair_saver
+    - sh
+    - git+https://github.com/nestauk/research_daps@24_topsbm
+    - https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.0.0/en_core_web_lg-3.0.0.tar.gz
 
   # Tooling requirements (don't edit)
     - tornado>=5.0  # Stops luigi breaking jupyter
     - pandoc
     - pandoc-crossref
+    - filelock
   - tqdm
   - pyyaml
   - pytables

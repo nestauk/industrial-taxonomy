@@ -1,4 +1,6 @@
 """Data getters for Glass business website data."""
+import logging
+
 import pandas as pd
 from metaflow import namespace
 
