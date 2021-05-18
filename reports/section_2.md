@@ -1,3 +1,4 @@
+
 # Data collection and processing
 
 ## Glass.ai
@@ -6,8 +7,7 @@ The core dataset for our analysis has been obtained from Glass, a startup that u
 More specifically, Glass begin from the universe of UK websites in web domain registers, identifies those that are highly likely to belong to a business, and extracts relevant information about them including their description, postcodes and sector based on an industrial taxonomy developed by LinkedIn.
 In this project, we work with information about 1.8 million business websites (which according to Glass account for 90% of UK business websites) collected in May and June 2020.
 
-**[TODO - adapt and extend this paragraph from Scotland report]**
-The main advantage of Glass data that makes it relevant for our project is that it includes business descriptions that can be used to understand their economic activities at a higher level of resolution than is possible using industrial taxonomies.
+The granular business descriptions contained within this dataset can be used to understand a business' economic activities at a higher level of resolution than is possible using industrial taxonomies.
 
 ## Labelling business websites with SIC codes by matching to Companies House {#sec:matching}
 
@@ -20,7 +20,7 @@ The matching methodology matches the names of companies in Companies House with 
 Naively comparing the similarity of all combinations (~4 million Companies House companies x ~1.5 million Glass websites) of names is computationally infeasible - this would take roughly 20 years (on a single CPU) assuming we could do 10,000 similarity computations per second.
 This leaves us with three options, with the third being the only one that is reasonable and possible:
 
-1. Throw a supercomputer at the problem
+1. Performing the computations on a supercomputer
 2. Make a breakthrough in the field of computing by improving the performance of a fundamental algorithm by several orders of magnitudes
 3. Reduce the number of pairwise comparisons by only comparing pairs that are 'likely' to be matches
 
@@ -111,3 +111,66 @@ Due to the nature of Companies House, some matches may be to the wrong part of a
 Furthermore, many companies in Companies House have inaccurate SIC designations.
 The IDBR team within the ONS have a modified version of the Companies House dataset which reassigns SIC codes and may contain information about company groupings.
 Due to the timescales of this project it was not possible to access this data.
+
+
+## Pre-processing of Glass business descriptions {#sec:glass_preproc}
+
+The analysis of [@sec:topsbm] and [@sec:taxonomy] requires processing the raw descriptions extracted from business' websites by Glass into a form we can use to, for example, generate a network of words where the strength of connections between words is based on how frequently they co-occur in documents. We are specially interested in removing text which is uninformative about the industry where a company operates in but is likely to appear in a website, such as for example its location.
+
+<!---
+TODO: Add references to gensim and spacy?
+--->
+
+In order to do this, we build a Natural Language Processing (NLP) pipeline using the Spacy and Gensim Python libraries, which convert the raw 'string' of a business website description into an ordered list of 'tokens' where each token is a unigram, bigram or trigram composed of the lemmatised form of a word or an (uppercased) entity type label (for a subset of entity types).
+
+For example: `"I went to the Eiffel tower and visited my friend Jacques"` -> `["went", "GPE", "visit", "friend", "PERSON"
+`]
+
+### Pipeline steps
+
+Steps 1-8 are performed or rely on information extracted using the Spacy `en_core_web_lg` model, whilst steps 9-10 are performed or rely on information extracted using Gensim.
+
+1. Tokenisation
+4. Named entity recognition (NER) - Predict named entities using a transition-based method
+<!-- TODO: summarise how these methods work? https://spacy.io/api/architectures#TransitionBasedParser -->
+5. Lemmatise - Assign base forms to tokens
+6. Merge entities - Merges series of tokens predicted by Spacy to be an entity into a single token
+7. Filter
+   - stopwords
+   - punctuation
+   - whitespace
+8. Extract to list of strings - lemmatise or entity form
+9. Generate n-grams - Use `gensim` to generate bi-grams, requiring that a bigram occurs at least 10 times and that the normalised pointwise mutual information (NPMI)[^NPMI] is 0.25 or higher.
+
+10. Filter
+   - short tokens
+   - combinations of stop words
+   - Words with low and very high frequency (those occurring less than 10 times and in more than 90% of documents)
+
+
+### Token lemmatisation/remapping {#sec:remapping}
+
+Tokens that are entities in the following categories are renamed to correspond to their entity category (uppercased):
+
+ - CARDINAL
+ - DATE
+ - GPE
+ - LOC
+ - MONEY
+ - NORP
+ - ORDINAL
+ - ORG
+ - PERCENT
+ - PERSON
+ - QUANTITY
+ - TIME
+
+We hypothesised that replacing these entities with their entity type name helps keep more information in the bag of words representation, particularly when entity types can be formed into n-grams with other words.
+
+The alternative is that individual dates, people, organisation names etc. are too infrequent in the corpus to contribute information to the topic modelling approach.
+
+Several entity categories such as `WORK_OF_ART`, `LANGUAGE`, `LAW`, `EVENT` were excluded as an empirical assessment of the classifications appeared inaccurate.
+
+Furthermore, `PRODUCT` was left out because in this problem context (generating an industrial taxonomy) this is valuable information that we do not wish to homogenise.
+
+Tokens that are not entities are replaced with their lowercase lemmatised form.

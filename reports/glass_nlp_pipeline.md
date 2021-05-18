@@ -1,4 +1,5 @@
-# Pre-processing of Glass business descriptions {#sec:glass_preproc}
+
+## Pre-processing of Glass business descriptions {#sec:glass_preproc}
 
 The analysis of [@sec:topsbm] and [@sec:taxonomy] requires processing the raw descriptions extracted from business' websites by Glass into a form we can use to, for example, generate a network of words where the strength of connections between words is based on how frequently they co-occur in documents. We are specially interested in removing text which is uninformative about the industry where a company operates in but is likely to appear in a website, such as for example its location.
 
@@ -11,7 +12,7 @@ In order to do this, we build a Natural Language Processing (NLP) pipeline using
 For example: `"I went to the Eiffel tower and visited my friend Jacques"` -> `["went", "GPE", "visit", "friend", "PERSON"
 `]
 
-## Pipeline steps
+### Pipeline steps
 
 Steps 1-8 are performed or rely on information extracted using the Spacy `en_core_web_lg` model, whilst steps 9-10 are performed or rely on information extracted using Gensim.
 
@@ -33,7 +34,7 @@ Steps 1-8 are performed or rely on information extracted using the Spacy `en_cor
    - Words with low and very high frequency (those occurring less than 10 times and in more than 90% of documents)
 
 
-# Appendix
+## Appendix
 
 <!--- I think it is ok to keep this in the body of the text. One option is to put the concatenated renamed categories in a footnote. 
 --->
