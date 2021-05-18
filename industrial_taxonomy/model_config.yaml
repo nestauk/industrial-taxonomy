@@ -13,6 +13,6 @@ flows:
   topsbm:
     params:
       n_docs: 100000
-    run_id: 1221
+    run_id: 1222
 params:
   match_threshold: 75

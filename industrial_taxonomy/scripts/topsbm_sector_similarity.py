@@ -84,7 +84,7 @@ if __name__ == "__main__":
     alt.data_transformers.disable_max_rows()
     group_topsbm_by_sector = group_topsbm_by_sector_(cluster_type="document")
 
-    model_levels = [1]
+    model_levels = [0, 1, 2]
     SIC_level = 2
     sector = get_glass_SIC_sectors()
     model = get_topsbm()
