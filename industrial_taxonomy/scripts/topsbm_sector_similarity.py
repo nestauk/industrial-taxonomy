@@ -105,6 +105,6 @@ if __name__ == "__main__":
             plot_sic_similarity,
             t.curry(
                 export_chart,
-                key=f"topsbm/SIC{SIC_level}_similarity_{model_name}-model_L{L}",
+                key=f"topsbm/SIC{SIC_level}_similarity-model_L{L}",
             ),
         )
