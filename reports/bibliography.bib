@@ -253,4 +253,82 @@ isbn="978-3-642-33718-5"
   author={Rajaraman, Anand and Ullman, Jeffrey David},
   year={2011},
   publisher={Cambridge University Press}
+
+@article{vaswani_attention_2017,
+	title = {Attention {Is} {All} {You} {Need}},
+	url = {http://arxiv.org/abs/1706.03762},
+	abstract = {The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.},
+	urldate = {2021-03-07},
+	journal = {arXiv:1706.03762 [cs]},
+	author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia},
+	month = dec,
+	year = {2017},
+	note = {arXiv: 1706.03762},
+	keywords = {Computer Science - Computation and Language, Computer Science - Machine Learning},
+	file = {arXiv Fulltext PDF:/Users/George/Zotero/storage/PFEWA4KQ/Vaswani et al. - 2017 - Attention Is All You Need.pdf:application/pdf;arXiv.org Snapshot:/Users/George/Zotero/storage/MUER35P5/1706.html:text/html}
+}
+
+@article{devlin_bert_2019,
+	title = {{BERT}: {Pre}-training of {Deep} {Bidirectional} {Transformers} for {Language} {Understanding}},
+	shorttitle = {{BERT}},
+	url = {http://arxiv.org/abs/1810.04805},
+	abstract = {We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5\% (7.7\% point absolute improvement), MultiNLI accuracy to 86.7\% (4.6\% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).},
+	urldate = {2021-03-07},
+	journal = {arXiv:1810.04805 [cs]},
+	author = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+	month = may,
+	year = {2019},
+	note = {arXiv: 1810.04805},
+	keywords = {Computer Science - Computation and Language},
+	file = {arXiv Fulltext PDF:/Users/George/Zotero/storage/K2IKAQWQ/Devlin et al. - 2019 - BERT Pre-training of Deep Bidirectional Transform.pdf:application/pdf;arXiv.org Snapshot:/Users/George/Zotero/storage/I46IVXCW/1810.html:text/html}
+}
+
+@article{sanh_distilbert_2020,
+	title = {{DistilBERT}, a distilled version of {BERT}: smaller, faster, cheaper and lighter},
+	shorttitle = {{DistilBERT}, a distilled version of {BERT}},
+	url = {http://arxiv.org/abs/1910.01108},
+	abstract = {As Transfer Learning from large-scale pre-trained models becomes more prevalent in Natural Language Processing (NLP), operating these large models in on-the-edge and/or under constrained computational training or inference budgets remains challenging. In this work, we propose a method to pre-train a smaller general-purpose language representation model, called DistilBERT, which can then be fine-tuned with good performances on a wide range of tasks like its larger counterparts. While most prior work investigated the use of distillation for building task-specific models, we leverage knowledge distillation during the pre-training phase and show that it is possible to reduce the size of a BERT model by 40\%, while retaining 97\% of its language understanding capabilities and being 60\% faster. To leverage the inductive biases learned by larger models during pre-training, we introduce a triple loss combining language modeling, distillation and cosine-distance losses. Our smaller, faster and lighter model is cheaper to pre-train and we demonstrate its capabilities for on-device computations in a proof-of-concept experiment and a comparative on-device study.},
+	urldate = {2021-03-07},
+	journal = {arXiv:1910.01108 [cs]},
+	author = {Sanh, Victor and Debut, Lysandre and Chaumond, Julien and Wolf, Thomas},
+	month = feb,
+	year = {2020},
+	note = {arXiv: 1910.01108},
+	keywords = {Computer Science - Computation and Language},
+	file = {arXiv Fulltext PDF:/Users/George/Zotero/storage/KJYQXLLD/Sanh et al. - 2020 - DistilBERT, a distilled version of BERT smaller, .pdf:application/pdf;arXiv.org Snapshot:/Users/George/Zotero/storage/6P9PUYT5/1910.html:text/html}
+}
+
+@inproceedings{wolf-etal-2020-transformers,
+    title = "Transformers: State-of-the-Art Natural Language Processing",
+    author = "Wolf, Thomas  and
+      Debut, Lysandre  and
+      Sanh, Victor  and
+      Chaumond, Julien  and
+      Delangue, Clement  and
+      Moi, Anthony  and
+      Cistac, Pierric  and
+      Rault, Tim  and
+      Louf, Remi  and
+      Funtowicz, Morgan  and
+      Davison, Joe  and
+      Shleifer, Sam  and
+      von Platen, Patrick  and
+      Ma, Clara  and
+      Jernite, Yacine  and
+      Plu, Julien  and
+      Xu, Canwen  and
+      Le Scao, Teven  and
+      Gugger, Sylvain  and
+      Drame, Mariama  and
+      Lhoest, Quentin  and
+      Rush, Alexander",
+    booktitle = "Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations",
+    month = oct,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.emnlp-demos.6",
+    doi = "10.18653/v1/2020.emnlp-demos.6",
+    pages = "38--45",
+    abstract = "Recent progress in natural language processing has been driven by advances in both model architecture and model pretraining. Transformer architectures have facilitated building higher-capacity models and pretraining has made it possible to effectively utilize this capacity for a wide variety of tasks. Transformers is an open-source library with the goal of opening up these advances to the wider machine learning community. The library consists of carefully engineered state-of-the art Transformer architectures under a unified API. Backing this library is a curated collection of pretrained models made by and available for the community. Transformers is designed to be extensible by researchers, simple for practitioners, and fast and robust in industrial deployments. The library is available at https://github.com/huggingface/transformers.",
 }
