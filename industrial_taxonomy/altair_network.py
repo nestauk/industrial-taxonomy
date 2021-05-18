@@ -11,6 +11,7 @@ def node_layer(
     node_label,
     node_size,
     node_color,
+    node_opacity,
     show_neighbours,
     **kwargs
 ):
@@ -19,7 +20,7 @@ def node_layer(
         alt.Chart(node_df)
         .mark_point(filled=True, stroke="black", strokeWidth=0.5)
         .encode(
-            x=alt.X("x", axis=None), y=alt.Y("y", axis=None), fillOpacity=alt.value(1)
+            x=alt.X("x", axis=None), y=alt.Y("y", axis=None)
         )
     )
 
@@ -33,15 +34,27 @@ def node_layer(
         )
 
     if node_color in node_df.columns:
-        node_chart = node_chart.encode(
-            color=alt.Color(
-                node_color,
-                title=kwargs["node_color_title"],
-                legend=alt.Legend(columns=2),
-                scale=alt.Scale(scheme="tableau20"),
-                sort="descending",
-            )
-        )
+        # node_chart = node_chart.encode(
+        #     color=alt.condition(f'datum.{node_color} !== null', 
+        #                         alt.Color(
+        #                                   node_color,
+        #                                   title=kwargs["node_color_title"],
+        #                                   legend=alt.Legend(columns=2),
+        #                                   scale=alt.Scale(scheme="tableau20"),
+        #                                   sort="descending"),
+        #                         alt.value('lightgray')))
+        node_chart = node_chart.encode(color=alt.Color(
+                                          node_color,
+                                          title=kwargs["node_color_title"],
+                                          legend=alt.Legend(columns=2),
+                                          scale=alt.Scale(scheme="tableau20"),
+                                          sort="descending"))
+
+    if node_opacity in node_df.columns:
+
+        node_chart = node_chart.encode(opacity=alt.Opacity(node_opacity,
+                                                           title=kwargs['node_opacity_title']))
+
     if show_neighbours is True:
         neighbors = {
             node: ", ".join(
@@ -115,6 +128,7 @@ def plot_altair_network(
     node_label=None,
     node_size=None,
     node_color=None,
+    node_opacity=None,
     show_neighbours=True,
     edge_scale=1,
     edge_opacity=0.1,
@@ -148,6 +162,7 @@ def plot_altair_network(
         node_label,
         node_size,
         node_color,
+        node_opacity,
         show_neighbours,
         **kwargs
     )
