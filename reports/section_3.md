@@ -1,3 +1,4 @@
+
 # Section 3: Using predictive modelling to analyse the SIC taxonomy
 
 How well can a machine learn the relationship between what a company says it does and the SIC code that company has been assigned? 
@@ -116,7 +117,7 @@ In addition to the precision and recall positions of the codes, [#fig:precision_
 
 Overall, it is clear that there are sources of misalignment between many company's descriptions and the SIC codes that they are labelled with, and that lead to the prediction errors. A final demonstration of the impact of this is a visualisation of 4 of the less specific SIC codes across the semantic space of all company descriptions, namely 8299, 9609, 7022 and 7490. The 768 dimensional vectors are projected down to 2 dimensions for visualisation purposes via dimensionality reduction using the UMAP algorithm [@mcinnes2018umap]. Although it is not advised to draw conclusions about the exact relationship between two points according to their relative positions, due to fluctuations in the density of the space, some global trends can be determined. In this case, it is immediately clear that these codes are highly dispersed among companies with descriptions that cover the semantic space, and are neighbours to companies from a wide range of other sectors. This is likely to have a very large impact on the ability of the model to learn distinct patterns in the company descriptions belonging to these sectors, but also the sectors they they overlap with.
 
-![Comparing the silhouette score of company description embeddings and Shannon index of predictions for each 4-digit SIC code shows that SIC codes with less well defined semantic space are more likely generate a diverse array of predictions.](tables_figures/recall_vs_precision.png){#fig:precision_recall}
+![Comparing the silhouette score of company description embeddings and Shannon index of predictions for each 4-digit SIC code shows that SIC codes with less well defined semantic space are more likely generate a diverse array of predictions.](tables_figures/recall_vs_precision.png){#tbl:precision_recall}
 
 ## 2.3 Conclusion
 

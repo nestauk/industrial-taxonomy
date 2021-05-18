@@ -1,4 +1,4 @@
-# Section 5: Pilot strategy to develop a bottom-up industrial taxonomy
+# Section 5: Pilot strategy to develop a bottom-up industrial taxonomy {#sec:taxonomy}
 
 Sections 3 and 4 have provided empirical evidence of important limitations of the SIC-2007 taxonomy. They include the mismatch between business descriptions and codes for some of the SIC codes, the strong overlap between codes in different parts of the taxonomy, and the presence of semantically heterogeneous 'not elsewhere classified' codes that attract very different types of economic activity as well as some companies that could be classified elsewhere in the taxonomy.
 
