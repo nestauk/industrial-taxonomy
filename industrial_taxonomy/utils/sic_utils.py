@@ -33,7 +33,7 @@ def extract_sic_code_description(table, var_name):
     select = table.iloc[:, [loc, loc + 1]].dropna()  # Extract variable & description
     select.columns = [var_name, "description"]
 
-    select[var_name] = [re.sub(r"\.", "", str(x).strip()) for x in select[var_name]]
+    select[var_name] = [re.sub(r"\.", "", str(x)) for x in select[var_name]]
     return select.set_index(var_name)["description"].to_dict()
 
 
