@@ -33,12 +33,12 @@ def get_w2v():
 
 
 def save_model(mod, name):
-    with open(project_dir + f"/model/{name}.p", "wb") as outfile:
+    with open(os.path.join(project_dir, f"models/{name}.p"), "wb") as outfile:
         pickle.dump(mod, outfile)
 
 
 def load_model(name):
-    with open(project_dir + f"/model/{name}.p", "rb") as infile:
+    with open(os.path.join(project_dir, f"models/{name}.p"), "rb") as infile:
         model = pickle.load(infile)
     return model
 

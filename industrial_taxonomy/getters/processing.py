@@ -12,9 +12,11 @@ def get_config(element):
         out = yaml.safe_load(infile)[element]
     return out
 
+
 def get_table(name):
-    
+
     return pd.read_csv(f"{project_dir}/data/processed/{name}.csv")
+
 
 def get_networks():
 

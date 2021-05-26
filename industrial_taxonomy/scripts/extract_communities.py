@@ -29,18 +29,22 @@ method_pars = {
     algorithms.louvain: [
         ensemble.Parameter(name="resolution", start=0.7, end=1, step=0.1)
     ],
-    algorithms.leiden:[ensemble.BoolParameter(name='weights',value='weight')],
-    #algorithms.em:[k_param],
-    #algorithms.async_fluid:[k_param],
-    algorithms.agdl: [ensemble.Parameter(name="number_communities", start=20, end=50, step=10),
-    ensemble.Parameter(name="kc", start=4, end=10, step=2)],
+    algorithms.leiden: [ensemble.BoolParameter(name="weights", value="weight")],
+    # algorithms.em:[k_param],
+    # algorithms.async_fluid:[k_param],
+    algorithms.agdl: [
+        ensemble.Parameter(name="number_communities", start=20, end=50, step=10),
+        ensemble.Parameter(name="kc", start=4, end=10, step=2),
+    ],
     algorithms.chinesewhispers: [],
     # algorithms.girvan_newman: [
     #     ensemble.Parameter(name="level", start=20, end=50, step=15)
     # ],
     algorithms.label_propagation: [],
     algorithms.markov_clustering: [],
-    algorithms.sbm_dl_nested: [ensemble.Parameter(name="B_min", start=20, end=50, step=10)],
+    algorithms.sbm_dl_nested: [
+        ensemble.Parameter(name="B_min", start=20, end=50, step=10)
+    ],
 }
 
 

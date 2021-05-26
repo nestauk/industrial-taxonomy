@@ -19,9 +19,7 @@ def node_layer(
     node_chart = (
         alt.Chart(node_df)
         .mark_point(filled=True, stroke="black", strokeWidth=0.5)
-        .encode(
-            x=alt.X("x", axis=None), y=alt.Y("y", axis=None)
-        )
+        .encode(x=alt.X("x", axis=None), y=alt.Y("y", axis=None))
     )
 
     if node_size in node_df.columns:
@@ -35,7 +33,7 @@ def node_layer(
 
     if node_color in node_df.columns:
         # node_chart = node_chart.encode(
-        #     color=alt.condition(f'datum.{node_color} !== null', 
+        #     color=alt.condition(f'datum.{node_color} !== null',
         #                         alt.Color(
         #                                   node_color,
         #                                   title=kwargs["node_color_title"],
@@ -43,17 +41,21 @@ def node_layer(
         #                                   scale=alt.Scale(scheme="tableau20"),
         #                                   sort="descending"),
         #                         alt.value('lightgray')))
-        node_chart = node_chart.encode(color=alt.Color(
-                                          node_color,
-                                          title=kwargs["node_color_title"],
-                                          legend=alt.Legend(columns=2),
-                                          scale=alt.Scale(scheme="tableau20"),
-                                          sort="descending"))
+        node_chart = node_chart.encode(
+            color=alt.Color(
+                node_color,
+                title=kwargs["node_color_title"],
+                legend=alt.Legend(columns=2),
+                scale=alt.Scale(scheme="tableau20"),
+                sort="descending",
+            )
+        )
 
     if node_opacity in node_df.columns:
 
-        node_chart = node_chart.encode(opacity=alt.Opacity(node_opacity,
-                                                           title=kwargs['node_opacity_title']))
+        node_chart = node_chart.encode(
+            opacity=alt.Opacity(node_opacity, title=kwargs["node_opacity_title"])
+        )
 
     if show_neighbours is True:
         neighbors = {

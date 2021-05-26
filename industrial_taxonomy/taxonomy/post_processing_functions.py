@@ -22,8 +22,8 @@ def load_model(name):
     return model
 
 
-def save_table(table, name):
-    table.to_csv(f"{project_dir}/data/processed/{name}.csv", index=False)
+def save_table(table, name,index=False):
+    table.to_csv(f"{project_dir}/data/processed/{name}.csv", index=index)
 
 
 def make_co_occurrence_table(co_occurrence_dict):
@@ -124,8 +124,8 @@ def make_labelled_set(glass_labellled, merged_comms, count_thres):
     return labelled_set
 
 
-def train_d2v(tagged_docs):
-    d2v = Doc2Vec(min_count=2, vector_size=200)
+def train_d2v(tagged_docs, min_count=2,dimensions=100):
+    d2v = Doc2Vec(min_count=min_count, vector_size=dimensions)
     d2v.build_vocab(tagged_docs)
     d2v.train(tagged_docs, total_examples=len(tagged_docs), epochs=10)
     return d2v
@@ -148,8 +148,8 @@ def make_average_docvecs(labelled_set, doc2v):
     return vector_df
 
 
-def find_closest_sector(vect, all_vectors, d2v, counter,token_lim=4):
-    if counter % 5000==0:
+def find_closest_sector(vect, all_vectors, d2v, counter, token_lim=4):
+    if counter % 5000 == 0:
         logging.info(counter)
 
     if len(vect["token_filtered"]) < token_lim:
