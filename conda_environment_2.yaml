@@ -1,0 +1,23 @@
+name: it_faiss
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - python=3.6
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - jupyter
+  - faiss-cpu
+  - pytorch
+
+ - pip:
+    # Put any pip dependencies here (and no conda ones anywhere below)
+    - pyyaml
+    - jupyterlab
+    - jupytext
+    - flake8
+    - black
+ 
