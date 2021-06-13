@@ -137,14 +137,18 @@ if __name__ == "__main__":
     company_label_lookup = get_company_sector_lookup()
     label_name_lookup = get_sector_name_lookup()
 
+    logging.info("Reassigning sectors")
+
     (
         org_sector_container,
         transition_container,
         distance_container,
     ) = sector_reassignment_iterative(emb, company_label_lookup, iter_n=15)
 
+    logging.info("Getting closest neighbours")
     closest_sectors, distances = get_closest(emb, org_sector_container[-1], k=10)
 
+    logging,info("Saving results")
     save_reassignment_outputs(
         org_sector_container,
         transition_container,
