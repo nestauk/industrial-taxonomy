@@ -14,12 +14,14 @@ dependencies:
   - ipython
   - altair
   - clang_osx-64  # [not linux]
-  - gcc_linux-64  # [not darwin]
+  #- gcc_linux-64  # [not darwin]
   - metaflow
   - networkx
   - nltk
   - graph-tool
   - xlrd
+  - faiss-cpu
+  - pytorch
   # Put any conda dependencies here
 
   - pip:

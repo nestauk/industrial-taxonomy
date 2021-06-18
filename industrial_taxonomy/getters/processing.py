@@ -44,3 +44,10 @@ def get_company_sector_lookup():
 def get_sector_name_lookup():
     with open(f"{project_dir}/data/processed/topsbm_cluster_names.json", "r") as infile:
         return json.load(infile)
+
+def get_sector_reassignment_outputs():
+    with open(f"{project_dir}/data/processed/reassignment_analysis.p", 'rb') as infile:
+        return pickle.load(infile)
+
+
+
