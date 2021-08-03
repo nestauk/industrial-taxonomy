@@ -44,7 +44,6 @@ Run `conda activate it_faiss` to activate the environment for faiss and run `pyt
 Run `python industrial_taxonomy.scripts.report_results.py` to produce analysis and chart for the final report. 
 Run `python industrial_taxonomy.scripts.complexity_regression.py` to create the local authority dataset and run a regression analysis between measures of local economic performance and complexity based in SIC4 and text data.
 
-
 ## Code-style
 
 Please run `make lint` to format your code to a common style, and to lint code with flake8.
