@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .error {
+        color: red;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}, "axis": {"labelFontSize": 12, "titleFontSize": 14}, "legend": {"labelFontSize": 12, "titleFontSize": 14}}, "data": {"name": "data-d4b5619484e194d54a1513652265d87f"}, "facet": {"row": {"type": "nominal", "field": "dep", "sort": ["GDP per capita", "GDP growth", "Annual gross pay", "Share tertiary"], "title": "Dependent variable"}}, "spec": {"layer": [{"mark": {"type": "point", "filled": true, "size": 40, "stroke": "black", "strokeWidth": 0.5}, "encoding": {"color": {"type": "nominal", "field": "index", "legend": null}, "x": {"type": "quantitative", "field": "mean", "title": "HDI 3%-97%"}, "y": {"type": "nominal", "field": "index", "title": null}}, "height": 100, "width": 250}, {"mark": {"type": "errorbar", "color": "black"}, "encoding": {"x": {"type": "quantitative", "field": "hdi_3%", "title": "HDI 3%-97%"}, "x2": {"field": "hdi_97%"}, "y": {"type": "nominal", "field": "index", "title": null}}}]}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-d4b5619484e194d54a1513652265d87f": [{"index": "ECI SIC4", "dep": "GDP per capita", "hdi_3%": 0.143, "hdi_97%": 0.211, "mean": 0.176}, {"index": "ECI SIC4", "dep": "GDP growth", "hdi_3%": -0.01, "hdi_97%": 0.01, "mean": 0.001}, {"index": "ECI SIC4", "dep": "Share tertiary", "hdi_3%": 0.082, "hdi_97%": 0.13, "mean": 0.105}, {"index": "ECI SIC4", "dep": "Annual gross pay", "hdi_3%": 0.016, "hdi_97%": 0.039, "mean": 0.027}, {"index": "ECI text", "dep": "GDP per capita", "hdi_3%": 0.189, "hdi_97%": 0.268, "mean": 0.229}, {"index": "ECI text", "dep": "GDP growth", "hdi_3%": -0.001, "hdi_97%": 0.023, "mean": 0.011}, {"index": "ECI text", "dep": "Share tertiary", "hdi_3%": 0.126, "hdi_97%": 0.181, "mean": 0.154}, {"index": "ECI text", "dep": "Annual gross pay", "hdi_3%": 0.032, "hdi_97%": 0.06, "mean": 0.047}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div class="error" style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

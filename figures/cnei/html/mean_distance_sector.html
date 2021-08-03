@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .error {
+        color: red;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"name": "data-fa2e83b7d5e9e06f353908785841a7a4"}, "mark": {"type": "line", "point": true}, "encoding": {"x": {"type": "quantitative", "field": "iteration"}, "y": {"type": "quantitative", "field": "mean", "scale": {"zero": false}, "title": ["Mean distance", "to closest sector"]}}, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-fa2e83b7d5e9e06f353908785841a7a4": [{"mean": 197.40567016601562, "std": 29.93573570251465, "low": 167.46993446350098, "high": 227.34140586853027, "iteration": 0}, {"mean": 190.35206604003906, "std": 28.913110733032227, "low": 161.43895530700684, "high": 219.2651767730713, "iteration": 1}, {"mean": 188.3942108154297, "std": 28.311988830566406, "low": 160.08222198486328, "high": 216.7061996459961, "iteration": 2}, {"mean": 187.45367431640625, "std": 27.986831665039062, "low": 159.4668426513672, "high": 215.4405059814453, "iteration": 3}, {"mean": 186.9049530029297, "std": 27.820280075073242, "low": 159.08467292785645, "high": 214.72523307800293, "iteration": 4}, {"mean": 186.56539916992188, "std": 27.715147018432617, "low": 158.85025215148926, "high": 214.2805461883545, "iteration": 5}, {"mean": 186.32188415527344, "std": 27.644245147705078, "low": 158.67763900756836, "high": 213.96612930297852, "iteration": 6}, {"mean": 186.136962890625, "std": 27.59177589416504, "low": 158.54518699645996, "high": 213.72873878479004, "iteration": 7}, {"mean": 185.99098205566406, "std": 27.559776306152344, "low": 158.43120574951172, "high": 213.5507583618164, "iteration": 8}, {"mean": 185.8729248046875, "std": 27.532373428344727, "low": 158.34055137634277, "high": 213.40529823303223, "iteration": 9}, {"mean": 185.77650451660156, "std": 27.51291275024414, "low": 158.26359176635742, "high": 213.2894172668457, "iteration": 10}, {"mean": 185.69677734375, "std": 27.496828079223633, "low": 158.19994926452637, "high": 213.19360542297363, "iteration": 11}, {"mean": 185.63253784179688, "std": 27.47942543029785, "low": 158.15311241149902, "high": 213.11196327209473, "iteration": 12}, {"mean": 185.5832061767578, "std": 27.46277618408203, "low": 158.12042999267578, "high": 213.04598236083984, "iteration": 13}, {"mean": 185.53836059570312, "std": 27.446178436279297, "low": 158.09218215942383, "high": 212.98453903198242, "iteration": 14}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div class="error" style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

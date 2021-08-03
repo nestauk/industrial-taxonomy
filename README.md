@@ -9,6 +9,10 @@ Ensure you have AWS configured, and [git-crypt](https://github.com/AGWA/git-cryp
 
 To configure git, build the environment, and setup metaflow simply run `make install`.
 
+You will need to install a second python 3.6 environment to run `faiss`.
+
+Do this by running `conda env create --file conda_environment_2.yaml`
+
 ### Cache metaflow getters
 
 Adding `temp_dir` in a `.env` file, e.g. `temp_dir=/Users/<username>/GIT/industrial-taxonomy/data/interim/` will cause the metaflow getters to be pickled and cached in `temp_dir`. This cache will be checked and used first when running a getter - this saves downloading large files each time you run a getter at the expense of using more disk-space.
@@ -30,6 +34,15 @@ Note: metaflow does do some limited caching by itself (i.e. without setting `tem
   - Flow execution environment - `metaflow_args` in `industrial_taxonomy/flows/glass_description_ngrams/run.py`
 - Run with: `python industrial_taxonomy/flows/glass_description_ngrams/run.py`
   - Note - Runs with AWS Batch
+
+### Generation of prototype taxonomy
+
+Run `python industrial_taxonomy.script.extract_communities.py` to tokenise the glass company descriptions
+Run `python industrial_taxonomy.script.fit_topic_model.py` to fit the topic models by sector and generate various outputs that are used later
+
+Run `conda activate it_faiss` to activate the environment for faiss and run `python industrial_taxonomy.scripts.sector_reassignment` to reassign sectors using faiss
+Run `python industrial_taxonomy.scripts.report_results.py` to produce analysis and chart for the final report. 
+Run `python industrial_taxonomy.scripts.complexity_regression.py` to create the local authority dataset and run a regression analysis between measures of local economic performance and complexity based in SIC4 and text data.
 
 ## Code-style
 

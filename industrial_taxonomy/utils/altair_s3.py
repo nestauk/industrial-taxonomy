@@ -44,4 +44,3 @@ def export_chart(chart, key, bucket="industrial-taxonomy"):
     path = Path(f"{project_dir}/output/figures/{key}.png")
     path.parent.mkdir(parents=True, exist_ok=True)
     chart.save(str(path), format="png")
-

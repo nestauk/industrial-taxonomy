@@ -10,3 +10,21 @@ flows:
     run_id: 1111
 params:
   match_threshold: 75
+extraction:
+  keybert:
+    use_maxsum: True
+  sample:
+    sample_size: 10000
+  industries:
+    - category: sic4
+      code: 6201
+    - category: sic4
+      code: 7490
+taxonomy_test:
+  test_file: description_kws_6201_7490
+community_extraction:
+    min_sector_size: 1000
+    salient_filter_thres: 0.4
+company_tagging:
+    occ_thres_label: 4
+    occ_thres_tag: 4
