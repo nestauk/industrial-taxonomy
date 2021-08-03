@@ -35,6 +35,12 @@ dependencies:
     - altair_saver
     - sh
     - s3fs
+    - umap-learner
+    - openpyxl
+    - bambi
+    - arviz
+
+
 
   # Tooling requirements (don't edit)
     - tornado>=5.0  # Stops luigi breaking jupyter

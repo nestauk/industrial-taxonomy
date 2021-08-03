@@ -26,6 +26,7 @@ def calculate_centroids(emb, org_sector_lookup):
         emb_.reset_index(drop=False)
         .melt(id_vars=["org_id", "sector"], var_name="dimension")
         .groupby(["sector", "dimension"])["value"]
+        #.median()
         .mean()
         .reset_index(name="mean")
         .pivot_table(index="sector", columns="dimension", values="mean")

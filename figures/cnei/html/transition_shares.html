@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .error {
+        color: red;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}, "axis": {"labelFontSize": 12, "titleFontSize": 14}, "legend": {"labelFontSize": 12, "titleFontSize": 14}}, "data": {"name": "data-eea92e1608b5e4f4ae6166b0fe691592"}, "mark": {"type": "line", "point": true}, "encoding": {"color": {"type": "nominal", "field": "variable", "title": "Transition"}, "x": {"type": "quantitative", "field": "iteration"}, "y": {"type": "quantitative", "axis": {"format": "%"}, "field": "value", "title": "% of reassignments"}}, "height": 400, "width": 600, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-eea92e1608b5e4f4ae6166b0fe691592": [{"iteration": 0, "variable": "Same text sector", "value": 0.15710863451723778}, {"iteration": 1, "variable": "Same text sector", "value": 0.6702062285178627}, {"iteration": 2, "variable": "Same text sector", "value": 0.8237943964170399}, {"iteration": 3, "variable": "Same text sector", "value": 0.8849234454744297}, {"iteration": 4, "variable": "Same text sector", "value": 0.918643891261327}, {"iteration": 5, "variable": "Same text sector", "value": 0.9381991459222998}, {"iteration": 6, "variable": "Same text sector", "value": 0.9510259347984585}, {"iteration": 7, "variable": "Same text sector", "value": 0.9601916467034683}, {"iteration": 8, "variable": "Same text sector", "value": 0.9659566711800854}, {"iteration": 9, "variable": "Same text sector", "value": 0.9713363191334236}, {"iteration": 10, "variable": "Same text sector", "value": 0.9758358504322466}, {"iteration": 11, "variable": "Same text sector", "value": 0.9792782001874805}, {"iteration": 12, "variable": "Same text sector", "value": 0.982663264243308}, {"iteration": 13, "variable": "Same text sector", "value": 0.9847672117487761}, {"iteration": 14, "variable": "Same text sector", "value": 0.9866993021560254}, {"iteration": 0, "variable": "Same SIC4 code", "value": 0.3341318612644516}, {"iteration": 1, "variable": "Same SIC4 code", "value": 0.7465680658264764}, {"iteration": 2, "variable": "Same SIC4 code", "value": 0.8594677637746068}, {"iteration": 3, "variable": "Same SIC4 code", "value": 0.9060722841370691}, {"iteration": 4, "variable": "Same SIC4 code", "value": 0.9333298614727632}, {"iteration": 5, "variable": "Same SIC4 code", "value": 0.9491094677637746}, {"iteration": 6, "variable": "Same SIC4 code", "value": 0.9593323612123738}, {"iteration": 7, "variable": "Same SIC4 code", "value": 0.9668367878346006}, {"iteration": 8, "variable": "Same SIC4 code", "value": 0.9715237996042079}, {"iteration": 9, "variable": "Same SIC4 code", "value": 0.9758879283407978}, {"iteration": 10, "variable": "Same SIC4 code", "value": 0.9797156546193105}, {"iteration": 11, "variable": "Same SIC4 code", "value": 0.9824705759816685}, {"iteration": 12, "variable": "Same SIC4 code", "value": 0.9856525361941464}, {"iteration": 13, "variable": "Same SIC4 code", "value": 0.9873190292677846}, {"iteration": 14, "variable": "Same SIC4 code", "value": 0.9887615873346527}, {"iteration": 0, "variable": "Same SIC division", "value": 0.4129517758566816}, {"iteration": 1, "variable": "Same SIC division", "value": 0.7826476408707427}, {"iteration": 2, "variable": "Same SIC division", "value": 0.8777679408394958}, {"iteration": 3, "variable": "Same SIC division", "value": 0.9171700864493282}, {"iteration": 4, "variable": "Same SIC division", "value": 0.9410217685657744}, {"iteration": 5, "variable": "Same SIC division", "value": 0.9549682324757838}, {"iteration": 6, "variable": "Same SIC division", "value": 0.9640662430996771}, {"iteration": 7, "variable": "Same SIC division", "value": 0.9702583064264139}, {"iteration": 8, "variable": "Same SIC division", "value": 0.9746536819081346}, {"iteration": 9, "variable": "Same SIC division", "value": 0.9785386938860535}, {"iteration": 10, "variable": "Same SIC division", "value": 0.9820331215498386}, {"iteration": 11, "variable": "Same SIC division", "value": 0.9845068222060203}, {"iteration": 12, "variable": "Same SIC division", "value": 0.9872252890323925}, {"iteration": 13, "variable": "Same SIC division", "value": 0.9886261847724196}, {"iteration": 14, "variable": "Same SIC division", "value": 0.9897979377148214}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div class="error" style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
