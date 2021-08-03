@@ -39,6 +39,9 @@ def save_altair(fig, name, driver, path=FIG_PATH):
     )
     fig.save(f"{path}/html/{name}.html")
 
+def altair_text_resize(chart, sizes=[12, 14]):
 
-if __name__ == "__main__":
-    google_chrome_driver_setup()
+    ch = chart.configure_axis(
+        labelFontSize=sizes[0], titleFontSize=sizes[1]
+    ).configure_legend(labelFontSize=sizes[0], titleFontSize=sizes[1])
+    return ch
