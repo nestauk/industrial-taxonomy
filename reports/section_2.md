@@ -7,7 +7,7 @@ The core dataset for our analysis has been obtained from Glass, a startup that u
 More specifically, Glass begin from the universe of UK websites in web domain registers, identifies those that are highly likely to belong to a business, and extracts relevant information about them including their description, postcodes and sector based on an industrial taxonomy developed by LinkedIn.
 In this project, we work with information about 1.8 million business websites (which according to Glass account for 90% of UK business websites) collected in May and June 2020.
 
-The granular business descriptions contained within this dataset can be used to understand a business' economic activities at a higher level of resolution than is possible using industrial taxonomies.
+The granular business descriptions contained within this dataset can be used to understand a business' economic activities at a higher level of resolution than is possible using the SIC taxonomy.
 
 ## Labelling business websites with SIC codes by matching to Companies House {#sec:matching}
 
@@ -32,7 +32,7 @@ probabilistic data structures -
 namely the Minhash combined with Locality Sensitive Hashing (LSH) -
 and the cosine similarity computed using a chunked dot-product [^cheating].
 
-[^cheating]: This approach does in fact compute similarities up-front; however the similarity measure used is cheap to compute...
+[^cheating]: This approach does in fact compute similarities up-front; however the similarity measure used is cheap to compute.
 
 ### Probabilistic data structures (PDS) approach
 
@@ -63,14 +63,14 @@ Putting this all together, for each name in the first dataset of names (e.g. for
 ### Chunked cosine similarity approach
 
 We augment the pairs of likely similar names identified by the PDS approach with pairs identified by:
-count-vectorising names to produce a matrix for each set of names (rows are names, columns are tokens);
-{Term frequency}-{inverse document frequency} (TFIDF) transforming our matrices (considering both datasets of names to come from the same corpus for this purpose);
-computing the cosine similarity of the TFIDF scores of company names and identifying the top $n$ most cosine similar pairs in the second dataset for each name in the first dataset.
+1. count-vectorising names to produce a matrix for each set of names (rows are names, columns are tokens);
+2. {Term frequency}-{inverse document frequency} (TFIDF) transforming our matrices (considering both datasets of names to come from the same corpus for this purpose);
+3. computing the cosine similarity of the TFIDF scores of company names and identifying the top $n$ most cosine similar pairs in the second dataset for each name in the first dataset.
 
 This is performed in a computationally efficient manner by performing the dot-product between TFIDF matrices in a chunked manner.
 <!-- (which can be efficiently computed and queried for the top $n$ most similar terms). -->
 
-This provides a complementary approach to the PDS approach, which excels at capturing small character level discrepancies, by excelling at capturing word ordering differences and information about the frequency of words across the corpus of company names.
+This provides a complementary approach to the PDS approach, which excels at capturing small character level discrepancies, by taking into account word ordering differences and information about the frequency of words across the corpus of company names.
 
 ### Computing exact similarities of subset
 
@@ -115,13 +115,13 @@ Due to the timescales of this project it was not possible to access this data.
 
 ## Pre-processing of Glass business descriptions {#sec:glass_preproc}
 
-The analysis of [@sec:topsbm] and [@sec:taxonomy] requires processing the raw descriptions extracted from business' websites by Glass into a form we can use to, for example, generate a network of words where the strength of connections between words is based on how frequently they co-occur in documents. We are specially interested in removing text which is uninformative about the industry where a company operates in but is likely to appear in a website, such as for example its location.
+The analysis of [@sec:topsbm] and [@sec:taxonomy] requires processing the raw descriptions extracted from business' websites by Glass into a form we can use to, for example, train a topic model on company descriptions or generate their vector representation to measure similarities between companies. We are specially interested in removing text which is uninformative about the industry where a company operates in but is likely to appear in a website, such as for example its location.
 
 <!---
 TODO: Add references to gensim and spacy?
 --->
 
-In order to do this, we build a Natural Language Processing (NLP) pipeline using the Spacy and Gensim Python libraries, which convert the raw 'string' of a business website description into an ordered list of 'tokens' where each token is a unigram, bigram or trigram composed of the lemmatised form of a word or an (uppercased) entity type label (for a subset of entity types).
+In order to do this, we build a Natural Language Processing (NLP) pipeline using the Spacy and Gensim Python libraries, which convert the raw 'string' of a business website description into an ordered list of 'tokens' where each token is a unigram, bigram or trigram composed of the lemmatised form of a word or an (uppercased) entity type label (for a subset of entity types) [@srinivasa2018natural, @vrehuuvrek2011gensim].
 
 For example: `"I went to the Eiffel tower and visited my friend Jacques"` -> `["went", "GPE", "visit", "friend", "PERSON"
 `]

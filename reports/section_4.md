@@ -1,6 +1,6 @@
 # Hierarchical Topic modelling {#sec:topsbm}
 
-In this section, we present an unsupervised machine learning analysis by which we train a hierarchical topic model on the processed Glass descriptions.
+In this section, we present an unsupervised machine learning analysis where we train a hierarchical topic model on the processed Glass descriptions.
 This allows us to assess the semantic heterogeneity of 4-digit SIC codes
 (i.e. the extent to which they contain companies with widely varying descriptions of their activities)
 as well as semantic overlaps between codes in different parts of the SIC taxonomy.
@@ -57,7 +57,7 @@ Many similar intuitive relationships exist across related extraction, manufactur
 : High similarity pairs of divisions not captured by the SIC taxonomy. {#tbl:list-of-sims}
 
 
-The fact that the SIC taxonomy doesn't capture these relationships is more a limitation of imposing a single hierarchy (in the form of a taxonomy) than a limitation of the SIC taxonomy itself.
+The fact that the SIC taxonomy does not capture these relationships is more a limitation of imposing a single hierarchy (in the form of a taxonomy) than a limitation of the SIC taxonomy itself.
 
 Finally, we note that many sectors possess a high degree of similarity to many (if not most) industries -
  e.g. _Office administrative, office support, and other business support activities (82)_ - 
@@ -69,7 +69,7 @@ It may be the case that these services are offered across industries by one busi
 By aggregating the topic distributions by SIC, and calculating the entropy of the topic distributions for each SIC, we create a measure of the "heterogeneity" of sectors within the Glass data.
 [@Fig:hetero-class] shows the ten most heterogeneous (highest entropy) and ten least heterogeneous SIC classes according to this measure.
 The most heterogeneous sectors such as _Other personal services not elsewhere classified_ are sectors that a company may be labelled as because their activity is not well-captured by an existing SIC code.
-Such sectors are prime candidates for reclassification in some way such as adding further levels of depth to the SIC taxonomy for these highly heterogeneous codes.
+Such sectors are prime candidates for reclassification in some way such as adding further levels of depth to the SIC taxonomy for these highly heterogeneous codes - we explore a strategy to do this in Section 5.
 
 ![Ten most heterogeneous (highest entropy) and ten least heterogeneous SIC classes calculated according to the entropy of the topic distributions of each SIC class.](tables_figures/topsbm/SIC4_entropy.png){#fig:hetero-class .altair}
 
@@ -86,4 +86,4 @@ The analysis of this section has highlighted the rich structure which can be cap
 
 Furthermore, by analysing the heterogeneity of SIC codes (based on semantic overlap) we can identify the small parts of the SIC taxonomy that are less useful and may benefit from reclassification or a more granular description that captures emerging industries.
 
-The simultaneous construction of a hierarchy of topics and clusters would be a prime candidate for bottom-up taxonomy creation were it not for the fact that the method did not scale to the full Glass dataset.
+The simultaneous construction of a hierarchy of topics and clusters would be a prime candidate for bottom-up taxonomy creation were it not for the fact that the method did not scale to the full Glass dataset. Next section we leverage the structure of the SIC taxonomy to implement a similar clustering strategy in a more scalable way.
