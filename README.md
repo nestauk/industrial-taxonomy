@@ -38,10 +38,13 @@ Note: metaflow does do some limited caching by itself (i.e. without setting `tem
 ### Generation of prototype taxonomy
 
 Run `python industrial_taxonomy.script.extract_communities.py` to tokenise the glass company descriptions
+
 Run `python industrial_taxonomy.script.fit_topic_model.py` to fit the topic models by sector and generate various outputs that are used later
 
 Run `conda activate it_faiss` to activate the environment for faiss and run `python industrial_taxonomy.scripts.sector_reassignment` to reassign sectors using faiss
+
 Run `python industrial_taxonomy.scripts.report_results.py` to produce analysis and chart for the final report. 
+
 Run `python industrial_taxonomy.scripts.complexity_regression.py` to create the local authority dataset and run a regression analysis between measures of local economic performance and complexity based in SIC4 and text data.
 
 ## Code-style
