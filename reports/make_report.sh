@@ -1,0 +1,1 @@
+pandoc -F pandoc-crossref --number-sections --citeproc -s exec_summary.md introduction.md section_2.md section_3.md section_4.md section_5v2.md section_6.md -o "$1.pdf" -C

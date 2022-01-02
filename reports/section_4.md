@@ -7,9 +7,9 @@ as well as semantic overlaps between codes in different parts of the SIC taxonom
 
 The hierarchical topic model approach used is the TopSBM [@topSBM] model.
 This approach confers multiple advantages over the more traditional Latent Dirichlet Allocation (LDA) [@LDA] frequently used in the literature such as automatically selecting the number of topics; yielding a hierarchy of topics; permitting a more heterogeneous topic mixture than is permitted by LDA; and, crucially for the analysis of [@sec:similarities] generating document clusters.
-Theese benefits are not without cost - due to the high memory use[^ram] of this methodology we use only $100000$ Glass descriptions (those with the highest match score to Companies House are selected) to fit the model.
+Theese benefits are not without cost - due to the high memory use of this methodology we use only $100,000$ Glass descriptions (those with the highest match score to Companies House are selected) to fit the model.[^ram]
 
-[^ram]: Fitting the model on $100000$ documents required use of a machine with 64GB RAM.
+[^ram]: Fitting the model on $100,000$ documents required use of a machine with 64GB RAM.
 
 | Level | Number of topics | Number of clusters |
 | ----: | ---------------: | -----------------: |

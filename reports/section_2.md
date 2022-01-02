@@ -1,10 +1,10 @@
 
 # Data collection and processing
 
-## Glass.ai
+## Glass
 
 The core dataset for our analysis has been obtained from Glass, a startup that uses machine learning to collect and analyse business website data at scale.
-More specifically, Glass begin from the universe of UK websites in web domain registers, identifies those that are highly likely to belong to a business, and extracts relevant information about them including their description, postcodes and sector based on an industrial taxonomy developed by LinkedIn.
+More specifically, Glass begins from the universe of UK websites in web domain registers, identifies those that are highly likely to belong to a business, and extracts relevant information about them including their description, postcodes and sector based on an industrial taxonomy developed by LinkedIn.
 In this project, we work with information about 1.8 million business websites (which according to Glass account for 90% of UK business websites) collected in May and June 2020.
 
 The granular business descriptions contained within this dataset can be used to understand a business' economic activities at a higher level of resolution than is possible using the SIC taxonomy.
@@ -16,12 +16,12 @@ We use the monthly data snapshots for May, June, and July 2020 - available at th
 
 <!-- BONUS:, and to a lesser extent to obtain a secondary source of address data,-->
 
-The matching methodology matches the names of companies in Companies House with the names extracted by Glass from business websites based on their similarity according to some measure[^similarity].
+The matching methodology matches the names of companies in Companies House with the names extracted by Glass from business websites based on their similarity according to some measure.[^similarity]
 Naively comparing the similarity of all combinations (~4 million Companies House companies x ~1.5 million Glass websites) of names is computationally infeasible - this would take roughly 20 years (on a single CPU) assuming we could do 10,000 similarity computations per second.
 This leaves us with three options, with the third being the only one that is reasonable and possible:
 
 1. Performing the computations on a supercomputer
-2. Make a breakthrough in the field of computing by improving the performance of a fundamental algorithm by several orders of magnitudes
+2. Make a breakthrough in the field of computing by improving the performance of a fundamental algorithm by several orders of magnitude
 3. Reduce the number of pairwise comparisons by only comparing pairs that are 'likely' to be matches
 
 [^similarity]: For example the Levenshtein distance [@levenshtein].
@@ -30,13 +30,13 @@ It may sound paradoxical that we could identify pairs that are likely to be matc
 We achieve this by using two approaches:
 probabilistic data structures -
 namely the Minhash combined with Locality Sensitive Hashing (LSH) -
-and the cosine similarity computed using a chunked dot-product [^cheating].
+and the cosine similarity computed using a chunked dot-product. [^cheating]
 
 [^cheating]: This approach does in fact compute similarities up-front; however the similarity measure used is cheap to compute.
 
 ### Probabilistic data structures (PDS) approach
 
-Convert company names to a set of 'k-shingles' - a sliding window $k$ characters.
+We convert company names to a set of 'k-shingles' - a sliding window $k$ characters.
 For example,
 for $k=4$ "acme co" would become the set {"acme", "cme ", "me c", "e co"}.
 
@@ -45,11 +45,11 @@ One can measure the similarity between the k-shingle sets of two company names w
 The Jaccard similarity can be approximated using Minhash and LSH -
 a method originally used by search engines to detect near-duplicate web pages to improve their search results [@LSH].
 Below we outline the high-level concepts behind the approach.
-The interested reader should refer to Chapter 3 of [@mmds] for a thorough treatment of the theory and implementation behind MinHash and LSH.
+The interested reader should refer to Chapter 3 of @mmds for a thorough treatment of the theory and implementation behind MinHash and LSH.
 
 A Minhash is cheap to compute and has the following relation to the Jaccard similarity: The Jaccard similarity of two sets is the probability that their minhash is the same.
 By computing many ($n$) minhashes of each name (second column in [@tbl:minhash]) we can approximate probability that the minhash of two sets is the same and thus their Jaccard similarity - as $n \to \infty$ this will become exact.
-Next we use Locality Sensitive Hashing and group the $n$ MinHashes of each name into $b$ bands of size $r$ ($n = b r$) and checking for collisions in each band (third column [@tbl:minhash]) we identify names with a high probability of having the same MinHash.
+Next we use Locality Sensitive Hashing and group the $n$ MinHashes of each name into $b$ bands of size $r$ ($n = b r$) and check for collisions in each band (third column [@tbl:minhash]) we identify names with a high probability of having the same MinHash.
 Putting this all together, for each name in the first dataset of names (e.g. for each Glass name) we can efficiently identify names in the second dataset of names (e.g. Companies House names) that have a high probability of having the same MinHash and thus are likely to be highly Jaccard similar.
 
 | Name           | $n=6$ Minhashes of Name | LSH Groups ($b=2, r=3$) |
@@ -76,7 +76,7 @@ This provides a complementary approach to the PDS approach, which excels at capt
 
 After identifying these sets of similar names we can apply the exact similarity measures that were computationally infeasible to naively apply across the whole dataset.
 
-The similarity measures we chose to use for matching Glass to Companies House were:
+The similarity measures we chose to use for matching Glass to Companies House are:
 
 - Jaccard Similarity of 3-shingles (exact)
 - Cosine Similarity of TFIDF scores
@@ -121,7 +121,7 @@ The analysis of [@sec:topsbm] and [@sec:taxonomy] requires processing the raw de
 TODO: Add references to gensim and spacy?
 --->
 
-In order to do this, we build a Natural Language Processing (NLP) pipeline using the Spacy and Gensim Python libraries, which convert the raw 'string' of a business website description into an ordered list of 'tokens' where each token is a unigram, bigram or trigram composed of the lemmatised form of a word or an (uppercased) entity type label (for a subset of entity types) [@srinivasa2018natural, @vrehuuvrek2011gensim].
+In order to do this, we build a Natural Language Processing (NLP) pipeline using the Spacy and Gensim Python libraries, which convert the raw 'string' of a business website description into an ordered list of 'tokens' where each token is a unigram, bigram or trigram composed of the lemmatised form of a word or an (uppercased) entity type label (for a subset of entity types) [@srinivasa2018natural; @rehurek2011gensim].
 
 For example: `"I went to the Eiffel tower and visited my friend Jacques"` -> `["went", "GPE", "visit", "friend", "PERSON"
 `]
@@ -138,7 +138,7 @@ Steps 1-8 are performed or rely on information extracted using the Spacy `en_cor
    - punctuation
    - whitespace
 8. Extract to list of strings - lemmatise or entity form
-9. Generate n-grams - Use `gensim` to generate bi-grams, requiring that a bigram occurs at least 10 times and that the normalised pointwise mutual information (NPMI)[^NPMI] is 0.25 or higher.
+9. Generate n-grams - Use `gensim` to generate bi-grams, requiring that a bigram occurs at least 10 times and that the normalised pointwise mutual information (NPMI)is 0.25 or higher.[^NPMI]
 
 10. Filter
    - short tokens
@@ -146,7 +146,7 @@ Steps 1-8 are performed or rely on information extracted using the Spacy `en_cor
    - Words with low and very high frequency (those occurring less than 10 times and in more than 90% of documents)
 
 
-[^NPMI]: NPMI $\in [-1, 1]$ where a value of: -1 indicates tokens never occur together; 0 indicates independence; and 1 indicates complete co-occurrence.
+[^NPMI]: NPMI $\in [-1, 1]$ where a value of: -1 indicates tokens that never occur together; 0 indicates independence; and 1 indicates complete co-occurrence.
 
 #### Token lemmatisation/remapping {#sec:remapping}
 

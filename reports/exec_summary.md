@@ -8,18 +8,19 @@ author:
 date:
     - 11 May 2021
 figPrefix:
-  - "figure"
-  - "figures"
+  - "Figure"
+  - "Figures"
 tblPrefix:
-  - "table"
-  - "tables"
+  - "Table"
+  - "Tables"
 secPrefix:
-  - "section"
-  - "sections"
-bibliography: /bibliography.bib
+  - "Section"
+  - "Sections"
+bibliography: bibliography.bib
 toc-depth: 2
 toc: true
 secnumdepth: 3
+number_sections: true
 ---
 
 # Executive summary {-}
@@ -39,4 +40,4 @@ The results confirm our priors about the limitations of the SIC taxonomy current
 
 Our emerging results also illustrate the potential of a bottom-up industrial taxonomy for generating sectoral categories that can be used to measure notable economic activities for example related to sustainability and the green economy. Some limitations of our approach include insufficient coverage of sectors outside the 'knowledge economy' and the presence of some noisy sectors in the data.
 
-We conclude by setting out potential avenues to overcome these limitations and deploy, in a forthcoming ESCoE project, a bottom-up industrial taxonomy to analyse the UK economy in a way that demonstrates the value added of the methodology we have piloted here.
+We conclude by setting out potential avenues to overcome these limitations and deploy, in future projects, a bottom-up industrial taxonomy to analyse the UK economy in a way that demonstrates the value added of the methodology we have piloted here.
